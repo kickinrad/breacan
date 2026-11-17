@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/kickinrad/kumiko/compare/v0.19.0...v0.20.0) (2026-11-17)
+
+
+### Features
+
+* live kit editing with kumiko dev, a Kit panel and a kit Storybook ([#90](https://github.com/kickinrad/kumiko/issues/90)) ([16b1fd7](https://github.com/kickinrad/kumiko/commit/16b1fd7fc9ed136054f590c32c33f5117abe6ace))
+
 ## [0.19.0](https://github.com/kickinrad/kumiko/compare/v0.18.0...v0.19.0) (2026-11-09)
 
 
