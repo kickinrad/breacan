@@ -131,7 +131,7 @@ export const dev = async ({ config, port = 4400 }) => {
       // Every route answers only to this server's loopback name. A DNS-rebinding page (its own name pointed at
       // 127.0.0.1) sends its own name as Host, so it can neither read the kit and the project's files nor write.
       const host = request.headers.get("host");
-      if (!["127.0.0.1", "localhost", "[::1]"].some((name) => host === `${name}:${server.port}`)) return new Response("Unknown host", { status: 403 });
+      if (!["127.0.0.1", "localhost"].some((name) => host === `${name}:${server.port}`)) return new Response("Unknown host", { status: 403 });
       const url = new URL(request.url);
       if (url.pathname === "/" && config.playground?.path) return Response.redirect(`/${config.playground.path.replace(/^\.?\//, "")}/index.html`, 302);
       if (url.pathname === "/_kumiko/bridge.js") return new Response(bridge, { headers: { ...OPEN, "Content-Type": "text/javascript" } });

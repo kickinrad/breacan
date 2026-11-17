@@ -55,10 +55,16 @@ test("a page on a rebound name cannot edit or save, though its Host and Origin m
 
 test("a page on a rebound name cannot read the kit or the project's files", async () => {
   await ready;
+  // The server listens on 127.0.0.1 alone, so it answers to no IPv6 name either.
+  expect(await raw("/VERSION", `[::1]:${port}`)).toBe(403);
   for (const path of ["/VERSION", "/_kumiko/live", "/_kumiko/panel", "/_kumiko/bridge.js"]) {
     expect(await raw(path, `rebind.example:${port}`)).toBe(403);
     expect(await raw(path, `localhost:${port}`)).toBe(200);
   }
+});
+
+test("a scratch directory stays in the temp folder", () => {
+  expect(() => scratch("../escape-")).toThrow("not a path");
 });
 
 test("a symlink cannot serve a file from outside the project", async () => {

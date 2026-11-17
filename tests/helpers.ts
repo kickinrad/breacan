@@ -13,6 +13,7 @@ const scratches: string[] = [];
 // bunfig.toml preloads this file, so the hook is global and runs once, after every test file.
 afterAll(() => { for (const dir of scratches) rmSync(dir, { recursive: true, force: true }); });
 export const scratch = (prefix: string) => {
+  if (/[\\/]/.test(prefix)) throw new Error(`scratch: a prefix names a directory in the temp folder, not a path: ${prefix}`);
   const dir = mkdtempSync(join(tmpdir(), prefix));
   scratches.push(dir);
   return dir;
