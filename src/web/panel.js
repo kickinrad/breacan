@@ -34,7 +34,12 @@ const refresh = () => {
   for (const item of fresh.querySelectorAll("[data-item]")) {
     const shown = panel.querySelector(`[data-item="${CSS.escape(item.dataset.item)}"]`);
     if (!shown) continue;
-    shown.querySelector("small").replaceWith(item.querySelector("small"));
+    // A colour shows its contrast status; a length or time has none, and an edit can add or clear it.
+    const was = shown.querySelector(".status");
+    const now = item.querySelector(".status");
+    if (was && now) was.replaceWith(now);
+    else if (now) shown.querySelector("label").after(now);
+    else was?.remove();
     shown.querySelector("[data-tune-undo]").hidden = !(item.dataset.item in state.edits);
   }
 };
@@ -60,12 +65,21 @@ const send = async (change) => {
   queued = { ...queued, ...change };
   if (sending) return;
   sending = true;
-  while (Object.keys(queued).length) {
-    const body = queued;
-    queued = {};
-    state.problem = (await post("/_kumiko/edit", body)).error ?? "";
+  let body = {};
+  try {
+    while (Object.keys(queued).length) {
+      body = queued;
+      queued = {};
+      state.problem = (await post("/_kumiko/edit", body)).error ?? "";
+    }
+  } catch (error) {
+    // The server is gone or answered with something other than JSON: say so, and keep the unsent values for the
+    // next edit to carry.
+    queued = { ...body, ...queued };
+    state.problem = `Not sent: ${error.message}`;
+  } finally {
+    sending = false;
   }
-  sending = false;
   refresh();
 };
 
@@ -91,9 +105,13 @@ document.addEventListener("click", async (event) => {
     return draw();
   }
   if (event.target.closest("[data-tune-save]")) {
-    const result = await post("/_kumiko/save", {});
-    state.problem = result.error ?? "";
-    if (!result.error) state.edits = {};
+    try {
+      const result = await post("/_kumiko/save", {});
+      state.problem = result.error ?? "";
+      if (!result.error) state.edits = {};
+    } catch (error) {
+      state.problem = `Not saved: ${error.message}`;
+    }
     return draw();
   }
 });

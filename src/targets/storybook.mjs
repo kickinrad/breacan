@@ -249,6 +249,17 @@ export default {
     };
     // Each site is a story (a docs page has no addon panel), the page in a frame that fills the canvas.
     if (options.sites?.length) {
+      // Each story's export is a JavaScript identifier made from the site's name, kept apart from the name it shows:
+      // one that would start with a digit or repeat another gains a "Site" prefix or a number.
+      const taken = new Set();
+      const exportName = (name) => {
+        const words = name.replace(/[^A-Za-z0-9]+(.)?/g, (_, next = "") => next.toUpperCase()).replace(/^./, (first) => first.toUpperCase());
+        const base = /^[A-Za-z]/.test(words) ? words : `Site${words}`;
+        let id = base;
+        for (let count = 2; taken.has(id); count += 1) id = `${base}${count}`;
+        taken.add(id);
+        return id;
+      };
       files["sites.stories.js"] = `// The project's sites, live: each loads kumiko dev's bridge, so an edit in the Kit panel restyles it. Stories
 // return HTML (@storybook/html-vite).
 export default { title: "Site/Live", parameters: { layout: "fullscreen" } };
@@ -263,7 +274,7 @@ const frame = (url, title, mode) => {
   return iframe;
 };
 ${options.sites.map((site) => `
-export const ${site.name.replace(/[^A-Za-z0-9]+(.)?/g, (_, next = "") => next.toUpperCase()).replace(/^./, (first) => first.toUpperCase())} = {
+export const ${exportName(site.name)} = {
   name: ${JSON.stringify(site.name)},
   render: (args, { globals }) => frame(${JSON.stringify(site.url)}, ${JSON.stringify(site.name)}, globals.theme),
 };`).join("\n")}

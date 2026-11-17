@@ -50,6 +50,16 @@ test("writes the theme, manager, preview, docs and site stories, and --check pas
   expect(read(dir, ".storybook/sites.stories.js")).toContain('title: "Site/Live"');
 });
 
+test("a site story's export is a valid identifier, whatever the site is called", () => {
+  const dir = kit('{ sites: [{ name: "24/7 Site", url: "https://a.test/" }, { name: "Our site", url: "https://b.test/" }, { name: "Our-site", url: "https://c.test/" }] }');
+  expect(run(dir).exitCode).toBe(0);
+  const stories = read(dir, ".storybook/sites.stories.js");
+  expect(() => new Bun.Transpiler({ loader: "jsx" }).transformSync(stories)).not.toThrow();
+  expect(stories).toContain("export const Site247Site = {");
+  expect(stories).toContain("export const OurSite2 = {");
+  expect(stories).toContain('"24/7 Site"');
+});
+
 test("path and dev are options", () => {
   const dir = kit('{ path: "sb", dev: "http://localhost:5000" }');
   expect(run(dir).exitCode).toBe(0);

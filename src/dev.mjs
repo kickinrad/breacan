@@ -3,7 +3,7 @@
 // (/_kumiko/bridge.js) or listens to /_kumiko/events. Save writes the edits into theme.toml and rebuilds; a change to
 // the kit's sources on disk rebuilds every output and sends "reload".
 import { watch } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, realpath, writeFile } from "node:fs/promises";
 import { extname, join, resolve, sep } from "node:path";
 import { build } from "./build.mjs";
 import { contrastPairs } from "./checks/contrast.mjs";
@@ -37,7 +37,7 @@ const bridge = `// kumiko's live bridge: the kit's CSS from kumiko dev, updated 
 `;
 
 export const dev = async ({ config, port = 4400 }) => {
-  const root = resolve(".");
+  const root = await realpath(resolve("."));
   const kitRoot = resolve(config.kit?.root ?? "design");
   const themeFile = join(kitRoot, "theme.toml");
   const cssPath = config.css?.path;
@@ -76,7 +76,16 @@ export const dev = async ({ config, port = 4400 }) => {
     clearTimeout(pending);
     pending = setTimeout(() => rebuild().then(() => send("reload", {}), (error) => send("problem", { message: error.message })), 100);
   };
-  for (const dir of [kitRoot, resolve("tokens")]) try { watch(dir, changed); } catch {}
+  // tokens/ is optional, so a missing one is skipped; any other failure to watch is reported, since edits on disk would
+  // otherwise go unseen.
+  const report = (dir) => (error) => console.error(`kumiko dev: not watching ${dir}: ${error.message}`);
+  for (const dir of [kitRoot, resolve("tokens")]) {
+    try {
+      watch(dir, changed).on("error", report(dir));
+    } catch (error) {
+      if (!(error.code === "ENOENT" && dir !== kitRoot)) report(dir)(error);
+    }
+  }
 
   // The panel's page: the kit's draft css (replaced live), the panel's stylesheet on the kit's variables, its client.
   const panel = async () => {
@@ -101,9 +110,13 @@ export const dev = async ({ config, port = 4400 }) => {
   };
 
   const json = (body, status = 200) => Response.json(body, { status, headers: OPEN });
-  // A write from this page only: the browser sends Origin on a cross-site POST, and a JSON body needs a preflight
-  // this server never grants, so no other site can edit or save.
-  const ours = (request) => request.headers.get("origin") === new URL(request.url).origin && request.headers.get("content-type") === "application/json";
+  // A write from this page only. Host must name this server on the loopback address, which stops a DNS-rebinding page
+  // (its own name pointed at 127.0.0.1) that would send a matching Host and Origin. The browser sends Origin on a
+  // cross-site POST, and a JSON body needs a preflight this server never grants, so no other site can edit or save.
+  const ours = (request) => {
+    const host = request.headers.get("host");
+    return ["127.0.0.1", "localhost", "[::1]"].some((name) => host === `${name}:${server.port}`) && request.headers.get("origin") === `http://${host}` && request.headers.get("content-type") === "application/json";
+  };
 
   const server = Bun.serve({
     hostname: "127.0.0.1",
@@ -148,8 +161,8 @@ export const dev = async ({ config, port = 4400 }) => {
           return json({ error: error.message }, 400);
         }
       }
-      // The project's own files, nothing outside it.
-      const file = resolve(root, `.${decodeURIComponent(url.pathname)}`);
+      // The project's own files, nothing outside it: the boundary holds on the real path, so a symlink cannot lead out.
+      const file = await realpath(resolve(root, `.${decodeURIComponent(url.pathname)}`)).catch(() => "");
       if (!file.startsWith(root + sep)) return new Response("Not found", { status: 404 });
       const body = Bun.file(file);
       if (!(await body.exists())) return new Response("Not found", { status: 404 });

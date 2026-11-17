@@ -1,7 +1,8 @@
 // kumiko dev: an edit is built in memory and sent live; only its own pages may edit or save; save writes exactly the
 // edited values into theme.toml, and the outputs pass --check after (tests/playground/ is the kit).
 import { afterAll, expect, test } from "bun:test";
-import { cpSync, mkdtempSync, readFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { connect } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { command, root, run } from "./helpers";
@@ -35,6 +36,31 @@ test("a page elsewhere cannot edit or save", async () => {
   expect((await post("/_kumiko/save", {}, "https://example.com")).status).toBe(403);
 });
 
+// A raw request, so the test sets Host itself, as a DNS-rebinding page's browser would.
+const raw = (path: string, host: string, body = "{}") => new Promise<number>((done, fail) => {
+  const socket = connect(port, "127.0.0.1", () => socket.write(`POST ${path} HTTP/1.1\r\nHost: ${host}\r\nOrigin: http://${host}\r\nContent-Type: application/json\r\nContent-Length: ${body.length}\r\nConnection: close\r\n\r\n${body}`));
+  let reply = "";
+  socket.on("data", (chunk) => { reply += chunk; });
+  socket.on("end", () => done(Number(reply.split(" ")[1])));
+  socket.on("error", fail);
+});
+
+test("a page on a rebound name cannot edit or save, though its Host and Origin match", async () => {
+  await ready;
+  expect(await raw("/_kumiko/edit", `rebind.example:${port}`, '{"palette.night.blue":"#00ff00"}')).toBe(403);
+  expect(await raw("/_kumiko/save", `rebind.example:${port}`)).toBe(403);
+  expect(await raw("/_kumiko/edit", `127.0.0.1:${port}`, "{}")).toBe(200);
+});
+
+test("a symlink cannot serve a file from outside the project", async () => {
+  await ready;
+  const outside = mkdtempSync(join(tmpdir(), "kumiko-outside-"));
+  writeFileSync(join(outside, "secret.txt"), "outside");
+  symlinkSync(join(outside, "secret.txt"), join(dir, "leak.txt"));
+  expect((await fetch(`${origin}/leak.txt`)).status).toBe(404);
+  expect((await fetch(`${origin}/VERSION`)).status).toBe(200);
+});
+
 test("save writes exactly the edited values, and --check passes after", async () => {
   await ready;
   await post("/_kumiko/edit", { "faces.brand": ["Archivo", "serif"] });
@@ -56,9 +82,10 @@ test("the panel page carries the kit's draft CSS and the panel's client", async 
 test("the event stream stays open past Bun's idle timeout", async () => {
   await ready;
   const reader = (await fetch(`${origin}/_kumiko/events`)).body!.getReader();
-  await reader.read();
-  const next = reader.read();
+  // A late rebuild from an earlier test's save may send events meanwhile; only the stream's end fails this.
+  let closed = false;
+  (async () => { while (!(await reader.read()).done); closed = true; })().catch(() => {});
   await Bun.sleep(13_000);
-  expect(await Promise.race([next.then(({ done }) => (done ? "closed" : "data")), Bun.sleep(10).then(() => "open")])).toBe("open");
+  expect(closed).toBe(false);
   await reader.cancel();
 }, 20_000);
