@@ -1,10 +1,9 @@
 // A kit's hand-written design/theme.toml becomes token layers in memory: nothing is written beside it.
 import { expect, test } from "bun:test";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import material from "../src/material.mjs";
-import { command, read, root, run } from "./helpers";
+import { command, read, root, run, scratch } from "./helpers";
 
 
 // The fixture fills every Material colour role with ink, but primary.
@@ -33,7 +32,7 @@ mono = "Some Mono"
 
 // A kit project on Material, with one token file of its own; the kit's root is design/.
 const kitProject = (toml: string | null = theme, config = 'kit: { name: "acme" }, include: ["builtin:material"]') => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-theme-"));
+  const dir = scratch("tokens-theme-");
   mkdirSync(join(dir, "tokens"));
   mkdirSync(join(dir, "design"));
   writeFileSync(join(dir, "tokens/own.tokens.json"),
@@ -65,13 +64,15 @@ test("a kit with a theme.toml builds, writing only its outputs", () => {
   expect(css).toContain("Some Sans");
 });
 
-test("the base mode holds the palette, the roles and the faces, brand and plain in Material's slots", () => {
+test("the base mode holds the palette, the roles and the faces, brand and plain in Material's slots, plain following brand", () => {
   const dir = kitProject();
   run(dir);
   const { base } = blocks(dir);
   expect(base).toContain("--acme-palette-blue: #7aa2f7;");
   expect(base).toContain("--md-sys-color-surface: #101418;");
   expect(base).toContain("--md-ref-typeface-brand: 'Some Sans';");
+  // Plain follows brand when only brand is set: one face for everything, not Material's Roboto underneath.
+  expect(base).toContain("--md-ref-typeface-plain: 'Some Sans';");
   expect(base).toContain("--acme-typeface-mono: 'Some Mono';");
 });
 
@@ -146,7 +147,7 @@ test("a kit with no theme.toml builds from its token files", () => {
 });
 
 test("without a kit a theme.toml is ignored and the golden outputs are byte-identical", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-theme-golden-"));
+  const dir = scratch("tokens-theme-golden-");
   cpSync(join(root, "tests/fixture"), dir, { recursive: true });
   mkdirSync(join(dir, "design"));
   writeFileSync(join(dir, "design/theme.toml"), theme);

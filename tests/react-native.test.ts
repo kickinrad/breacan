@@ -1,11 +1,10 @@
 import { expect, test } from "bun:test";
-import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { read, root, run } from "./helpers";
+import { read, root, run, scratch } from "./helpers";
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), "kumiko-react-native-"));
+  const dir = scratch("kumiko-react-native-");
   for (const entry of ["design", "VERSION"]) cpSync(join(root, "tests/outputs", entry), join(dir, entry), { recursive: true });
   writeFileSync(join(dir, "kumiko.config.mjs"), `export default { targets: ["react-native"], include: ["builtin:material"], kit: { name: "acme" }, "react-native": { path: "ports/react-native/tokens.ts" } };\n`);
   return dir;
@@ -44,9 +43,18 @@ test("react-native requires a kit, output path and exactly one light/dark counte
   expect(run(dir).stderr.toString()).toContain("needs a declared kit");
 });
 
-test("react-native refuses relative CSS dimensions", () => {
+test("react-native converts rem at 16px per rem, so a web measure keeps its CSS form", async () => {
   const dir = project();
-  const theme = read(dir, "design/theme.toml").replace('"acme.layout.card-gap" = "8px"', '"acme.layout.card-gap" = "1rem"');
+  const theme = read(dir, "design/theme.toml").replace('"acme.layout.card-gap" = "8px"', '"acme.layout.card-gap" = "2.5rem"');
   writeFileSync(join(dir, "design/theme.toml"), theme);
-  expect(run(dir).stderr.toString()).toContain("acme.layout.card-gap must use px");
+  expect(run(dir).exitCode).toBe(0);
+  const module = await import(join(dir, "ports/react-native/tokens.ts"));
+  expect(module.tokens.night.acme.layout["card-gap"]).toBe(40);
+});
+
+test("react-native refuses dimensions relative to a parent", () => {
+  const dir = project();
+  const theme = read(dir, "design/theme.toml").replace('"acme.layout.card-gap" = "8px"', '"acme.layout.card-gap" = "1.5em"');
+  writeFileSync(join(dir, "design/theme.toml"), theme);
+  expect(run(dir).stderr.toString()).toContain("acme.layout.card-gap must use px or rem");
 });

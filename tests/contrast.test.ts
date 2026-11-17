@@ -1,12 +1,12 @@
 // The colour maths live in the engine, and a kit's declared contrast pairs are checked in every mode.
 import { describe, expect, test } from "bun:test";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
   bestOn, byPath, contrast, hsl, linear, luminance, mix, rgb, stateLayer, textSafe,
 } from "../src/color.mjs";
 import { contrastPairs, toHex } from "../src/checks/contrast.mjs";
+import { scratch } from "./helpers";
 
 describe("colour maths", () => {
   test("luminance runs from 0 (black) to 1 (white)", () => {
@@ -94,7 +94,7 @@ min = 3
 `;
   // Base is light; the dark mode swaps bg and fg, with its own mark, and `dark` may change its fg further.
   const kit = (contrast: string, { dark = "#ffffff", tokens = "" } = {}) => {
-    const dir = mkdtempSync(join(tmpdir(), "tokens-contrast-"));
+    const dir = scratch("tokens-contrast-");
     mkdirSync(join(dir, "design"));
     writeFileSync(join(dir, "VERSION"), "1.0.0\n");
     writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
@@ -189,7 +189,7 @@ ${contrast}`);
   });
 
   test("with no kit, nothing is checked and the golden outputs stay byte-identical", () => {
-    const dir = mkdtempSync(join(tmpdir(), "tokens-contrast-golden-"));
+    const dir = scratch("tokens-contrast-golden-");
     cpSync(join(root, "tests/fixture"), dir, { recursive: true });
     expect(run(dir).exitCode).toBe(0);
     for (const file of ["src/styles/tokens.css", "DESIGN.md"]) {

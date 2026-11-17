@@ -1,13 +1,12 @@
 // `kumiko audit` on a kit: the sample kit (tests/playground/ with tests/render.theme.toml, a complete theme) passes in
 // headless Chrome; a page that breaks a rule fails, naming it. Needs Chrome (`kumiko audit` finds it).
 import { expect, test } from "bun:test";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { root, run } from "./helpers";
+import { root, run, scratch } from "./helpers";
 
 const kit = () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-render-"));
+  const dir = scratch("tokens-render-");
   for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   cpSync(join(root, "tests/render.theme.toml"), join(dir, "design/theme.toml"));
   // The project's own example: an entry with one capture (a 1×1 PNG).

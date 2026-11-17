@@ -1,9 +1,8 @@
 // The tailwind, compose-tv, obsidian and mealie outputs, built from a small kit (tests/outputs/) with a design/theme.toml.
 import { expect, test } from "bun:test";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { command, read, root, run } from "./helpers";
+import { cpSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { command, read, root, run, scratch } from "./helpers";
 
 const golden = join(root, "tests/outputs/expected");
 const files = (dir: string, at = ""): string[] => readdirSync(join(dir, at)).flatMap((entry) =>
@@ -11,7 +10,7 @@ const files = (dir: string, at = ""): string[] => readdirSync(join(dir, at)).fla
 const outputs = files(golden);
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-outputs-"));
+  const dir = scratch("tokens-outputs-");
   for (const entry of ["design", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/outputs", entry), join(dir, entry), { recursive: true });
   return dir;
 };
@@ -187,7 +186,7 @@ test("compose-tv on a plain Material kit exports no layout values it lacks, and 
 });
 
 test("an output without a declared kit fails, saying so", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-outputs-"));
+  const dir = scratch("tokens-outputs-");
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/own.tokens.json"), JSON.stringify({ own: { gap: { $type: "dimension", $value: { value: 4, unit: "px" } } } }));
   writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["tailwind"], tailwind: { path: "a.css", css: "b.css" } };\n');

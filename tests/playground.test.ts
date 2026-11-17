@@ -1,15 +1,14 @@
 // The playground output: one kit-agnostic page on the kit's web outputs that carries the kit's data (tests/playground/ is the kit).
 import { expect, test } from "bun:test";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { contrast } from "../src/color.mjs";
 import { HEADER_LINE } from "../src/header.mjs";
-import { command, read, root, run } from "./helpers";
+import { command, read, root, run, scratch } from "./helpers";
 
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-playground-"));
+  const dir = scratch("tokens-playground-");
   for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   return dir;
 };

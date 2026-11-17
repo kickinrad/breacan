@@ -1,0 +1,3 @@
+[test]
+# The test helpers remove every scratch directory once the run ends.
+preload = ["./tests/helpers.ts"]
