@@ -1,17 +1,16 @@
 // The web targets: css pins a mode with `scheme` and carries Material's springs, and beer themes Beer CSS.
 import { expect, test } from "bun:test";
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { cpSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import beerCss from "beercss/dist/cdn/beer.css" with { type: "text" };
 import material from "../src/material.mjs";
 import { settle, springEasing } from "../src/motion.mjs";
-import { command, read, root, run } from "./helpers";
+import { command, read, root, run, scratch } from "./helpers";
 
 const golden = (file: string) => readFileSync(join(root, "tests/web/expected", file), "utf8");
 
 const project = (config?: string) => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-web-"));
+  const dir = scratch("tokens-web-");
   cpSync(join(root, "tests/web/tokens"), join(dir, "tokens"), { recursive: true });
   cpSync(join(root, "tests/web/kumiko.config.mjs"), join(dir, "kumiko.config.mjs"));
   writeFileSync(join(dir, "VERSION"), "1.0.0\n");

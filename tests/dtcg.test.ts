@@ -1,13 +1,12 @@
 // The dtcg output: a kit's resolved tokens as DTCG files, which a consumer includes to build its own outputs.
 import { expect, test } from "bun:test";
-import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { read, root, run } from "./helpers";
+import { read, root, run, scratch } from "./helpers";
 
 // acme, the sample kit, with the dtcg output beside its css.
 const kit = () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-dtcg-kit-"));
+  const dir = scratch("tokens-dtcg-kit-");
   for (const entry of ["design", "tokens", "VERSION"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   writeFileSync(join(dir, "kumiko.config.mjs"), `export default {
   targets: ["css", "dtcg"], include: ["builtin:material"], kit: { name: "acme" },
@@ -36,7 +35,7 @@ test("writes the base mode and each other mode's differences, aliases resolved, 
 
 test("a consumer that includes the files beneath builtin:material builds the kit's own css", () => {
   const dir = kit();
-  const app = mkdtempSync(join(tmpdir(), "tokens-dtcg-app-"));
+  const app = scratch("tokens-dtcg-app-");
   mkdirSync(join(app, "kit"));
   for (const file of ["acme.tokens.json", "acme.day.tokens.json"]) cpSync(join(dir, "tokens-out", file), join(app, "kit", file));
   writeFileSync(join(app, "kumiko.config.mjs"), `export default {
@@ -51,7 +50,7 @@ test("a consumer that includes the files beneath builtin:material builds the kit
 });
 
 test("every colour, a derived role's too, is a DTCG 2025.10 colour object", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-dtcg-derived-"));
+  const dir = scratch("tokens-dtcg-derived-");
   cpSync(join(root, "tests/derived"), dir, { recursive: true });
   writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" }, dtcg: { path: "out" } };\n');
   const result = run(dir);

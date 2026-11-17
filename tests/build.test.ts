@@ -1,13 +1,12 @@
 // Golden outputs were frozen from the design-system 2.1.0 template; any byte change fails.
 import { expect, test } from "bun:test";
-import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { command, read, root, run } from "./helpers";
+import { appendFileSync, cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { command, read, root, run, scratch } from "./helpers";
 import { reads } from "../src/targets/beer.mjs";
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-"));
+  const dir = scratch("tokens-");
   cpSync(join(root, "tests/fixture"), dir, { recursive: true });
   return dir;
 };
@@ -40,7 +39,7 @@ test("a token file that isn't valid JSON fails the build with the parse error, n
 });
 
 test("a token set in two source files fails the build naming both, not a hang (#7)", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-collision-"));
+  const dir = scratch("tokens-collision-");
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ x: { $type: "number", $value: 1 } }));
   writeFileSync(join(dir, "tokens/b.tokens.json"), JSON.stringify({ x: { $type: "number", $value: 3 } }));
@@ -61,7 +60,7 @@ test("a project target is a module the config imports and lists", () => {
 });
 
 test("token files build in sorted order, whatever order the filesystem lists them", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-order-"));
+  const dir = scratch("tokens-order-");
   mkdirSync(join(dir, "tokens"));
   // Scrambled creation order: directory listing order differs from sorted order on common filesystems.
   const names = ["web", "foundation", "m", "c", "x", "b", "q", "a"];
@@ -84,7 +83,7 @@ test("an unknown target fails loudly", () => {
 });
 
 test("include files are a silent base: project tokens override them, in the base and in media", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-include-"));
+  const dir = scratch("tokens-include-");
   mkdirSync(join(dir, "tokens"));
   mkdirSync(join(dir, "vendor"));
   const dim = (value: number) => ({ $type: "dimension", $value: { value, unit: "px" } });
@@ -163,7 +162,7 @@ test("with no kit, a target's ctx carries no kit keys", () => {
 
 // A kit's tokens are not schema-checked: a hex-string colour builds and passes --check.
 test("a kit with hex-string colours passes --check", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-hex-"));
+  const dir = scratch("tokens-hex-");
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/brand.tokens.json"), JSON.stringify({ color: { ink: { $type: "color", $value: "#121416" } } }));
   writeFileSync(join(dir, "VERSION"), "1.0.0\n");
@@ -176,7 +175,7 @@ test("a kit with hex-string colours passes --check", () => {
 
 // The built-in Material 3 baseline: `builtin:material` in include, read from the engine, never from the project.
 const materialProject = (include: string) => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-material-"));
+  const dir = scratch("tokens-material-");
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/project.tokens.json"), JSON.stringify({
     md: { sys: { shape: { corner: { medium: { $type: "dimension", $value: { value: 20, unit: "px" } } } } } },

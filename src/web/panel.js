@@ -74,15 +74,14 @@ const flush = async () => {
   } catch (error) {
     // The server is gone or answered with something other than JSON.
     state.problem = `Not sent: ${error.message}`;
-  } finally {
-    sending = undefined;
   }
   refresh();
 };
 const send = (change) => {
   for (const [path, value] of Object.entries(change)) if (value === null) delete state.edits[path]; else state.edits[path] = value;
   queued = { ...queued, ...change };
-  return (sending ??= flush());
+  // Cleared on the promise itself: a flush with nothing to send finishes before this line could assign it.
+  return (sending ??= flush().finally(() => { sending = undefined; }));
 };
 
 document.addEventListener("input", (event) => {
@@ -109,7 +108,8 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-tune-save]")) {
     try {
       // Save writes what the server holds, so every edit must reach it first.
-      await (sending ?? send({}));
+      await sending;
+      if (unsent()) await send({});
       if (unsent()) {
         state.problem = `Not saved: ${unsent()} edit${unsent() === 1 ? "" : "s"} not sent`;
         return draw();

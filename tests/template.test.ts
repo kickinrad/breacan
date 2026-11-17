@@ -1,10 +1,9 @@
 // The template output: a kit's own files for apps the engine has no output for (terminal and editor themes), each a
 // template whose {{<mode>.<colour>}} slots the theme's palette fills.
 import { expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { read, run } from "./helpers";
+import { read, run, scratch } from "./helpers";
 
 const THEME = `name = "acme"
 default = "night"
@@ -22,7 +21,7 @@ blue = "#2e7de9"
 `;
 
 const kit = (templates: Record<string, string>) => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-template-"));
+  const dir = scratch("tokens-template-");
   writeFileSync(join(dir, "VERSION"), "0.5.0\n");
   writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates", to: "ports" } };\n');
   mkdirSync(join(dir, "design"));

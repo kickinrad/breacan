@@ -91,6 +91,15 @@ test("Save refuses while an edit is unsent, and sends the queue before saving", 
   expect($("[data-changes]")?.textContent).toContain("No changes");
 });
 
+test("an edit after a Save still reaches the server", async () => {
+  await edit("palette.night.signal", "#333333");
+  await click("[data-tune-save]");
+  const before = posts.length;
+  await edit("palette.night.signal", "#444444");
+  expect(posts.slice(before)).toEqual([{ path: "/_kumiko/edit", body: { "palette.night.signal": "#444444" } }]);
+  expect($("[data-changes]")?.textContent).toContain("1 unsaved change");
+});
+
 test("a failed undo stays queued until the server has it", async () => {
   await edit("palette.night.signal", "#222222");
   failPosts = true;

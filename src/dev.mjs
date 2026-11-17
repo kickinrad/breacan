@@ -83,11 +83,15 @@ export const dev = async ({ config, port = 4400 }) => {
 
   await rebuild();
   // A change on disk (the kit's folder, tokens/) rebuilds and tells every listener to reload. theme.toml as Save last
-  // wrote it is already built, so the server's own write reloads nothing.
+  // wrote it is already built, so the server's own write reloads nothing; once theme.toml holds anything else, every
+  // later change rebuilds, a revert to the saved text included.
   let pending;
   let wrote;
   const changed = async (_, file) => {
-    if (file === "theme.toml" && wrote !== undefined && (await readFile(themeFile, "utf8").catch(() => undefined)) === wrote) return;
+    if (file === "theme.toml" && wrote !== undefined) {
+      if ((await readFile(themeFile, "utf8").catch(() => undefined)) === wrote) return;
+      wrote = undefined;
+    }
     clearTimeout(pending);
     pending = setTimeout(() => rebuild().then(() => send("reload", {}), (error) => send("problem", { message: error.message })), 100);
   };

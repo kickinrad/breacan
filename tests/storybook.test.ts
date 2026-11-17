@@ -1,13 +1,12 @@
 // The storybook output: Storybook's UI from the kit, the preview on the kit's CSS and modes, generated docs pages, and
 // each site as a story (tests/playground/ is the kit).
 import { expect, test } from "bun:test";
-import { cpSync, mkdtempSync, readdirSync, renameSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { read, root, run } from "./helpers";
+import { read, root, run, scratch } from "./helpers";
 
 const kit = (options: string) => {
-  const dir = mkdtempSync(join(tmpdir(), "kumiko-storybook-"));
+  const dir = scratch("kumiko-storybook-");
   for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   renameSync(join(dir, "kumiko.config.mjs"), join(dir, "base.config.mjs"));
   writeFileSync(join(dir, "kumiko.config.mjs"), `import base from "./base.config.mjs";\nexport default { ...base, targets: [...base.targets, "storybook"], storybook: ${options} };\n`);

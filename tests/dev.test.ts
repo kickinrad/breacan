@@ -1,14 +1,13 @@
 // kumiko dev: an edit is built in memory and sent live; only its own pages may edit or save; save writes exactly the
 // edited values into theme.toml, and the outputs pass --check after (tests/playground/ is the kit).
 import { afterAll, expect, test } from "bun:test";
-import { cpSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { connect } from "node:net";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { watchSources } from "../src/dev.mjs";
-import { command, root, run } from "./helpers";
+import { command, root, run, scratch } from "./helpers";
 
-const dir = mkdtempSync(join(tmpdir(), "kumiko-dev-"));
+const dir = scratch("kumiko-dev-");
 for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
 const port = 4800 + Math.floor(Math.random() * 1000);
 const server = Bun.spawn([...command, "dev", "--port", String(port)], { cwd: dir, stdout: "pipe", stderr: "pipe" });
@@ -64,7 +63,7 @@ test("a page on a rebound name cannot read the kit or the project's files", asyn
 
 test("a symlink cannot serve a file from outside the project", async () => {
   await ready;
-  const outside = mkdtempSync(join(tmpdir(), "kumiko-outside-"));
+  const outside = scratch("kumiko-outside-");
   writeFileSync(join(outside, "secret.txt"), "outside");
   symlinkSync(join(outside, "secret.txt"), join(dir, "leak.txt"));
   expect((await fetch(`${origin}/leak.txt`)).status).toBe(404);
@@ -96,10 +95,14 @@ test("save writes exactly the edited values without reloading the pages, and --c
   expect(run(dir, "--check").exitCode).toBe(0);
 });
 
-test("an edit to theme.toml on disk reloads the pages", async () => {
+test("an edit to theme.toml on disk reloads the pages, and so does a revert to the saved text", async () => {
   await ready;
   const file = join(dir, "design/theme.toml");
-  expect(await listen(1000, () => writeFileSync(file, `${readFileSync(file, "utf8")}\n# edited by hand\n`))).toContain("event: reload");
+  const saved = readFileSync(file, "utf8");
+  expect(await listen(1000, () => writeFileSync(file, saved.replace('blue = "#ff0000"', 'blue = "#00ff00"')))).toContain("event: reload");
+  expect((await live()).css).toContain("#00ff00");
+  expect(await listen(1000, () => writeFileSync(file, saved))).toContain("event: reload");
+  expect((await live()).css).not.toContain("#00ff00");
 });
 
 test("a source folder that cannot be watched is reported, unless it is optional and absent", () => {

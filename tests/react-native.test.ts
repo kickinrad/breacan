@@ -1,11 +1,10 @@
 import { expect, test } from "bun:test";
-import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { read, root, run } from "./helpers";
+import { read, root, run, scratch } from "./helpers";
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), "kumiko-react-native-"));
+  const dir = scratch("kumiko-react-native-");
   for (const entry of ["design", "VERSION"]) cpSync(join(root, "tests/outputs", entry), join(dir, entry), { recursive: true });
   writeFileSync(join(dir, "kumiko.config.mjs"), `export default { targets: ["react-native"], include: ["builtin:material"], kit: { name: "acme" }, "react-native": { path: "ports/react-native/tokens.ts" } };\n`);
   return dir;

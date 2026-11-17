@@ -1,13 +1,12 @@
 // The derived roles: on-colours, accent containers, fixed roles and group marks, from theme.toml's [derived],
 // computed in memory and read by every output, as the css output shows.
 import { expect, test } from "bun:test";
-import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { read, root, run } from "./helpers";
+import { read, root, run, scratch } from "./helpers";
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-derived-"));
+  const dir = scratch("tokens-derived-");
   cpSync(join(root, "tests/derived"), dir, { recursive: true });
   return dir;
 };

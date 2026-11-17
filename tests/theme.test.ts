@@ -1,10 +1,9 @@
 // A kit's hand-written design/theme.toml becomes token layers in memory: nothing is written beside it.
 import { expect, test } from "bun:test";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import material from "../src/material.mjs";
-import { command, read, root, run } from "./helpers";
+import { command, read, root, run, scratch } from "./helpers";
 
 
 // The fixture fills every Material colour role with ink, but primary.
@@ -33,7 +32,7 @@ mono = "Some Mono"
 
 // A kit project on Material, with one token file of its own; the kit's root is design/.
 const kitProject = (toml: string | null = theme, config = 'kit: { name: "acme" }, include: ["builtin:material"]') => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-theme-"));
+  const dir = scratch("tokens-theme-");
   mkdirSync(join(dir, "tokens"));
   mkdirSync(join(dir, "design"));
   writeFileSync(join(dir, "tokens/own.tokens.json"),
@@ -148,7 +147,7 @@ test("a kit with no theme.toml builds from its token files", () => {
 });
 
 test("without a kit a theme.toml is ignored and the golden outputs are byte-identical", () => {
-  const dir = mkdtempSync(join(tmpdir(), "tokens-theme-golden-"));
+  const dir = scratch("tokens-theme-golden-");
   cpSync(join(root, "tests/fixture"), dir, { recursive: true });
   mkdirSync(join(dir, "design"));
   writeFileSync(join(dir, "design/theme.toml"), theme);

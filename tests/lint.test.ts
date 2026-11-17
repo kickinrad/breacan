@@ -1,16 +1,15 @@
 // `kumiko lint` fails a consumer's hand-typed colour, motion, type size, radius, spacing or z-index, and markup off Beer.
 import { expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { command, root } from "./helpers";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { command, root, scratch } from "./helpers";
 
 const lint = (dir: string, ...paths: string[]) => {
   const result = Bun.spawnSync([...command, "lint", ...paths], { cwd: dir, stderr: "pipe", stdout: "pipe" });
   return { code: result.exitCode, out: result.stdout.toString(), err: result.stderr.toString() };
 };
 const project = (files: Record<string, string>) => {
-  const dir = mkdtempSync(join(tmpdir(), "lint-"));
+  const dir = scratch("lint-");
   for (const [path, content] of Object.entries(files)) {
     mkdirSync(dirname(join(dir, path)), { recursive: true });
     writeFileSync(join(dir, path), content);

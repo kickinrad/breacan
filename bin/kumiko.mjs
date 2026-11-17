@@ -55,7 +55,7 @@ if (verb === "dev") {
   const { dev } = await import("../src/dev.mjs");
   try {
     const server = await dev({ config, port });
-    console.log(`kumiko dev: http://localhost:${server.port}/ (the bridge is http://localhost:${server.port}/_kumiko/bridge.js)`);
+    console.log(`kumiko dev: http://localhost:${server.port}/ (the bridge is http://localhost:${server.port}/_kumiko/bridge.js); it answers only to localhost, 127.0.0.1 and [::1]`);
   } catch (error) {
     console.error(error.message);
     process.exit(1);
