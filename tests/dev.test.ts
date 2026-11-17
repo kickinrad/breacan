@@ -5,6 +5,7 @@ import { cpSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "n
 import { connect } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { watchSources } from "../src/dev.mjs";
 import { command, root, run } from "./helpers";
 
 const dir = mkdtempSync(join(tmpdir(), "kumiko-dev-"));
@@ -37,8 +38,9 @@ test("a page elsewhere cannot edit or save", async () => {
 });
 
 // A raw request, so the test sets Host itself, as a DNS-rebinding page's browser would.
-const raw = (path: string, host: string, body = "{}") => new Promise<number>((done, fail) => {
-  const socket = connect(port, "127.0.0.1", () => socket.write(`POST ${path} HTTP/1.1\r\nHost: ${host}\r\nOrigin: http://${host}\r\nContent-Type: application/json\r\nContent-Length: ${body.length}\r\nConnection: close\r\n\r\n${body}`));
+const raw = (path: string, host: string, body?: string) => new Promise<number>((done, fail) => {
+  const request = body === undefined ? `GET ${path} HTTP/1.1\r\nHost: ${host}\r\n` : `POST ${path} HTTP/1.1\r\nHost: ${host}\r\nOrigin: http://${host}\r\nContent-Type: application/json\r\nContent-Length: ${body.length}\r\n`;
+  const socket = connect(port, "127.0.0.1", () => socket.write(`${request}Connection: close\r\n\r\n${body ?? ""}`));
   let reply = "";
   socket.on("data", (chunk) => { reply += chunk; });
   socket.on("end", () => done(Number(reply.split(" ")[1])));
@@ -48,8 +50,16 @@ const raw = (path: string, host: string, body = "{}") => new Promise<number>((do
 test("a page on a rebound name cannot edit or save, though its Host and Origin match", async () => {
   await ready;
   expect(await raw("/_kumiko/edit", `rebind.example:${port}`, '{"palette.night.blue":"#00ff00"}')).toBe(403);
-  expect(await raw("/_kumiko/save", `rebind.example:${port}`)).toBe(403);
+  expect(await raw("/_kumiko/save", `rebind.example:${port}`, "{}")).toBe(403);
   expect(await raw("/_kumiko/edit", `127.0.0.1:${port}`, "{}")).toBe(200);
+});
+
+test("a page on a rebound name cannot read the kit or the project's files", async () => {
+  await ready;
+  for (const path of ["/VERSION", "/_kumiko/live", "/_kumiko/panel", "/_kumiko/bridge.js"]) {
+    expect(await raw(path, `rebind.example:${port}`)).toBe(403);
+    expect(await raw(path, `localhost:${port}`)).toBe(200);
+  }
 });
 
 test("a symlink cannot serve a file from outside the project", async () => {
@@ -61,14 +71,42 @@ test("a symlink cannot serve a file from outside the project", async () => {
   expect((await fetch(`${origin}/VERSION`)).status).toBe(200);
 });
 
-test("save writes exactly the edited values, and --check passes after", async () => {
+// Everything the event stream sends for a while.
+const listen = async (ms: number, during: () => unknown = () => {}) => {
+  const reader = (await fetch(`${origin}/_kumiko/events`)).body!.getReader();
+  const decoder = new TextDecoder();
+  let text = "";
+  const reading = (async () => { for (let chunk; !(chunk = await reader.read()).done; ) text += decoder.decode(chunk.value); })().catch(() => {});
+  await during();
+  await Bun.sleep(ms);
+  await reader.cancel();
+  await reading;
+  return text;
+};
+
+test("save writes exactly the edited values without reloading the pages, and --check passes after", async () => {
   await ready;
   await post("/_kumiko/edit", { "faces.brand": ["Archivo", "serif"] });
-  expect((await post("/_kumiko/save", {})).status).toBe(200);
+  const events = await listen(1000, async () => expect((await post("/_kumiko/save", {})).status).toBe(200));
+  expect(events).toContain("event: live");
+  expect(events).not.toContain("event: reload");
   const saved = readFileSync(join(dir, "design/theme.toml"), "utf8").split("\n");
   const changed = saved.filter((line, i) => line !== theme.split("\n")[i]);
   expect(changed).toEqual(['blue = "#ff0000"', 'brand = ["Archivo", "serif"]']);
   expect(run(dir, "--check").exitCode).toBe(0);
+});
+
+test("an edit to theme.toml on disk reloads the pages", async () => {
+  await ready;
+  const file = join(dir, "design/theme.toml");
+  expect(await listen(1000, () => writeFileSync(file, `${readFileSync(file, "utf8")}\n# edited by hand\n`))).toContain("event: reload");
+});
+
+test("a source folder that cannot be watched is reported, unless it is optional and absent", () => {
+  const reported: string[] = [];
+  const missing = join(dir, "nowhere");
+  watchSources([{ dir: missing }, { dir: join(dir, "absent"), optional: true }], () => {}, (each) => reported.push(each));
+  expect(reported).toEqual([missing]);
 });
 
 test("the panel page carries the kit's draft CSS and the panel's client", async () => {
@@ -82,10 +120,10 @@ test("the panel page carries the kit's draft CSS and the panel's client", async 
 test("the event stream stays open past Bun's idle timeout", async () => {
   await ready;
   const reader = (await fetch(`${origin}/_kumiko/events`)).body!.getReader();
-  // A late rebuild from an earlier test's save may send events meanwhile; only the stream's end fails this.
-  let closed = false;
-  (async () => { while (!(await reader.read()).done); closed = true; })().catch(() => {});
+  // Events from an earlier test may arrive meanwhile; only the stream ending, or failing, fails this.
+  let ended: unknown = false;
+  (async () => { while (!(await reader.read()).done); ended = "closed"; })().catch((error) => { ended = error; });
   await Bun.sleep(13_000);
-  expect(closed).toBe(false);
+  expect(ended).toBe(false);
   await reader.cancel();
 }, 20_000);

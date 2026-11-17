@@ -57,30 +57,32 @@ const apply = (live) => {
 };
 
 const post = async (path, body) => (await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })).json();
-let sending = false;
+// Values the server has not yet confirmed, and the request carrying them.
 let queued = {};
-// Sends an edit; one request at a time, the latest values winning.
-const send = async (change) => {
-  for (const [path, value] of Object.entries(change)) if (value === null) delete state.edits[path]; else state.edits[path] = value;
-  queued = { ...queued, ...change };
-  if (sending) return;
-  sending = true;
-  let body = {};
+let sending;
+const unsent = () => Object.keys(queued).length;
+// Sends the queued values; one request at a time, the latest values winning. A value leaves the queue only once the
+// server has it, so a failed request leaves it for the next edit or Save to carry.
+const flush = async () => {
   try {
-    while (Object.keys(queued).length) {
-      body = queued;
-      queued = {};
-      state.problem = (await post("/_kumiko/edit", body)).error ?? "";
+    while (unsent()) {
+      const body = queued;
+      const result = await post("/_kumiko/edit", body);
+      for (const [path, value] of Object.entries(body)) if (queued[path] === value) delete queued[path];
+      state.problem = result.error ?? "";
     }
   } catch (error) {
-    // The server is gone or answered with something other than JSON: say so, and keep the unsent values for the
-    // next edit to carry.
-    queued = { ...body, ...queued };
+    // The server is gone or answered with something other than JSON.
     state.problem = `Not sent: ${error.message}`;
   } finally {
-    sending = false;
+    sending = undefined;
   }
   refresh();
+};
+const send = (change) => {
+  for (const [path, value] of Object.entries(change)) if (value === null) delete state.edits[path]; else state.edits[path] = value;
+  queued = { ...queued, ...change };
+  return (sending ??= flush());
 };
 
 document.addEventListener("input", (event) => {
@@ -106,6 +108,12 @@ document.addEventListener("click", async (event) => {
   }
   if (event.target.closest("[data-tune-save]")) {
     try {
+      // Save writes what the server holds, so every edit must reach it first.
+      await (sending ?? send({}));
+      if (unsent()) {
+        state.problem = `Not saved: ${unsent()} edit${unsent() === 1 ? "" : "s"} not sent`;
+        return draw();
+      }
       const result = await post("/_kumiko/save", {});
       state.problem = result.error ?? "";
       if (!result.error) state.edits = {};

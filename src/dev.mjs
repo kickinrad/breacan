@@ -36,6 +36,18 @@ const bridge = `// kumiko's live bridge: the kit's CSS from kumiko dev, updated 
 })();
 `;
 
+// Watches each source folder for changes. An optional folder that is not there is skipped; any other failure to watch
+// is reported, since edits on disk would otherwise go unseen.
+export const watchSources = (sources, changed, report = (dir, error) => console.error(`kumiko dev: not watching ${dir}: ${error.message}`)) => {
+  for (const { dir, optional } of sources) {
+    try {
+      watch(dir, changed).on("error", (error) => report(dir, error));
+    } catch (error) {
+      if (!(optional && error.code === "ENOENT")) report(dir, error);
+    }
+  }
+};
+
 export const dev = async ({ config, port = 4400 }) => {
   const root = await realpath(resolve("."));
   const kitRoot = resolve(config.kit?.root ?? "design");
@@ -70,22 +82,16 @@ export const dev = async ({ config, port = 4400 }) => {
   const rebuild = async () => { await build(config); edits = {}; await preview(); };
 
   await rebuild();
-  // A change on disk (the kit's folder, tokens/) rebuilds and tells every listener to reload.
+  // A change on disk (the kit's folder, tokens/) rebuilds and tells every listener to reload. theme.toml as Save last
+  // wrote it is already built, so the server's own write reloads nothing.
   let pending;
-  const changed = () => {
+  let wrote;
+  const changed = async (_, file) => {
+    if (file === "theme.toml" && wrote !== undefined && (await readFile(themeFile, "utf8").catch(() => undefined)) === wrote) return;
     clearTimeout(pending);
     pending = setTimeout(() => rebuild().then(() => send("reload", {}), (error) => send("problem", { message: error.message })), 100);
   };
-  // tokens/ is optional, so a missing one is skipped; any other failure to watch is reported, since edits on disk would
-  // otherwise go unseen.
-  const report = (dir) => (error) => console.error(`kumiko dev: not watching ${dir}: ${error.message}`);
-  for (const dir of [kitRoot, resolve("tokens")]) {
-    try {
-      watch(dir, changed).on("error", report(dir));
-    } catch (error) {
-      if (!(error.code === "ENOENT" && dir !== kitRoot)) report(dir)(error);
-    }
-  }
+  watchSources([{ dir: kitRoot }, { dir: resolve("tokens"), optional: true }], changed);
 
   // The panel's page: the kit's draft css (replaced live), the panel's stylesheet on the kit's variables, its client.
   const panel = async () => {
@@ -110,18 +116,18 @@ export const dev = async ({ config, port = 4400 }) => {
   };
 
   const json = (body, status = 200) => Response.json(body, { status, headers: OPEN });
-  // A write from this page only. Host must name this server on the loopback address, which stops a DNS-rebinding page
-  // (its own name pointed at 127.0.0.1) that would send a matching Host and Origin. The browser sends Origin on a
-  // cross-site POST, and a JSON body needs a preflight this server never grants, so no other site can edit or save.
-  const ours = (request) => {
-    const host = request.headers.get("host");
-    return ["127.0.0.1", "localhost", "[::1]"].some((name) => host === `${name}:${server.port}`) && request.headers.get("origin") === `http://${host}` && request.headers.get("content-type") === "application/json";
-  };
+  // A write from this page only: the browser sends Origin on a cross-site POST, and a JSON body needs a preflight this
+  // server never grants, so no other site can edit or save.
+  const ours = (request) => request.headers.get("origin") === `http://${request.headers.get("host")}` && request.headers.get("content-type") === "application/json";
 
   const server = Bun.serve({
     hostname: "127.0.0.1",
     port,
     async fetch(request, server) {
+      // Every route answers only to this server's loopback name. A DNS-rebinding page (its own name pointed at
+      // 127.0.0.1) sends its own name as Host, so it can neither read the kit and the project's files nor write.
+      const host = request.headers.get("host");
+      if (!["127.0.0.1", "localhost", "[::1]"].some((name) => host === `${name}:${server.port}`)) return new Response("Unknown host", { status: 403 });
       const url = new URL(request.url);
       if (url.pathname === "/" && config.playground?.path) return Response.redirect(`/${config.playground.path.replace(/^\.?\//, "")}/index.html`, 302);
       if (url.pathname === "/_kumiko/bridge.js") return new Response(bridge, { headers: { ...OPEN, "Content-Type": "text/javascript" } });
@@ -154,6 +160,7 @@ export const dev = async ({ config, port = 4400 }) => {
           const { text, contrast } = await preview();
           if (contrast.length) return json({ error: `Not saved: ${contrast.length} pair${contrast.length === 1 ? " is" : "s are"} under its floor`, contrast }, 409);
           const saved = Object.keys(edits);
+          wrote = text;
           await writeFile(themeFile, text);
           await rebuild();
           return json({ saved });
