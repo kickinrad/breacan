@@ -11,6 +11,7 @@
   "private": true,
   "author": "wils <wils@bestfootforward.business>",
   "dependencies": {
+    "@adobe/leonardo-contrast-colors": "latest",
     "@material/material-color-utilities": "latest",
     "@radix-ui/colors": "latest",
     "@terrazzo/parser": "latest",

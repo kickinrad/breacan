@@ -60,6 +60,7 @@ const loadKit = async (kit) => {
 export const build = async (config = {}, { check = false, preview = false, theme: themeText,
   configFile = ["breacan.config.mjs", "kumiko.config.mjs"].find((file) => existsSync(file)) } = {}) => {
   const modules = resolveModules(config);
+  const foundations = modules.filter((module) => module.slot === "foundation");
   const kit = await loadKit(config.kit);
 
   // The layers, lowest first: built-in trees, include files, the kit's theme.toml, then the project's own tokens/
@@ -76,7 +77,9 @@ export const build = async (config = {}, { check = false, preview = false, theme
   // builtin:base fills every contract role: Material beneath, the base's shared values, then its colours in the
   // scheme of the kit's base mode, and the other scheme under the colour-scheme query. A kit with no modes takes
   // light, with dark under (prefers-color-scheme: dark).
-  const base = (config.include ?? []).includes("builtin:base");
+  // A colour engine (a foundation module) builds on the base, which fills every role it leaves.
+  const base = (config.include ?? []).includes("builtin:base") || foundations.length > 0;
+  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]) })));
   const schemeQuery = Object.keys(media).find((query) => /prefers-color-scheme:\s*(light|dark)/.test(query));
   if (base && !modes) {
     modes = { base: "light", media: { "(prefers-color-scheme: dark)": "dark" } };
@@ -85,7 +88,8 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const baseScheme = /prefers-color-scheme:\s*light/.test(schemeQuery ?? "") ? "dark" : "light";
   if (base) {
     const query = schemeQuery ?? "(prefers-color-scheme: dark)";
-    media[query]?.unshift({ tree: colours(baseScheme === "dark" ? "light" : "dark"), file: "builtin:base" });
+    const other = baseScheme === "dark" ? "light" : "dark";
+    media[query]?.unshift({ tree: colours(other), file: "builtin:base" }, ...engines.map((engine, i) => ({ tree: engine[other], file: foundations[i].name })));
   }
   const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
   const baseFiles = standard ? [] : listed.filter((file) => file.endsWith(".tokens.json")).map((file) => `tokens/${file}`)
@@ -100,7 +104,8 @@ export const build = async (config = {}, { check = false, preview = false, theme
   }
   if (base) {
     if (!builtins.some((layer) => layer.file === material.name)) builtins.push({ tree: material.tokens(), file: material.name });
-    builtins.push({ tree: shared(), file: "builtin:base" }, { tree: colours(baseScheme), file: "builtin:base" });
+    builtins.push({ tree: shared(), file: "builtin:base" }, { tree: colours(baseScheme), file: "builtin:base" },
+      ...engines.map((engine, i) => ({ tree: engine[baseScheme], file: foundations[i].name })));
   }
   include.unshift(...builtins);
   if (theme.tree) include.push({ tree: theme.tree, file: "theme.toml" });
@@ -188,7 +193,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const built = (path) => outputs.find((output) => resolve(output.path) === resolve(path))?.content;
   const moduleConfig = { ...config, targets: modules.map((module) => module.name),
     ...Object.fromEntries(modules.map((module) => [module.name, withDefaults(module, config[module.name])])) };
-  for (const module of modules) {
+  for (const module of modules.filter((each) => each.slot === "output")) {
     const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, list, built, ...kit,
       ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }) };
     const files = await module.run({ ...base, render: (name) => render(name, base), options: optionsFor(module, base, config[module.name]) });

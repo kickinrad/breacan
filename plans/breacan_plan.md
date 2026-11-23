@@ -156,7 +156,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 3. [x] **Output contract** (prefactor). Put the targets behind the module shape and presets. Delete material-you, compose-tv and `builtin:material-tv`, which no consumer builds. Keep storybook, dev and audit until their replacements land. Route: implementation-hard. Demo: tokyo outputs byte-identical to the goldens; acceptance 2. Blocked by: 2.
 4. [x] **Standard load, one kit first.** Load tokyo-material's tokens through `@terrazzo/parser` and write its resolver. Then compile theme.toml to DTCG and a resolver, then replace `--check` with the receipt, keeping the header rule. Route: implementation-hard. Demo: acceptance 3. Blocked by: 3.
 5. [x] **Role contract and neutral base.** Write the contract and the base that fills it, with the base check. Route: implementation-hard. Demo: acceptance 4 on a web-only kit. Blocked by: 4.
-6. [ ] **Seed starter.** Leonardo and Material colour modules and `breacan new --seed`. Route: implementation. Demo: walkthrough A on web; acceptance 8. Blocked by: 5.
+6. [x] **Seed starter.** Leonardo and Material colour modules and `breacan new --seed`. Route: implementation. Demo: walkthrough A on web; acceptance 8. Blocked by: 5.
 7. [ ] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
 8. [ ] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
 9. [ ] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
@@ -214,6 +214,11 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - `include: ["builtin:base"]` (`src/base.mjs`) fills them all over Material: Radix gray, blue, slate, violet and red (step 11 accents, step 4 containers), Spectrum type and spacing, Fluent 2 durations, easings and shadow tiers, a system font stack, 48px touch target.
   - Design calls for the owner: blue as the base accent, bold headings, 48px touch target, Material's corners kept.
   - Evidence: a web kit with nothing but the base builds light with dark under its query, every colour role present, each on-role at 4.5:1 or more on its role in both modes (`tests/base.test.ts`, acceptance 4 on web).
+- Task 6, seed starter (implementation, Demo passed first try).
+  - The `foundation` slot opens with two colour engines: `leonardo` (default; accents at 5.5:1 light and 7:1 dark against the base surface, containers at 1.25 and 1.35, container text at 10 and 11) and `material` (tonal spot from the first seed; later seeds replace secondary and tertiary palettes).
+  - `breacan new --seed <hex>… [--engine material] [<dir>]` writes a starter config and VERSION on the default preset.
+  - Shortcut: Leonardo 1.1 warns about its own internal `colorspace` argument; `src/foundations/leonardo.mjs` hides that one message while it runs.
+  - Evidence: `tests/seed.test.ts` builds walkthrough A on web from two seeds (every default output, every colour role, check passes), proves Leonardo meets its targets, and proves the Material engine equals `SchemeTonalSpot` for #6750a4 role by role in both schemes (acceptance 8).
 
 ## Related
 

@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 import pkg from "../package.json" with { type: "json" };
 import { build } from "../src/build.mjs";
 
-const USAGE = "breacan [build | check | lint <file>… | audit [<dir>] | dev [--port <n>] | --version]";
+const USAGE = "breacan [build | check | new --seed <hex>… [<dir>] | lint <file>… | audit [<dir>] | dev [--port <n>] | --version]";
 const fail = (message) => { console.error(message); process.exit(1); };
 const exit = (findings) => { if (findings.length) console.log(findings.join("\n")); process.exit(findings.length ? 1 : 0); };
 
@@ -21,11 +21,20 @@ if (verb === "--version") {
   process.exit(0);
 }
 const port = verb === "dev" && rest[0] === "--port" && /^\d+$/.test(rest[1] ?? "") ? Number(rest[1]) : undefined;
-const extra = verb === "lint" || verb === "audit" ? undefined
+const extra = verb === "lint" || verb === "audit" || verb === "new" ? undefined
   : verb === "dev" ? (port ? rest.slice(2) : rest)[0]
   : verb === "build" || verb === "check" ? rest[0]
   : verb;
 if (extra !== undefined) fail(`breacan: unknown ${extra} (${USAGE})`);
+
+if (verb === "new") {
+  const { create } = await import("../src/new.mjs");
+  try {
+    const { dir, name } = await create(rest);
+    console.log(`breacan new: the ${name} kit is in ${dir}; run breacan build there`);
+    process.exit(0);
+  } catch (error) { fail(error.message); }
+}
 
 if (verb === "lint") {
   const { lint } = await import("../src/lint.mjs");

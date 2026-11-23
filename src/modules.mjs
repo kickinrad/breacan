@@ -2,10 +2,14 @@
 // `slot` says when the engine runs it, `reads` names what of ctx it needs, and `writes` maps each option that says
 // where it writes to its default, null when the config must set it. A preset is a named list of built-in modules.
 import outputs from "./outputs/index.mjs";
+import leonardo from "./foundations/leonardo.mjs";
+import materialColour from "./foundations/material.mjs";
 import { needKit } from "./system.mjs";
 
-// The slots that run today, in run order. Each new slot joins here when its first two modules land.
-export const SLOTS = ["output"];
+// The slots that run today, in run order. Each new slot joins here when its first two modules land. A foundation
+// gives every colour role in both schemes ({ light, dark } token trees) over the base; an output writes files.
+export const SLOTS = ["foundation", "output"];
+const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour };
 
 // The kumiko target shape { name, build }, still read until every consumer has moved.
 const normalize = (module) => module && typeof module.build === "function" && module.run === undefined
@@ -24,7 +28,7 @@ export const resolveModules = (config) => {
   const listed = [...(presets[config.preset] ?? []).filter((name) => !without.has(name)), ...(config.modules ?? config.targets ?? [])];
   if (!listed.length) throw new Error("breacan.config.mjs names no modules");
   return listed.map((spec) => {
-    const module = normalize(typeof spec === "string" ? outputs[spec] : spec);
+    const module = normalize(typeof spec === "string" ? builtin[spec] : spec);
     if (!module) throw new Error(`Unknown token target ${spec}`);
     const name = module.name ?? spec;
     if (typeof module.run !== "function") throw new Error(`Token target ${name} has no build()`);
