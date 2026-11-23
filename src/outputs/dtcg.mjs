@@ -6,7 +6,6 @@
 // Options: path (a directory).
 import { join, resolve } from "node:path";
 import { text } from "../header.mjs";
-import { need, needKit } from "../system.mjs";
 
 const kept = (token) => !(token.builtin && token.path.startsWith("md.comp."));
 // A colour as DTCG 2025.10 writes it: a derived role, and an alias of one, holds a hex string.
@@ -30,10 +29,12 @@ const file = (tokens, description) => {
 };
 
 export default {
+  slot: "output",
   name: "dtcg",
-  async build({ tokens, media, mediaTokens, options, name, version, modes = { media: {} } }) {
-    needKit({ name, version }, "dtcg");
-    const dir = need(options, "dtcg", "path");
+  reads: ["tokens", "media", "kit"],
+  writes: { path: null },
+  async run({ tokens, media, mediaTokens, options, name, version, modes = { media: {} } }) {
+    const dir = options.path;
     if (resolve(dir) === resolve("tokens")) throw new Error("dtcg: tokens/ is the project's own token source; write the output elsewhere");
     const header = text({ name, version }, "dtcg");
     const base = tokens.filter(kept);

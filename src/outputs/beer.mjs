@@ -29,9 +29,12 @@ const system = ({ iconFont, shadowOpacity }) => ({
 export const reads = new Set([...`${materialCss}${layoutCss}${Object.values(system({})).join("")}`.matchAll(/var\(--(md-comp-[a-z0-9-]+)/g)].map((match) => match[1]));
 
 export default {
+  slot: "output",
   name: "beer",
-  async build({ tokens, options, name }) {
-    const { path = "src/styles/beer.css" } = options;
+  reads: ["tokens"],
+  writes: { path: "src/styles/beer.css" },
+  async run({ tokens, options, name }) {
+    const { path } = options;
     const own = (rest) => name && tokens.some((token) => token.path === `${name}.${rest}`) ? `${name}.${rest}` : undefined;
     const [iconFont, shadowOpacity, monoFont] = [own("typeface.icon"), own("elevation.shadow-opacity"), own("typeface.mono")];
     const content = [

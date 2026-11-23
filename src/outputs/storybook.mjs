@@ -5,7 +5,7 @@
 // sites ([{ name, url }]: pages each shown in a story, framed; the stories are @storybook/html-vite's), logo (an image path for the
 // sidebar, relative to path). Needs the css output, listed before it.
 import { relative } from "node:path";
-import { need, needKit } from "../system.mjs";
+import { need } from "../system.mjs";
 import { contrastPairs } from "../checks/contrast.mjs";
 import { fontLinks } from "../web/foundations.js";
 import { source } from "./playground.mjs";
@@ -118,11 +118,13 @@ export const Roles = () => {
 `;
 
 export default {
+  slot: "output",
   name: "storybook",
-  async build(ctx) {
-    needKit(ctx, "storybook");
+  reads: ["tokens", "media", "kit"],
+  writes: { path: ".storybook" },
+  async run(ctx) {
     const { tokens, media, mediaTokens, options, config, name, title, theme, modes = { base: "base", media: {} } } = ctx;
-    const dir = options.path ?? ".storybook";
+    const dir = options.path;
     const dev = options.dev ?? "http://localhost:4400";
     const cssPath = need(config.css ?? {}, "css", "path");
     if (!config.targets.indexOf || config.targets.indexOf("css") > config.targets.indexOf("storybook")) throw new Error("storybook: list the css output before it");

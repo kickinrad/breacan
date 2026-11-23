@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { appendFileSync, cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { command, read, root, run, scratch } from "./helpers";
-import { reads } from "../src/targets/beer.mjs";
+import { reads } from "../src/outputs/beer.mjs";
 
 const project = () => {
   const dir = scratch("tokens-");
@@ -157,7 +157,7 @@ test("with no kit, a target's ctx carries no kit keys", () => {
   const dir = kitProject(undefined, null);
   expect(run(dir).exitCode).toBe(0);
   expect(JSON.parse(read(dir, "echo.json")).keys).toEqual(
-    ["built", "config", "media", "mediaTokens", "options", "readExisting", "tokens"]);
+    ["built", "config", "media", "mediaTokens", "options", "readExisting", "render", "tokens"]);
 });
 
 // A kit's tokens are not schema-checked: a hex-string colour builds and passes --check.
@@ -217,10 +217,9 @@ const tokensOf = (dir: string) => {
   return JSON.parse(read(dir, "tokens.json")) as { path: string; builtin?: boolean }[];
 };
 
-test("builtin:material is Material 3 only; builtin:material-tv adds tv-material's card defaults", () => {
+test("builtin:material is Material 3 only, with no TV layer beside it", () => {
   expect(tokensOf(materialProject('"builtin:material"')).some((token) => token.path.startsWith("md.comp.tv-card."))).toBe(false);
-  const tv = tokensOf(materialProject('"builtin:material", "builtin:material-tv"'));
-  expect(tv.find((token) => token.path === "md.comp.tv-card.focused-scale")?.builtin).toBe(true);
+  expect(run(materialProject('"builtin:material", "builtin:material-tv"')).stderr.toString()).toContain("Unknown built-in include builtin:material-tv");
 });
 
 test("css writes Material's own component tokens only where Beer's layer reads them, and a project's own always", () => {

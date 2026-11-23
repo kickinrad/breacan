@@ -1,6 +1,6 @@
 // React Native / Expo values for both theme modes. CSS-only shadows and Material's unchanged
 // component defaults stay out; the rest keep their DTCG path as a nested, typed object.
-import { need, needKit, twoModes } from "../system.mjs";
+import { twoModes } from "../system.mjs";
 import { typeScale } from "../type.mjs";
 
 // A rem is the web's root font size, 16px by default; em and % depend on a parent React Native does not have.
@@ -40,10 +40,12 @@ const modeStyles = (tokens) => Object.fromEntries(Object.entries(typeScale(token
 }]));
 
 export default {
+  slot: "output",
   name: "react-native",
-  async build(ctx) {
-    needKit(ctx, "react-native");
-    const path = need(ctx.options, "react-native", "path");
+  reads: ["tokens", "media", "kit"],
+  writes: { path: null },
+  async run(ctx) {
+    const { path } = ctx.options;
     if (!path.endsWith(".ts")) throw new Error("react-native: path must end in .ts");
     const [base, other] = twoModes(ctx, "react-native");
     const second = await ctx.mediaTokens(other.files);

@@ -12,7 +12,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
 import tailwind from "../web/tailwind.html" with { type: "text" };
-import { need, needKit } from "../system.mjs";
+import { need } from "../system.mjs";
 import { iconLink } from "../web/foundations.js";
 
 // Beer's stylesheet, installed with the engine (the binary carries Beer's dist/cdn folder as assets). Its shapes are
@@ -62,22 +62,24 @@ const notesHtml = (text) => Bun.markdown.html(text.replace(/^\s*# [^\n]*\n/, "")
 const lines = (tokens) => `[\n${tokens.map(({ path, value, type, description, derived }) => `      ${JSON.stringify({ path, value, type, description, derived })}`).join(",\n")}\n    ]`;
 
 export default {
+  slot: "output",
   name: "playground",
-  async build(ctx) {
-    needKit(ctx, "playground");
+  reads: ["tokens", "media", "kit"],
+  writes: { path: null },
+  async run(ctx) {
     const { tokens, media, mediaTokens, options, config, readExisting, built, root, name, version, theme, modes = { base: "base", media: {} } } = ctx;
-    const dir = need(options, "playground", "path");
+    const dir = options.path;
     // A sibling output's file, as its own options name it.
     const sibling = (target) => config.targets.includes(target) ? need(config[target] ?? {}, target, "path") : undefined;
-    // A sibling output's text as this run made it.
-    const made = (target) => {
+    // A sibling output's text as this run made it, or made in memory when the config leaves it out.
+    const made = async (target) => {
       const path = sibling(target);
-      if (!path) throw new Error(`playground needs the ${target} output in the config`);
+      if (!path) return ctx.render(target);
       const text = built(path);
       if (text === undefined) throw new Error(`playground: list the ${target} output before it`);
       return text;
     };
-    const [css, beer] = [made("css"), made("beer")];
+    const [css, beer] = [await made("css"), await made("beer")];
     const { css: beerStyles, release } = await beerCss();
     const iconFace = (tokens.find((token) => token.path === `${name}.typeface.icon`)?.value ?? "Material Symbols Outlined").split(",")[0].trim().replace(/^["']|["']$/g, "");
     const notes = await readExisting(join(root, "notes.md"));

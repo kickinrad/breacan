@@ -126,10 +126,11 @@ test("a missing path fails, naming it", () => {
   expect(result.stderr.toString()).toContain('playground option "path" is required');
 });
 
-test.each(["css", "beer"])("a config without the %s output fails, naming it", (target) => {
-  const result = run(edited(`c.targets = c.targets.filter((each) => each !== "${target}");`));
-  expect(result.exitCode).toBe(1);
-  expect(result.stderr.toString()).toContain(`playground needs the ${target} output in the config`);
+test.each(["css", "beer"])("a config without the %s output still builds the playground, with that stylesheet made in memory", (target) => {
+  const dir = edited(`c.targets = c.targets.filter((each) => each !== "${target}");`);
+  const result = run(dir);
+  expect(result.stderr.toString()).toBe("");
+  expect(read(dir, "docs/play/index.html")).toContain(target === "css" ? "--md-sys-color-primary:" : "--primary: var(--md-sys-color-primary);");
 });
 
 test("without a declared kit it fails, saying so", () => {

@@ -1,18 +1,17 @@
-// DTCG 2025.10 tokens/*.tokens.json is the only value source.
-// A target is a module exporting { name, build(ctx) → [{ path, content }] }: built in under ./targets (listed in its
-// index), or a project's own, imported by breacan.config.mjs and listed as an object.
+// DTCG 2025.10 tokens/*.tokens.json is the only value source. The engine loads and stacks the layers, resolves
+// them, runs the config's modules (src/modules.mjs) and writes or checks their files.
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import material, { tv } from "./material.mjs";
+import material from "./material.mjs";
 import { readTokens, resolve as resolveTokens, typography } from "./resolve.mjs";
 import { checkHeader, stamp } from "./header.mjs";
 import { checkContrast, contrastPairs } from "./checks/contrast.mjs";
 import { derive } from "./derived.mjs";
 import { loadTheme, withMedia } from "./theme.mjs";
-import builtins from "./targets/index.mjs";
+import { optionsFor, render, resolveModules, withDefaults } from "./modules.mjs";
 
 // Built-in include layers, named in a config's `include` beside its file globs.
-const layers = { [material.name]: material, [tv.name]: tv };
+const layers = { [material.name]: material };
 
 const cssTypes = new Set(["color", "dimension", "duration", "fontFamily", "fontWeight", "number", "string", "typography", "shadow", "cubicBezier"]);
 // One resolved token as targets see it: value is the CSS scalar.
@@ -51,14 +50,7 @@ const loadKit = async (kit) => {
 // `preview` (breacan dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
 // the outputs instead of failing on them.
 export const build = async (config = {}, { check = false, preview = false, theme: themeText } = {}) => {
-  if (!Array.isArray(config.targets) || !config.targets.length) throw new Error("breacan.config.mjs names no targets");
-  // A built-in by name, or a project's own target: a module the config imports, listed as its object.
-  const targets = config.targets.map((spec) => {
-    const target = typeof spec === "string" ? builtins[spec] : spec;
-    if (!target) throw new Error(`Unknown token target ${spec}`);
-    if (typeof target.build !== "function") throw new Error(`Token target ${target.name ?? spec} has no build()`);
-    return target;
-  });
+  const modules = resolveModules(config);
   const kit = await loadKit(config.kit);
 
   // The layers, lowest first: built-in trees, include files, the kit's theme.toml, then the project's own tokens/
@@ -143,15 +135,18 @@ export const build = async (config = {}, { check = false, preview = false, theme
     try { return await readFile(path, "utf8"); }
     catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
   };
-  // Every target's files, written or checked by the one loop below.
+  // Every module's files, written or checked by the one loop below. A module reads the config with its resolved module
+  // names as `targets`, so a sibling's place is found the same way whether a preset or a list named it.
   const outputs = [];
   // What an earlier target in this run made at a path (stamped, as written), so a later one reads it current.
   const built = (path) => outputs.find((output) => resolve(output.path) === resolve(path))?.content;
-  for (const target of targets) {
-    const options = config[target.name] ?? {};
-    const files = await target.build({ tokens, media, mediaTokens, options, config, readExisting, built, ...kit,
-      ...(kit.name && { title: theme.title ?? kit.name }), ...(theme.modes && { modes: theme.modes, theme }) });
-    outputs.push(...(kit.name ? stamp(files, kit, target.name) : files));
+  const moduleConfig = { ...config, targets: modules.map((module) => module.name),
+    ...Object.fromEntries(modules.map((module) => [module.name, withDefaults(module, config[module.name])])) };
+  for (const module of modules) {
+    const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, built, ...kit,
+      ...(kit.name && { title: theme.title ?? kit.name }), ...(theme.modes && { modes: theme.modes, theme }) };
+    const files = await module.run({ ...base, render: (name) => render(name, base), options: optionsFor(module, base, config[module.name]) });
+    outputs.push(...(kit.name ? stamp(files, kit, module.name) : files));
   }
   if (preview) {
     // Each mode's tokens by name, the base first, for breacan dev's panel.
@@ -159,10 +154,10 @@ export const build = async (config = {}, { check = false, preview = false, theme
     for (const [query, files] of Object.entries(media)) modes[theme.modes?.media[query] ?? query] = await mediaTokens(files);
     return { outputs, contrast, theme, modes };
   }
-  for (const { path, content } of outputs) {
+  for (const { path, content, shared } of outputs) {
     if (check) {
       const existing = await readExisting(path);
-      if (kit.name) checkHeader(path, existing);
+      if (kit.name && !shared) checkHeader(path, existing);
       if (existing !== content) throw new Error(`${path} is stale; run breacan`);
       continue;
     }

@@ -6,7 +6,7 @@
 // border take the kit's on-surface-muted and comment roles when it has them, else Material's outline and outline-variant.
 // Options: out (path prefix: <out>-<mode>.css). The title, the mode names and the monospace face are the theme's.
 import { byPath, contrast, hsl, rgb } from '../color.mjs';
-import { need, needKit, rolePath, twoModes } from '../system.mjs';
+import { rolePath, twoModes } from '../system.mjs';
 
 const SLOTS = { red: 'error', orange: 'orange', yellow: 'yellow', green: 'green', cyan: 'cyan', blue: 'primary', purple: 'tertiary', pink: 'secondary' };
 // Minimal's text highlights: an accent at this alpha. A port value, not a Material state layer.
@@ -81,11 +81,13 @@ const snippet = (tokens, name, { scope, mode, title, font, extra }) => {
 };
 
 export default {
+  slot: 'output',
   name: 'obsidian',
-  async build(ctx) {
-    needKit(ctx, 'obsidian');
+  reads: ['tokens', 'media', 'kit'],
+  writes: { out: null },
+  async run(ctx) {
     const { tokens, mediaTokens, name, options, title } = ctx;
-    const out = need(options, 'obsidian', 'out');
+    const out = options.out;
     const [{ label: baseName }, { label: otherName, files }] = twoModes(ctx, 'obsidian');
     const other = await mediaTokens(files);
     const font = byPath(tokens).get(`${name}.typeface.mono`).value;

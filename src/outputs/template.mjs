@@ -4,15 +4,17 @@
 // as the template has it. Options: from, to (directories).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { need, needKit } from '../system.mjs';
+import { need } from '../system.mjs';
 
 const SLOT = /\{\{\s*([\w.-]+)\s*\}\}/g;
 
 export default {
+  slot: 'output',
   name: 'template',
-  async build({ tokens, media, mediaTokens, options, name, version, modes = { base: 'base', media: {} } }) {
-    needKit({ name, version }, 'template');
-    const [from, to] = [need(options, 'template', 'from'), need(options, 'template', 'to')];
+  reads: ['tokens', 'media', 'kit'],
+  writes: { to: null },
+  async run({ tokens, media, mediaTokens, options, name, version, modes = { base: 'base', media: {} } }) {
+    const [from, to] = [need(options, 'template', 'from'), options.to];
     // Each slot's value: the palette per mode, and the kit's name.
     const values = new Map([['name', name]]);
     const palette = (mode, each) => {

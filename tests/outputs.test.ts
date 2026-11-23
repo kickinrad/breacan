@@ -1,4 +1,4 @@
-// The tailwind, compose-tv, obsidian and mealie outputs, built from a small kit (tests/outputs/) with a design/theme.toml.
+// The tailwind, obsidian and mealie outputs, built from a small kit (tests/outputs/) with a design/theme.toml.
 import { expect, test } from "bun:test";
 import { cpSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -22,12 +22,12 @@ const edited = (edit: string) => {
   return dir;
 };
 
-test("builds the four outputs, byte-identical to the golden", () => {
+test("builds the three outputs, byte-identical to the golden", () => {
   const dir = project();
   const result = run(dir);
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
-  expect(outputs.length).toBe(11);
+  expect(outputs.length).toBe(5);
   for (const file of outputs) expect(read(dir, file)).toBe(read(golden, file));
 });
 
@@ -67,32 +67,6 @@ test("obsidian: a snippet per mode, the slots and the interactive accent from th
   expect(night).toContain("--font-monospace-theme: 'Some Mono', monospace;");
 });
 
-test("compose-tv: the package, five files, no Shapes, a font per face and the kit's layout", () => {
-  const read2 = (f: string) => read(golden, `ports/compose-tv/${f}`);
-  for (const f of ["Color.kt", "Type.kt", "Shape.kt", "Tokens.kt", "Motion.kt"]) expect(read2(f)).toContain("package com.example.acme\n");
-  expect(read2("Color.kt")).toMatch(/^val primaryDark = Color\(0xFF7AA2F7\)$/m);
-  expect(read2("Color.kt")).toMatch(/^val domainLightContainerLight = Color\(0xFF8C6C3E\)$/m);
-  expect(read2("Type.kt")).toMatch(/^val SomeSans = FontFamily\($/m);
-  expect(read2("Type.kt")).toMatch(/^val SomeMono = FontFamily\($/m);
-  expect(read2("Type.kt")).toMatch(/^val AcmeTypography = Typography\($/m);
-  expect(read2("Type.kt")).toMatch(/labelLarge = TextStyle\(\s*\n\s*fontFamily = SomeMono,/);
-  expect(read2("Shape.kt")).toMatch(/^val CornerMedium = 12\.dp$/m);
-  expect(read2("Tokens.kt")).toMatch(/^val SafeMargin = 58\.dp$/m);
-  expect(read2("Motion.kt")).toMatch(/^object Motion \{/m);
-});
-
-test("material-you: Material's components, elevation and spring curves, an alias as its variable so it follows HA's mode", () => {
-  const shared = read(golden, "ports/home-assistant/acme.css").split("html {")[1];
-  expect(shared).toContain("--md-comp-assist-chip-container-height: 32px;");
-  expect(shared).toContain("--md-comp-filled-card-container-color: var(--md-sys-color-surface-container-highest);");
-  expect(shared).toContain("--md-comp-list-item-leading-image-expressive-shape: var(--md-sys-shape-corner-small);");
-  expect(shared).toContain("--md-sys-elevation-level2: 3px;");
-  expect(shared).toMatch(/--md-sys-motion-spring-expressive-default-spatial-easing: linear\(/);
-  expect(shared).toMatch(/--md-sys-motion-spring-expressive-default-spatial-settle: \d+ms;/);
-  // A component's type role is the five typescale variables it stands for, as in the css output.
-  expect(shared).not.toMatch(/-font: (label|body|title|headline|display)-(large|medium|small);/);
-});
-
 test("obsidian: Minimal's code colours, each from a role", () => {
   const night = read(golden, "ports/obsidian/acme-night.css");
   expect(night).toContain("--code-function: #7aa2f7;  /* primary */");
@@ -114,29 +88,11 @@ test.each([
   ["tailwind", "path", "delete c.tailwind.path;"],
   ["tailwind", "css", "delete c.tailwind.css;"],
   ["obsidian", "out", "delete c.obsidian.out;"],
-  ["compose-tv", "out", 'delete c["compose-tv"].out;'],
-  ["compose-tv", "package", 'delete c["compose-tv"].package;'],
   ["mealie", "out", "delete c.mealie.out;"],
-  ["material-you", "path", 'delete c["material-you"].path;'],
 ])("%s: a missing %s fails, naming it", (output, option, edit) => {
   const result = run(edited(edit));
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain(`${output} option "${option}" is required`);
-});
-
-test("material-you: every Material colour role in both modes, then the kit's own values and no palette", () => {
-  const dir = project();
-  run(dir);
-  const file = read(dir, "ports/home-assistant/acme.css");
-  const roles = file.slice(file.indexOf(":host, html, body, ha-card {"), file.indexOf("html {"));
-  expect(roles).toMatch(/--md-sys-color-primary-light: rgb\(\d+ \d+ \d+\);/);
-  expect(roles).toMatch(/--md-sys-color-primary-dark: rgb\(\d+ \d+ \d+\);/);
-  expect(roles).not.toContain("--acme-");
-  const shared = file.slice(file.indexOf("html {"));
-  expect(shared).toContain("--md-sys-shape-corner-medium:");
-  expect(shared).toContain("--acme-");
-  expect(shared).not.toContain("--acme-palette-");
-  expect(shared).not.toMatch(/^  --md-sys-color-/m);
 });
 
 // The fixture with `edit` applied to the text of its theme.toml.
@@ -177,14 +133,6 @@ test("obsidian on a plain Material kit: the hue slots it lacks keep Minimal's, t
   expect(night).toMatch(/--hl2: rgba\([^)]+\);  \/\* tertiary/);
 });
 
-test("compose-tv on a plain Material kit exports no layout values it lacks, and the menu at Material's elevation", () => {
-  const dir = plain();
-  expect(run(dir).stderr.toString()).toBe("");
-  const kt = read(dir, "ports/compose-tv/Tokens.kt");
-  expect(kt).not.toMatch(/val (CardGap|CardInset|SafeMargin)/);
-  expect(kt).toMatch(/^val MenuElevation = 3\.dp$/m);
-});
-
 test("an output without a declared kit fails, saying so", () => {
   const dir = scratch("tokens-outputs-");
   mkdirSync(join(dir, "tokens"));
@@ -214,17 +162,4 @@ test("obsidian and mealie build from the palette alone: the kit's own roles in p
   const result = run(dir);
   expect(result.stderr.toString()).toBe("");
   for (const file of outputs.filter((each) => /\/(obsidian|mealie)\//.test(each))) expect(read(dir, file), file).toBe(readFileSync(join(golden, file), "utf8"));
-});
-
-test("material-you keeps a token's own Day value when its Night value is an alias Day does not share (a darker Day mark)", () => {
-  const dir = edited('c.targets = ["material-you"];');
-  const theme = join(dir, "design/theme.toml");
-  writeFileSync(theme, read(dir, "design/theme.toml").replace("[tokens]\n", '[derived]\naccents = ["orange"]\ncontainer-opacity = 0.16\nmarks = { group = "domain", darker = ["heat"] }\n\n[tokens]\n"acme.domain.heat.color" = "{acme.color.orange}"\n'));
-  const result = run(dir);
-  expect(result.stderr.toString()).toBe("");
-  const css = read(dir, "ports/home-assistant/acme.css");
-  const mark = css.match(/^ {2}--acme-color-domain-heat-mark: (.*);$/m)![1];
-  // Night's mark is the heat colour; Day's is darker, so the file picks between the two by HA's mode.
-  expect(mark).not.toBe("var(--acme-domain-heat-color)");
-  expect(mark).toStartWith("rgb(from var(--md-sys-color-surface");
 });

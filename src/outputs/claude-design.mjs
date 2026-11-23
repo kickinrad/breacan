@@ -11,7 +11,6 @@ import { version as beerVersion } from "beercss/package.json";
 import specimens from "../web/components.js";
 import { fontLinks } from "../web/foundations.js";
 import { text } from "../header.mjs";
-import { need, needKit } from "../system.mjs";
 
 const BEER_JS = `https://cdn.jsdelivr.net/npm/beercss@${beerVersion}/dist/cdn/beer.min.js`;
 // Beer's icon face, with the axes its fill and weight classes move.
@@ -102,21 +101,24 @@ const cover = (title, tagline) => {
 const card = (group, height) => `<!-- @dsCard${group ? ` group="${group}"` : ""} height=${height} -->`;
 
 export default {
+  slot: "output",
   name: "claude-design",
-  async build(ctx) {
-    needKit(ctx, "claude-design");
+  reads: ["tokens", "media", "kit"],
+  writes: { path: null },
+  async run(ctx) {
     const { tokens, media, mediaTokens, options, config, readExisting, built, root, title, name, version, modes = { base: "base", media: {} } } = ctx;
     // The page shows an HTML comment in markdown as text; a link reference is markdown's own comment.
     const markdown = (content) => `[//]: # (${text({ name, version }, "claude-design")})\n\n${content}`;
     const namespace = pascal(title).replace(/^\d+/, "");
-    const dir = join(need(options, "claude-design", "path"), "project");
-    const sibling = (target) => {
-      const path = config.targets.includes(target) && config[target]?.path;
-      const content = path && built(path);
-      if (content === undefined || !path) throw new Error(`claude-design needs the ${target} output, listed before it`);
+    const dir = join(options.path, "project");
+    // A sibling output's text as this run made it, or made in memory when the config leaves it out.
+    const sibling = async (target) => {
+      if (!config.targets.includes(target)) return ctx.render(target);
+      const content = built(config[target].path);
+      if (content === undefined) throw new Error(`claude-design needs the ${target} output, listed before it`);
       return content;
     };
-    const [kitCss, kitBeer] = [sibling("css"), sibling("beer")];
+    const [kitCss, kitBeer] = [await sibling("css"), await sibling("beer")];
 
     // One theme per mode, ids as the css output pins them (data-theme), else the mode's own name.
     const scheme = config.css?.scheme;

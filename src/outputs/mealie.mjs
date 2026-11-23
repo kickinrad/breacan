@@ -18,7 +18,7 @@
 // the text on-surface's and the quieter text on-surface-variant's.
 import { basename } from 'node:path';
 import { contrast, linear } from '../color.mjs';
-import { need, needKit, twoModes } from '../system.mjs';
+import { twoModes } from '../system.mjs';
 
 const SLOT_KEYS = ['primary', 'accent', 'secondary', 'success', 'info', 'warning', 'error'];
 const LAYERS = ['surface', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'];
@@ -202,11 +202,13 @@ const cssFile = (c, palette) => {
 };
 
 export default {
+  slot: 'output',
   name: 'mealie',
-  async build(ctx) {
-    needKit(ctx, 'mealie');
+  reads: ['tokens', 'media', 'kit'],
+  writes: { out: null },
+  async run(ctx) {
     const { tokens, mediaTokens, name, options, title, theme } = ctx;
-    const out = need(options, 'mealie', 'out');
+    const out = options.out;
     const [{ name: base, label: dark }, { name: other, label: light, files }] = twoModes(ctx, 'mealie');
     if (!theme.mealie) throw new Error('mealie needs a [mealie] table in theme.toml');
     // A role's palette colour, the same in both modes: Mealie's layers name one colour for both. The role is

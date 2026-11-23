@@ -8,7 +8,6 @@
 import { join, relative } from "node:path";
 import specimens from "../web/components.js";
 import { text } from "../header.mjs";
-import { need, needKit } from "../system.mjs";
 
 const NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const M3 = "https://m3.material.io/";
@@ -17,11 +16,13 @@ const BEER_DOCS = "https://github.com/beercss/beercss/blob/main/docs/";
 const guidance = (m3) => m3 ? `[Material 3](${M3}${m3.includes("/") ? m3 : `components/${m3}/overview`})` : "";
 
 export default {
+  slot: "output",
   name: "plugin",
-  async build(ctx) {
-    needKit(ctx, "plugin");
+  reads: ["tokens", "kit"],
+  writes: { path: null },
+  async run(ctx) {
     const { options, config, readExisting, root, name, version, title } = ctx;
-    const dir = need(options, "plugin", "path");
+    const dir = options.path;
     if (options.description !== undefined && (typeof options.description !== "string" || !options.description.trim())) throw new Error("plugin's description must be a non-empty string");
     if (!NAME.test(name) || name.length > 64) throw new Error(`plugin needs a kit name in kebab-case of at most 64 characters, not "${name}"`);
     const skillDir = join(dir, "skills", name);

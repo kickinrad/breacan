@@ -3,9 +3,12 @@
 import YAML from "yaml";
 
 export default {
+  slot: "output",
   name: "design-md",
-  async build({ tokens, options, readExisting }) {
-    const { path = "DESIGN.md" } = options;
+  reads: ["tokens"],
+  writes: { path: "DESIGN.md" },
+  async run({ tokens, options, readExisting }) {
+    const { path } = options;
     const current = await readExisting(path) ?? "";
     const match = current.startsWith("---")
       ? current.match(/^---\r?\n([\s\S]*?)^---(?:\r?\n|$)/m) : null;
@@ -35,6 +38,6 @@ export default {
     }
     document.deleteIn(["tokens"]);
     const body = match ? current.slice(match[0].length) : current;
-    return [{ path, content: `---\n${document.toString({ lineWidth: 0 })}---\n${body}` }];
+    return [{ path, shared: true, content: `---\n${document.toString({ lineWidth: 0 })}---\n${body}` }];
   },
 };

@@ -5,18 +5,20 @@
 // kit has no one variable per shadow.
 // Options: path (the file), css (the kit's runtime CSS file, named in the header).
 import { byPath } from '../color.mjs';
-import { colorRoles, need, needKit } from '../system.mjs';
+import { colorRoles, need } from '../system.mjs';
 
 const v = (path) => `var(--${path.replaceAll('.', '-')})`;
 // Tailwind's text sub-keys and the type scale part each reads.
 const TEXT = { '': 'size', '--line-height': 'line-height', '--letter-spacing': 'tracking', '--font-weight': 'weight' };
 
 export default {
+  slot: 'output',
   name: 'tailwind',
-  async build(ctx) {
-    needKit(ctx, 'tailwind');
+  reads: ['tokens', 'kit'],
+  writes: { path: null },
+  async run(ctx) {
     const { tokens, name, options, title } = ctx;
-    const path = need(options, 'tailwind', 'path');
+    const path = options.path;
     const css = need(options, 'tailwind', 'css');
     const paths = [...byPath(tokens).keys()];
     const under = (prefix) => paths.filter((p) => p.startsWith(prefix)).map((p) => p.slice(prefix.length));

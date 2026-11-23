@@ -16,9 +16,12 @@ import { reads } from "./beer.mjs";
 const declare = (indent, declarations) => declarations.map((line) => `${indent}${line}`).join("\n");
 
 export default {
+  slot: "output",
   name: "css",
-  async build({ tokens, media, mediaTokens, options }) {
-    const { path = "src/styles/tokens.css", layer = "", prelude = "", scheme } = options;
+  reads: ["tokens", "media"],
+  writes: { path: "src/styles/tokens.css" },
+  async run({ tokens, media, mediaTokens, options }) {
+    const { path, layer = "", prelude = "", scheme } = options;
     const other = scheme === "dark" ? "light" : "dark";
     const modeQuery = scheme && Object.keys(media).find((query) => query.includes("prefers-color-scheme"));
     const modeTokens = modeQuery ? await mediaTokens(media[modeQuery]) : [];
