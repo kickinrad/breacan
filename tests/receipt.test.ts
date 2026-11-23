@@ -90,3 +90,30 @@ test("a receipt that lost its outputs fails, rather than checking nothing", () =
   writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify({ engine: "0.0.0" }));
   expect(failure(dir)).toContain("breacan.receipt.json is not a receipt this engine reads");
 });
+
+test("a receipt file holding null or false fails, rather than falling back", () => {
+  const dir = kit();
+  for (const value of ["null", "false"]) {
+    writeFileSync(join(dir, "breacan.receipt.json"), value);
+    expect(failure(dir)).toContain("breacan.receipt.json is not a receipt this engine reads");
+  }
+});
+
+test("a theme's extended file outside the kit folder, and a helper the config imports, are inputs", () => {
+  const dir = scratch("receipt-reach-");
+  mkdirSync(join(dir, "design"));
+  mkdirSync(join(dir, "shared"));
+  mkdirSync(join(dir, "lib"));
+  writeFileSync(join(dir, "VERSION"), "0.1.0\n");
+  writeFileSync(join(dir, "shared/base.toml"), 'default = "light"\n\n[palette.light]\nink = "#101418"\n');
+  writeFileSync(join(dir, "design/theme.toml"), 'name = "acme"\nextends = "../shared/base.toml"\n');
+  writeFileSync(join(dir, "lib/helpers.mjs"), 'export const kit = { name: "acme" };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'import { kit } from "./lib/helpers.mjs";\nexport default { kit, modules: ["css"] };\n');
+  expect(run(dir, "build").stderr.toString()).toBe("");
+  expect(Object.keys(receipt(dir).inputs)).toEqual(expect.arrayContaining(["shared/base.toml", "lib/helpers.mjs"]));
+  appendFileSync(join(dir, "shared/base.toml"), "\n");
+  expect(failure(dir)).toContain("shared/base.toml changed since the last build");
+  run(dir, "build");
+  appendFileSync(join(dir, "lib/helpers.mjs"), "\n");
+  expect(failure(dir)).toContain("lib/helpers.mjs changed since the last build");
+});

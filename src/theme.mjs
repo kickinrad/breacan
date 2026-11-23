@@ -187,11 +187,14 @@ export const loadTheme = async ({ root, name } = {}, given) => {
     catch (error) { fail(`${file === "theme.toml" ? "" : `${file}: `}not valid TOML (${error.message})`); }
   };
   const toml = parse(source, "theme.toml");
+  // The files this theme read, for the receipt: theme.toml and any file it extends.
+  const files = [join(root, "theme.toml")];
   // `extends`: another theme's file beside this one (a copy of it at the version this kit builds on). Its modes,
   // palette and faces come first; this file's own add to them or change them.
   if (toml.extends !== undefined) {
     const file = join(root, text(toml.extends, "extends"));
     let base;
+    files.push(file);
     try { base = parse(await readFile(file, "utf8"), file); }
     catch (error) { if (error.code === "ENOENT") fail(`extends: no theme at ${relative(".", file)}`); throw error; }
     toml.default ??= base.default;
@@ -224,6 +227,7 @@ export const loadTheme = async ({ root, name } = {}, given) => {
   const others = theme.modes.filter((each) => each !== theme.base);
   return {
     ...theme,
+    files,
     tree: modeTree(theme.base, true),
     // Each other mode under its media query: its tree, and its name.
     media: Object.fromEntries(others.map((mode) => [theme.media[mode], { tree: modeTree(mode, false), name: mode }])),

@@ -1,8 +1,8 @@
 // DTCG 2025.10 tokens/*.tokens.json is the only value source. The engine loads and stacks the layers, resolves
 // them, runs the config's modules (src/modules.mjs) and writes or checks their files.
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import material from "./material.mjs";
 import { readTokens, resolve as resolveTokens, typography } from "./resolve.mjs";
 import { checkHeader, stamp } from "./header.mjs";
@@ -53,6 +53,17 @@ const loadKit = async (kit) => {
   catch (error) { if (error.code === "ENOENT") throw new Error("VERSION is missing; a kit needs one"); throw error; }
   if (!semver.test(version)) throw new Error(`VERSION must hold a semantic version, not "${version}"`);
   return { root: resolve(kit.root ?? "design"), version, name: kit.name };
+};
+
+// The local files a module imports, transitively (`./` and `../` specifiers), so a config split into helpers is held
+// by the receipt too.
+const localImports = (file, seen = new Set()) => {
+  if (!file || seen.has(resolve(file))) return [];
+  seen.add(resolve(file));
+  let text;
+  try { text = readFileSync(file, "utf8"); } catch { return []; }
+  const found = [...text.matchAll(/(?:from\s*|import\s*\(\s*|import\s+)["'](\.{1,2}\/[^"']+)["']/g)].map(([, spec]) => relative(".", resolve(dirname(file), spec)));
+  return found.flatMap((each) => [each, ...localImports(each, seen)]);
 };
 
 // `preview` (breacan dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
@@ -209,13 +220,13 @@ export const build = async (config = {}, { check = false, preview = false, theme
     return { outputs, contrast, theme, modes: byMode };
   }
   // The inputs: the config, VERSION, every file in the kit folder and tokens/, the layers' files and what modules read.
-  const candidates = [configFile, kit.name && "VERSION", ...(kit.root ? scan(kit.root) : []), ...scan("tokens"), ...[...folders].flatMap(scan)].filter(Boolean);
+  const candidates = [configFile, ...localImports(configFile), ...(theme.files ?? []), kit.name && "VERSION", ...(kit.root ? scan(kit.root) : []), ...scan("tokens"), ...[...folders].flatMap(scan)].filter(Boolean);
   const layerFiles = [...include, ...source, ...Object.values(media).flat()].map((layer) => layer.file).filter((file) => file && !file.startsWith("builtin:"));
   const inputs = [...candidates, ...layerFiles, ...(standard?.files ?? []), ...reads];
   const header = (output) => Boolean(kit.name && !output.shared && wantsHeader(output.path));
   if (check) {
     const held = await readReceipt();
-    if (held) {
+    if (held !== undefined) {
       // Every input this build found is a candidate, globbed includes too, so one the receipt lacks is caught.
       const written = new Set(outputs.map((output) => resolve(output.path)));
       await checkReceipt(held, inputs.filter((path) => !written.has(resolve(path)) && existsSync(path)), outputs.map((output) => output.path));
