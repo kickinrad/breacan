@@ -1,0 +1,7 @@
+# The golden manifests map output paths to sha256 digests; a path holding "tokens" beside a digest reads as a key.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Golden output digests"
+paths = ['''^tests/kits/[^/]+\.golden\.json$''']

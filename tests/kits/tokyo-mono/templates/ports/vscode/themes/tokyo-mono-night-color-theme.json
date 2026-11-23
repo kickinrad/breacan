@@ -1,0 +1,264 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Tokyo Mono Night",
+  "type": "dark",
+  "colors": {
+    "editor.background": "{{night.base}}",
+    "editor.foreground": "{{night.text}}",
+    "editorLineNumber.foreground": "{{night.overlay}}",
+    "editorLineNumber.activeForeground": "{{night.subtext0}}",
+    "editorCursor.foreground": "{{night.blue}}",
+    "editor.selectionBackground": "{{night.surface0}}cc",
+    "editor.selectionHighlightBackground": "{{night.surface0}}66",
+    "editor.lineHighlightBackground": "{{night.mantle}}",
+    "editor.wordHighlightBackground": "{{night.surface1}}80",
+    "editor.findMatchBackground": "{{night.yellow}}40",
+    "editor.findMatchHighlightBackground": "{{night.yellow}}20",
+    "editorIndentGuide.background1": "{{night.surface0}}",
+    "editorIndentGuide.activeBackground1": "{{night.subtext0}}",
+
+    "activityBar.background": "{{night.crust}}",
+    "activityBar.foreground": "{{night.subtext1}}",
+    "activityBar.inactiveForeground": "{{night.overlay}}",
+    "activityBar.activeBorder": "{{night.blue}}",
+    "activityBarBadge.background": "{{night.blue}}",
+    "activityBarBadge.foreground": "{{night.crust}}",
+
+    "sideBar.background": "{{night.mantle}}",
+    "sideBar.foreground": "{{night.subtext1}}",
+    "sideBar.border": "{{night.crust}}",
+    "sideBarTitle.foreground": "{{night.subtext0}}",
+    "sideBarSectionHeader.background": "{{night.mantle}}",
+    "sideBarSectionHeader.foreground": "{{night.subtext0}}",
+    "list.activeSelectionBackground": "{{night.surface0}}",
+    "list.activeSelectionForeground": "{{night.text}}",
+    "list.hoverBackground": "{{night.base}}80",
+    "list.inactiveSelectionBackground": "{{night.mantle}}",
+    "list.highlightForeground": "{{night.blue}}",
+
+    "editorGroupHeader.tabsBackground": "{{night.mantle}}",
+    "tab.activeBackground": "{{night.base}}",
+    "tab.activeForeground": "{{night.text}}",
+    "tab.activeBorder": "{{night.blue}}",
+    "tab.inactiveBackground": "{{night.mantle}}",
+    "tab.inactiveForeground": "{{night.overlay}}",
+    "tab.border": "{{night.crust}}",
+    "tab.activeModifiedBorder": "{{night.yellow}}",
+    "tab.inactiveModifiedBorder": "{{night.yellow}}80",
+
+    "statusBar.background": "{{night.crust}}",
+    "statusBar.foreground": "{{night.subtext0}}",
+    "statusBar.border": "{{night.crust}}",
+    "statusBar.debuggingBackground": "{{night.purple}}",
+    "statusBar.debuggingForeground": "{{night.crust}}",
+    "statusBar.noFolderBackground": "{{night.surface0}}",
+
+    "titleBar.activeBackground": "{{night.crust}}",
+    "titleBar.activeForeground": "{{night.subtext1}}",
+    "titleBar.inactiveBackground": "{{night.mantle}}",
+    "titleBar.inactiveForeground": "{{night.overlay}}",
+    "titleBar.border": "{{night.crust}}",
+
+    "panel.background": "{{night.mantle}}",
+    "panel.border": "{{night.crust}}",
+    "panelTitle.activeForeground": "{{night.text}}",
+    "panelTitle.inactiveForeground": "{{night.overlay}}",
+    "panelTitle.activeBorder": "{{night.blue}}",
+
+    "terminal.background": "{{night.base}}",
+    "terminal.foreground": "{{night.text}}",
+    "terminal.ansiBlack": "{{night.crust}}",
+    "terminal.ansiRed": "{{night.red}}",
+    "terminal.ansiGreen": "{{night.green}}",
+    "terminal.ansiYellow": "{{night.yellow}}",
+    "terminal.ansiBlue": "{{night.blue}}",
+    "terminal.ansiMagenta": "{{night.purple}}",
+    "terminal.ansiCyan": "{{night.cyan}}",
+    "terminal.ansiWhite": "{{night.subtext1}}",
+    "terminal.ansiBrightBlack": "{{night.overlay}}",
+    "terminal.ansiBrightRed": "{{night.red}}",
+    "terminal.ansiBrightGreen": "{{night.green}}",
+    "terminal.ansiBrightYellow": "{{night.yellow}}",
+    "terminal.ansiBrightBlue": "{{night.blue}}",
+    "terminal.ansiBrightMagenta": "{{night.purple}}",
+    "terminal.ansiBrightCyan": "{{night.cyan}}",
+    "terminal.ansiBrightWhite": "{{night.text}}",
+    "terminalCursor.foreground": "{{night.blue}}",
+    "terminalCursor.background": "{{night.crust}}",
+
+    "focusBorder": "{{night.blue}}",
+    "input.background": "{{night.surface0}}",
+    "input.foreground": "{{night.text}}",
+    "input.border": "{{night.surface1}}",
+    "input.placeholderForeground": "{{night.overlay}}",
+    "button.background": "{{night.blue}}",
+    "button.foreground": "{{night.crust}}",
+    "button.hoverBackground": "{{night.blue}}cc",
+    "dropdown.background": "{{night.mantle}}",
+    "dropdown.border": "{{night.surface0}}",
+    "dropdown.foreground": "{{night.subtext1}}",
+
+    "scrollbarSlider.background": "{{night.overlay}}40",
+    "scrollbarSlider.hoverBackground": "{{night.overlay}}80",
+    "scrollbarSlider.activeBackground": "{{night.overlay}}",
+
+    "gitDecoration.addedResourceForeground": "{{night.green}}",
+    "gitDecoration.modifiedResourceForeground": "{{night.yellow}}",
+    "gitDecoration.deletedResourceForeground": "{{night.red}}",
+    "gitDecoration.conflictingResourceForeground": "{{night.purple}}",
+    "gitDecoration.untrackedResourceForeground": "{{night.teal}}",
+    "gitDecoration.ignoredResourceForeground": "{{night.overlay}}",
+
+    "diffEditor.insertedTextBackground": "{{night.green}}20",
+    "diffEditor.removedTextBackground": "{{night.red}}20",
+    "diffEditor.insertedLineBackground": "{{night.green}}10",
+    "diffEditor.removedLineBackground": "{{night.red}}10",
+
+    "editorBracketHighlight.foreground1": "{{night.blue}}",
+    "editorBracketHighlight.foreground2": "{{night.purple}}",
+    "editorBracketHighlight.foreground3": "{{night.teal}}",
+    "editorBracketHighlight.foreground4": "{{night.cyan}}",
+    "editorBracketHighlight.foreground5": "{{night.green}}",
+    "editorBracketHighlight.foreground6": "{{night.yellow}}",
+
+    "breadcrumb.foreground": "{{night.overlay}}",
+    "breadcrumb.activeSelectionForeground": "{{night.subtext1}}",
+    "breadcrumb.background": "{{night.base}}",
+
+    "notifications.background": "{{night.surface0}}",
+    "notifications.foreground": "{{night.subtext1}}",
+    "notificationsErrorIcon.foreground": "{{night.red}}",
+    "notificationsWarningIcon.foreground": "{{night.orange}}",
+    "notificationsInfoIcon.foreground": "{{night.blue}}"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment", "punctuation.definition.comment"],
+      "settings": { "foreground": "{{night.overlay}}", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["string", "string.quoted"],
+      "settings": { "foreground": "{{night.cyan}}" }
+    },
+    {
+      "scope": ["string.regexp", "constant.other.character-class.regexp"],
+      "settings": { "foreground": "{{night.teal}}" }
+    },
+    {
+      "scope": ["constant.character.escape", "string.escape"],
+      "settings": { "foreground": "{{night.teal}}" }
+    },
+    {
+      "scope": ["constant.numeric", "constant.other"],
+      "settings": { "foreground": "{{night.orange}}" }
+    },
+    {
+      "scope": ["constant.language"],
+      "settings": { "foreground": "{{night.orange}}" }
+    },
+    {
+      "scope": ["keyword", "keyword.control"],
+      "settings": { "foreground": "{{night.purple}}" }
+    },
+    {
+      "scope": ["keyword.operator", "punctuation.accessor"],
+      "settings": { "foreground": "{{night.blue}}" }
+    },
+    {
+      "scope": ["storage.type", "storage.modifier"],
+      "settings": { "foreground": "{{night.purple}}" }
+    },
+    {
+      "scope": ["entity.name.function", "meta.function-call.generic"],
+      "settings": { "foreground": "{{night.blue}}" }
+    },
+    {
+      "scope": ["entity.name.class", "entity.name.type.class"],
+      "settings": { "foreground": "{{night.teal}}" }
+    },
+    {
+      "scope": ["entity.name.type", "entity.name.namespace", "entity.name.scope-resolution"],
+      "settings": { "foreground": "{{night.teal}}" }
+    },
+    {
+      "scope": ["entity.name.tag"],
+      "settings": { "foreground": "{{night.red}}" }
+    },
+    {
+      "scope": ["entity.other.attribute-name"],
+      "settings": { "foreground": "{{night.yellow}}" }
+    },
+    {
+      "scope": ["variable", "variable.other"],
+      "settings": { "foreground": "{{night.text}}" }
+    },
+    {
+      "scope": ["variable.parameter"],
+      "settings": { "foreground": "{{night.yellow}}", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["support.function"],
+      "settings": { "foreground": "{{night.blue}}" }
+    },
+    {
+      "scope": ["support.class"],
+      "settings": { "foreground": "{{night.teal}}" }
+    },
+    {
+      "scope": ["support.type", "support.other.namespace"],
+      "settings": { "foreground": "{{night.teal}}" }
+    },
+    {
+      "scope": ["meta.decorator", "punctuation.decorator"],
+      "settings": { "foreground": "{{night.yellow}}" }
+    },
+    {
+      "scope": ["invalid", "invalid.illegal"],
+      "settings": { "foreground": "{{night.red}}", "fontStyle": "underline" }
+    },
+    {
+      "scope": ["markup.heading", "entity.name.section"],
+      "settings": { "foreground": "{{night.blue}}", "fontStyle": "bold" }
+    },
+    {
+      "scope": ["markup.bold", "punctuation.definition.bold"],
+      "settings": { "foreground": "{{night.text}}", "fontStyle": "bold" }
+    },
+    {
+      "scope": ["markup.italic", "punctuation.definition.italic"],
+      "settings": { "foreground": "{{night.text}}", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["markup.inline.raw", "markup.raw.inline"],
+      "settings": { "foreground": "{{night.cyan}}" }
+    },
+    {
+      "scope": ["markup.list", "punctuation.definition.list"],
+      "settings": { "foreground": "{{night.red}}" }
+    },
+    {
+      "scope": ["markup.inserted"],
+      "settings": { "foreground": "{{night.green}}" }
+    },
+    {
+      "scope": ["markup.deleted"],
+      "settings": { "foreground": "{{night.red}}" }
+    },
+    {
+      "scope": ["markup.changed"],
+      "settings": { "foreground": "{{night.yellow}}" }
+    }
+  ],
+  "semanticTokenColors": {
+    "parameter": "{{night.yellow}}",
+    "property": "{{night.cyan}}",
+    "variable.readonly": "{{night.orange}}",
+    "function": "{{night.blue}}",
+    "method": "{{night.blue}}",
+    "class": "{{night.teal}}",
+    "interface": "{{night.teal}}",
+    "type": "{{night.teal}}",
+    "namespace": "{{night.subtext1}}",
+    "enumMember": "{{night.orange}}"
+  }
+}

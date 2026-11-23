@@ -1,0 +1,264 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Tokyo Mono Day",
+  "type": "light",
+  "colors": {
+    "editor.background": "{{day.base}}",
+    "editor.foreground": "{{day.text}}",
+    "editorLineNumber.foreground": "{{day.overlay}}",
+    "editorLineNumber.activeForeground": "{{day.subtext0}}",
+    "editorCursor.foreground": "{{day.blue}}",
+    "editor.selectionBackground": "{{day.surface1}}80",
+    "editor.selectionHighlightBackground": "{{day.surface1}}40",
+    "editor.lineHighlightBackground": "{{day.mantle}}",
+    "editor.wordHighlightBackground": "{{day.surface1}}80",
+    "editor.findMatchBackground": "{{day.yellow}}40",
+    "editor.findMatchHighlightBackground": "{{day.yellow}}20",
+    "editorIndentGuide.background1": "{{day.overlay}}",
+    "editorIndentGuide.activeBackground1": "{{day.subtext0}}",
+
+    "activityBar.background": "{{day.crust}}",
+    "activityBar.foreground": "{{day.subtext1}}",
+    "activityBar.inactiveForeground": "{{day.overlay}}",
+    "activityBar.activeBorder": "{{day.blue}}",
+    "activityBarBadge.background": "{{day.blue}}",
+    "activityBarBadge.foreground": "{{day.base}}",
+
+    "sideBar.background": "{{day.mantle}}",
+    "sideBar.foreground": "{{day.subtext1}}",
+    "sideBar.border": "{{day.crust}}",
+    "sideBarTitle.foreground": "{{day.subtext0}}",
+    "sideBarSectionHeader.background": "{{day.mantle}}",
+    "sideBarSectionHeader.foreground": "{{day.subtext0}}",
+    "list.activeSelectionBackground": "{{day.surface1}}",
+    "list.activeSelectionForeground": "{{day.text}}",
+    "list.hoverBackground": "{{day.base}}80",
+    "list.inactiveSelectionBackground": "{{day.mantle}}",
+    "list.highlightForeground": "{{day.blue}}",
+
+    "editorGroupHeader.tabsBackground": "{{day.mantle}}",
+    "tab.activeBackground": "{{day.base}}",
+    "tab.activeForeground": "{{day.text}}",
+    "tab.activeBorder": "{{day.blue}}",
+    "tab.inactiveBackground": "{{day.mantle}}",
+    "tab.inactiveForeground": "{{day.overlay}}",
+    "tab.border": "{{day.crust}}",
+    "tab.activeModifiedBorder": "{{day.yellow}}",
+    "tab.inactiveModifiedBorder": "{{day.yellow}}80",
+
+    "statusBar.background": "{{day.crust}}",
+    "statusBar.foreground": "{{day.subtext0}}",
+    "statusBar.border": "{{day.crust}}",
+    "statusBar.debuggingBackground": "{{day.purple}}",
+    "statusBar.debuggingForeground": "{{day.base}}",
+    "statusBar.noFolderBackground": "{{day.surface1}}",
+
+    "titleBar.activeBackground": "{{day.crust}}",
+    "titleBar.activeForeground": "{{day.subtext1}}",
+    "titleBar.inactiveBackground": "{{day.mantle}}",
+    "titleBar.inactiveForeground": "{{day.overlay}}",
+    "titleBar.border": "{{day.crust}}",
+
+    "panel.background": "{{day.mantle}}",
+    "panel.border": "{{day.crust}}",
+    "panelTitle.activeForeground": "{{day.text}}",
+    "panelTitle.inactiveForeground": "{{day.overlay}}",
+    "panelTitle.activeBorder": "{{day.blue}}",
+
+    "terminal.background": "{{day.mantle}}",
+    "terminal.foreground": "{{day.text}}",
+    "terminal.ansiBlack": "{{day.crust}}",
+    "terminal.ansiRed": "{{day.red}}",
+    "terminal.ansiGreen": "{{day.green}}",
+    "terminal.ansiYellow": "{{day.yellow}}",
+    "terminal.ansiBlue": "{{day.blue}}",
+    "terminal.ansiMagenta": "{{day.purple}}",
+    "terminal.ansiCyan": "{{day.cyan}}",
+    "terminal.ansiWhite": "{{day.subtext1}}",
+    "terminal.ansiBrightBlack": "{{day.overlay}}",
+    "terminal.ansiBrightRed": "{{day.red}}",
+    "terminal.ansiBrightGreen": "{{day.green}}",
+    "terminal.ansiBrightYellow": "{{day.yellow}}",
+    "terminal.ansiBrightBlue": "{{day.blue}}",
+    "terminal.ansiBrightMagenta": "{{day.purple}}",
+    "terminal.ansiBrightCyan": "{{day.cyan}}",
+    "terminal.ansiBrightWhite": "{{day.text}}",
+    "terminalCursor.foreground": "{{day.blue}}",
+    "terminalCursor.background": "{{day.base}}",
+
+    "focusBorder": "{{day.blue}}",
+    "input.background": "{{day.surface0}}",
+    "input.foreground": "{{day.text}}",
+    "input.border": "{{day.surface1}}",
+    "input.placeholderForeground": "{{day.overlay}}",
+    "button.background": "{{day.blue}}",
+    "button.foreground": "{{day.base}}",
+    "button.hoverBackground": "{{day.blue}}cc",
+    "dropdown.background": "{{day.mantle}}",
+    "dropdown.border": "{{day.surface1}}",
+    "dropdown.foreground": "{{day.subtext1}}",
+
+    "scrollbarSlider.background": "{{day.overlay}}40",
+    "scrollbarSlider.hoverBackground": "{{day.overlay}}80",
+    "scrollbarSlider.activeBackground": "{{day.overlay}}",
+
+    "gitDecoration.addedResourceForeground": "{{day.green}}",
+    "gitDecoration.modifiedResourceForeground": "{{day.yellow}}",
+    "gitDecoration.deletedResourceForeground": "{{day.red}}",
+    "gitDecoration.conflictingResourceForeground": "{{day.purple}}",
+    "gitDecoration.untrackedResourceForeground": "{{day.teal}}",
+    "gitDecoration.ignoredResourceForeground": "{{day.overlay}}",
+
+    "diffEditor.insertedTextBackground": "{{day.green}}20",
+    "diffEditor.removedTextBackground": "{{day.red}}20",
+    "diffEditor.insertedLineBackground": "{{day.green}}10",
+    "diffEditor.removedLineBackground": "{{day.red}}10",
+
+    "editorBracketHighlight.foreground1": "{{day.blue}}",
+    "editorBracketHighlight.foreground2": "{{day.purple}}",
+    "editorBracketHighlight.foreground3": "{{day.teal}}",
+    "editorBracketHighlight.foreground4": "{{day.cyan}}",
+    "editorBracketHighlight.foreground5": "{{day.green}}",
+    "editorBracketHighlight.foreground6": "{{day.yellow}}",
+
+    "breadcrumb.foreground": "{{day.overlay}}",
+    "breadcrumb.activeSelectionForeground": "{{day.subtext1}}",
+    "breadcrumb.background": "{{day.base}}",
+
+    "notifications.background": "{{day.surface0}}",
+    "notifications.foreground": "{{day.subtext1}}",
+    "notificationsErrorIcon.foreground": "{{day.red}}",
+    "notificationsWarningIcon.foreground": "{{day.orange}}",
+    "notificationsInfoIcon.foreground": "{{day.blue}}"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment", "punctuation.definition.comment"],
+      "settings": { "foreground": "{{day.overlay}}", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["string", "string.quoted"],
+      "settings": { "foreground": "{{day.cyan}}" }
+    },
+    {
+      "scope": ["string.regexp", "constant.other.character-class.regexp"],
+      "settings": { "foreground": "{{day.teal}}" }
+    },
+    {
+      "scope": ["constant.character.escape", "string.escape"],
+      "settings": { "foreground": "{{day.teal}}" }
+    },
+    {
+      "scope": ["constant.numeric", "constant.other"],
+      "settings": { "foreground": "{{day.orange}}" }
+    },
+    {
+      "scope": ["constant.language"],
+      "settings": { "foreground": "{{day.orange}}" }
+    },
+    {
+      "scope": ["keyword", "keyword.control"],
+      "settings": { "foreground": "{{day.purple}}" }
+    },
+    {
+      "scope": ["keyword.operator", "punctuation.accessor"],
+      "settings": { "foreground": "{{day.blue}}" }
+    },
+    {
+      "scope": ["storage.type", "storage.modifier"],
+      "settings": { "foreground": "{{day.purple}}" }
+    },
+    {
+      "scope": ["entity.name.function", "meta.function-call.generic"],
+      "settings": { "foreground": "{{day.blue}}" }
+    },
+    {
+      "scope": ["entity.name.class", "entity.name.type.class"],
+      "settings": { "foreground": "{{day.teal}}" }
+    },
+    {
+      "scope": ["entity.name.type", "entity.name.namespace", "entity.name.scope-resolution"],
+      "settings": { "foreground": "{{day.teal}}" }
+    },
+    {
+      "scope": ["entity.name.tag"],
+      "settings": { "foreground": "{{day.red}}" }
+    },
+    {
+      "scope": ["entity.other.attribute-name"],
+      "settings": { "foreground": "{{day.yellow}}" }
+    },
+    {
+      "scope": ["variable", "variable.other"],
+      "settings": { "foreground": "{{day.text}}" }
+    },
+    {
+      "scope": ["variable.parameter"],
+      "settings": { "foreground": "{{day.yellow}}", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["support.function"],
+      "settings": { "foreground": "{{day.blue}}" }
+    },
+    {
+      "scope": ["support.class"],
+      "settings": { "foreground": "{{day.teal}}" }
+    },
+    {
+      "scope": ["support.type", "support.other.namespace"],
+      "settings": { "foreground": "{{day.teal}}" }
+    },
+    {
+      "scope": ["meta.decorator", "punctuation.decorator"],
+      "settings": { "foreground": "{{day.yellow}}" }
+    },
+    {
+      "scope": ["invalid", "invalid.illegal"],
+      "settings": { "foreground": "{{day.red}}", "fontStyle": "underline" }
+    },
+    {
+      "scope": ["markup.heading", "entity.name.section"],
+      "settings": { "foreground": "{{day.blue}}", "fontStyle": "bold" }
+    },
+    {
+      "scope": ["markup.bold", "punctuation.definition.bold"],
+      "settings": { "foreground": "{{day.text}}", "fontStyle": "bold" }
+    },
+    {
+      "scope": ["markup.italic", "punctuation.definition.italic"],
+      "settings": { "foreground": "{{day.text}}", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["markup.inline.raw", "markup.raw.inline"],
+      "settings": { "foreground": "{{day.cyan}}" }
+    },
+    {
+      "scope": ["markup.list", "punctuation.definition.list"],
+      "settings": { "foreground": "{{day.red}}" }
+    },
+    {
+      "scope": ["markup.inserted"],
+      "settings": { "foreground": "{{day.green}}" }
+    },
+    {
+      "scope": ["markup.deleted"],
+      "settings": { "foreground": "{{day.red}}" }
+    },
+    {
+      "scope": ["markup.changed"],
+      "settings": { "foreground": "{{day.yellow}}" }
+    }
+  ],
+  "semanticTokenColors": {
+    "parameter": "{{day.yellow}}",
+    "property": "{{day.cyan}}",
+    "variable.readonly": "{{day.orange}}",
+    "function": "{{day.blue}}",
+    "method": "{{day.blue}}",
+    "class": "{{day.teal}}",
+    "interface": "{{day.teal}}",
+    "type": "{{day.teal}}",
+    "namespace": "{{day.subtext1}}",
+    "enumMember": "{{day.orange}}"
+  }
+}

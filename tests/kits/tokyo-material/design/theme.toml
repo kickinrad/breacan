@@ -1,0 +1,93 @@
+# Tokyo Material: Material 3 (kumiko's built-in, from Google's androidx token files) on the Tokyo Mono palette, with
+# a few named exceptions. base.toml is Tokyo Mono's theme file at the version this kit builds on (its palette and
+# faces); this file adds the ink tones, fills Material's roles and holds the exceptions. kumiko builds every output.
+name = "tokyo-material"
+title = "Tokyo Material"
+tagline = "Material 3 on Tokyo Night's accents and the Windows 11 greys."
+icon = "style"
+extends = "base.toml"
+
+# The ink tones: blue and red at a tone that reads as text on every surface, for Material's primary and error.
+# Tokyo Mono's blue and red stay as they are for the terminal and editor themes.
+[palette.night]
+blue-ink = "#7ea6fb"  # One tone above blue, the nearest that holds 4.5:1 on the filled card
+red-ink = "#f79178"  # Red already holds 4.5:1 in Night
+
+[palette.day]
+blue-ink = "#0058b3"  # Tone 38 of blue's hue, the nearest that holds 4.5:1 on every Day surface, the filled card included
+red-ink = "#cb290d"  # Tone 45 of red's hue, the nearest that holds 4.5:1 as error text on the page and the card
+
+# Material colours from the palette: the surfaces are the five Fluent greys, not Material's neutral tones.
+[roles]
+"md.sys.color.surface" = "crust"  # Page; the deepest layer in both modes
+"md.sys.color.surface-dim" = "crust"  # Fluent crust: Tokyo Mono's surfaces are the five Windows 11 greys, not Material's neutral tones
+"md.sys.color.surface-bright" = "surface1"  # Fluent surface1, the top neutral layer
+"md.sys.color.surface-container-lowest" = "crust"  # Fluent crust: the page is already the deepest layer
+"md.sys.color.surface-container-low" = "mantle"  # Cards and panels
+"md.sys.color.surface-container" = "base"  # Raised: dialogs, menus, the main app area
+"md.sys.color.surface-container-high" = "surface0"  # Inputs, chips, selections
+"md.sys.color.surface-container-highest" = "surface1"  # Hover, active rows, borders
+"md.sys.color.on-surface" = "text"  # Tokyo Mono text
+"md.sys.color.on-surface-variant" = "subtext1"  # Secondary text and icons
+"md.sys.color.outline" = "subtext0"  # Material's boundary: 3:1 or more on every surface role (text field and switch outlines, outlined controls), the nearest Tokyo grey that clears it. Dividers and card borders use outline-variant; surface1 blends into surface-container-highest and hides an off switch.
+"md.sys.color.outline-variant" = "surface0"  # Fluent surface0: a quieter divider than outline
+"md.sys.color.inverse-surface" = "day.crust"  # The other mode's surface, for snackbars and tooltips
+"md.sys.color.inverse-on-surface" = "day.text"  # Day text, for snackbars and tooltips on inverse-surface
+"md.sys.color.scrim" = "night.crust"  # Fluent crust, not pure black: Tokyo Mono never uses #000
+"md.sys.color.primary" = "blue-ink"  # Interactive: buttons, links, focus rings; blue at a tone that reads as text
+"md.sys.color.secondary" = "teal"  # Less prominent components: filter chips, tonal buttons, selection
+"md.sys.color.tertiary" = "purple"  # Contrasting accents beside primary and secondary
+"md.sys.color.error" = "red-ink"  # Errors and destructive actions only; red at a tone that reads as text
+"md.sys.color.inverse-primary" = "day.blue"  # The other mode's primary, for actions on inverse-surface
+"md.sys.color.shadow" = "night.crust"  # Material's shadow role (ColorDarkTokens.kt and ColorLightTokens.kt: Shadow = PaletteTokens.Neutral0), which the vendored token files omit: Tokyo's deepest grey rather than pure black, so an elevation shadow stays in the grey scale.
+"tokyo-material.color.on-surface-muted" = "subtext0"  # Tertiary text: hints, metadata, disabled labels (no Material role)
+"tokyo-material.color.comment" = "overlay"  # Code comments and placeholders only; fails AA for body text
+"tokyo-material.color.yellow" = "yellow"  # Custom colour, named by value: warning, pending
+"tokyo-material.color.orange" = "orange"  # Custom colour: caution, needs attention
+"tokyo-material.color.cyan" = "cyan"  # Custom colour: information, strings in code
+"tokyo-material.color.green" = "green"  # Custom colour: success
+
+[roles.day]
+"md.sys.color.surface-dim" = "surface1"
+"md.sys.color.surface-bright" = "base"
+"md.sys.color.outline-variant" = "overlay"
+"md.sys.color.inverse-surface" = "night.crust"
+"md.sys.color.inverse-on-surface" = "night.text"
+"md.sys.color.inverse-primary" = "night.blue"
+
+[faces]
+icon = ["Material Symbols Outlined"]  # The kit's icon set, Material Symbols (Apache-2.0): Outlined at rest, Rounded Filled for an on or selected state.
+
+[tokens]
+# Material's values the kit changes, each with why.
+"md.sys.color.background" = { value = "{md.sys.color.surface}", why = "Material's page role; the same layer as surface" }
+"md.sys.color.on-background" = { value = "{md.sys.color.on-surface}", why = "Tokyo Mono text, as on-surface" }
+"md.sys.color.surface-variant" = { value = "{md.sys.color.surface-container-highest}", why = "The older surface role matches the highest container layer" }
+"md.comp.list.item-selected-container-color" = { value = "{md.sys.color.primary-container}", why = "Material's lists guidance (m3.material.io) selects with primary container; the androidx token file still says secondary" }
+"md.comp.list.item-selected-label-text-color" = { value = "{md.sys.color.on-primary-container}", why = "Material's lists guidance (m3.material.io) selects with primary container; the androidx token file still says secondary" }
+"md.comp.list.item-selected-leading-icon-color" = { value = "{md.sys.color.on-primary-container}", why = "Material's lists guidance (m3.material.io) selects with primary container; the androidx token file still says secondary" }
+
+# Elevation on the web.
+"tokyo-material.elevation.shadow-opacity" = { value = 0.3, why = "The opacity of an elevation shadow on the web (Beer's --elevate1 to 3): Material's elevation is a key and an ambient shadow at 0.3 and 0.15 (m3.material.io/styles/elevation/applying-elevation); the web draws one shadow at the key's 0.3" }
+
+# The roles Material names but the palette has no step for: on-colours, containers and fixed roles.
+[derived]
+accents = ["yellow", "orange", "cyan", "green"]  # The kit's own accents, beside Material's four
+container-opacity = 0.16  # A container is its accent at this fraction over surface-container-low, a state layer: Tokyo's containers stay grey with a tint, not Material's tonal fills
+
+# Contrast floors, checked in Night and Day: text 4.5:1, graphics 3:1 (an outline on every surface).
+[contrast]
+text = 4.5
+graphics = 3
+
+[[contrast.exceptions]]
+fg = "md.sys.color.on-secondary"
+bg = "md.sys.color.secondary"
+min = 4.3
+why = "Day's teal reaches 4.31 with any palette neutral; a filled secondary carries a label, not body text"
+
+[[contrast.exceptions]]
+fg = "md.sys.color.on-tertiary"
+bg = "md.sys.color.tertiary"
+min = 4.3
+why = "Day's purple reaches 4.41 with any palette neutral; a filled tertiary carries a label, not body text"

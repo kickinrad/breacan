@@ -1,0 +1,40 @@
+system: "base16"
+name: "Tokyo Mono Night"
+author: "kickinrad (https://github.com/kickinrad/tokyo-mono)"
+variant: "dark"
+
+# base00–base07: strict dark→light luminance ramp (base16 spec requirement)
+#
+# Background tones:
+#   base00  {{night.base}}  base      — Default editor/app background (Win11 grey16)
+#   base01  {{night.surface0}}  surface0  — Lighter background: status bars, line highlight, cards
+#   base02  {{night.surface1}}  surface1  — Selection background, hover states, raised cards
+# Midtone:
+#   base03  {{night.overlay}}  overlay   — Comments, invisibles, line numbers (muted, non-WCAG)
+# Foreground tones:
+#   base04  {{night.subtext0}}  subtext0  — Dark foreground: status bar text, hints, metadata
+#   base05  {{night.subtext1}}  subtext1  — Default foreground: main readable content
+#   base06  {{night.text}}  text      — Light foreground: emphasis, headings, active labels
+#   base07  {{night.text}}  text      — Lightest (same as base06 — {{night.text}} is ceiling)
+#
+# Note: crust ({{night.crust}}) and mantle ({{night.mantle}}) are available in the palette for
+# deeper panels (activity bar, unfocused title bars) but sit below the base16
+# default-background slot, so they aren't mapped here.
+
+palette:
+  base00: "{{night.base}}"  # Default Background (base — Win11 grey16)
+  base01: "{{night.surface0}}"  # Lighter Background (surface0 — cards, inputs, status bars)
+  base02: "{{night.surface1}}"  # Selection Background (surface1 — hover, raised cards)
+  base03: "{{night.overlay}}"  # Comments, Invisibles (overlay — muted non-body text)
+  base04: "{{night.subtext0}}"  # Dark Foreground (subtext0 — hints, metadata, status bar text)
+  base05: "{{night.subtext1}}"  # Default Foreground (subtext1 — comfortable reading tone)
+  base06: "{{night.text}}"  # Light Foreground (text — emphasis, headings)
+  base07: "{{night.text}}"  # Lightest (text — {{night.text}} is the luminance ceiling)
+  base08: "{{night.red}}"  # Red — errors, deletions
+  base09: "{{night.orange}}"  # Orange — constants, warnings
+  base0A: "{{night.yellow}}"  # Yellow — attributes, classes
+  base0B: "{{night.green}}"  # Green — strings, success
+  base0C: "{{night.cyan}}"  # Cyan — support, escape characters
+  base0D: "{{night.blue}}"  # Blue — functions, headings
+  base0E: "{{night.purple}}"  # Purple — keywords, storage
+  base0F: "{{night.teal}}"  # Teal — types, embedded language tags

@@ -151,7 +151,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 
 ### Phase 1: core, Tokyo and agent rules
 
-1. [ ] **Baseline and Issues** (prefactor). Record every kit's outputs and every consumer's CI result at d0d1c10 as golden files and red evidence. File the out-of-scope Issues. Route: implementation-light. Demo: goldens committed; Issues listed. Blocked by: none.
+1. [x] **Baseline and Issues** (prefactor). Record every kit's outputs and every consumer's CI result at d0d1c10 as golden files and red evidence. File the out-of-scope Issues. Route: implementation-light. Demo: goldens committed; Issues listed. Blocked by: none.
 2. [ ] **Rename, expand** (prefactor). Rename the repo and binary, with the `kumiko` alias, the old config name and `--check` kept. Add AGENTS.md. Route: implementation. Demo: every consumer's CI green unchanged; acceptance 1. Blocked by: 1.
 3. [ ] **Output contract** (prefactor). Put the targets behind the module shape and presets. Delete material-you, compose-tv and `builtin:material-tv`, which no consumer builds. Keep storybook, dev and audit until their replacements land. Route: implementation-hard. Demo: tokyo outputs byte-identical to the goldens; acceptance 2. Blocked by: 2.
 4. [ ] **Standard load, one kit first.** Load tokyo-material's tokens through `@terrazzo/parser` and write its resolver. Then compile theme.toml to DTCG and a resolver, then replace `--check` with the receipt, keeping the header rule. Route: implementation-hard. Demo: acceptance 3. Blocked by: 3.
@@ -185,6 +185,14 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 ## Run
 
 Lane: here, with the owner watching design calls. Branch `kata/breacan` in the kumiko checkout's `.worktrees/breacan`.
+
+Assumption: the repo stays public through the rename, as kumiko is today. ADR-016 needs client CI to install it without credentials; the plan's "private" would break cttc-foundation and boombox-design.
+
+- Task 1, baseline (implementation-light, Demo passed first try).
+  - Goldens: `tests/kits/<kit>.golden.json` holds path → sha256 for every output of tokyo-mono (24), tokyo-material (83) and boombox-design (15), built from each repo's `origin/main` at kumiko d0d1c10. Each repo's committed outputs passed `--check` there. `tests/kits.test.ts` rebuilds them; Boombox runs only with `BOOMBOX_DESIGN` set, since its inputs stay private.
+  - Consumer CI at the baseline, last main run: kumiko ci success (d0d1c10), tokyo-mono CI success (1dfc96d), tokyo-material CI success (e800d49), porchlight check success (41979f8), skylight check success (083ce48), stacks ci success (85f69a1), boombox-design CI success (b42f3bb). tokyo-mono-site has no CI. The dotfiles install `github:kickinrad/kumiko` in `dot_config/mise/config.toml` (chezmoi e967505).
+  - Red evidence: `kickinrad/breacan` does not resolve; `kumiko --version` exits 1 as unknown; no source reads a resolver, Terrazzo or Leonardo; `design-system` is still in domains. Every other acceptance check names a feature that does not exist yet.
+  - Issues: [#95](https://github.com/kickinrad/kumiko/issues/95) Compose TV, [#96](https://github.com/kickinrad/kumiko/issues/96) Fluent and Apple, [#97](https://github.com/kickinrad/kumiko/issues/97) SwiftUI and WinUI, [#98](https://github.com/kickinrad/kumiko/issues/98) cttc-foundation.
 
 ## Related
 

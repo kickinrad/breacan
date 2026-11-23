@@ -1,0 +1,23 @@
+{
+    "name": "Tokyo Mono Day",
+    "background": "{{day.base}}",
+    "foreground": "{{day.text}}",
+    "cursorColor": "{{day.blue}}",
+    "selectionBackground": "{{day.surface1}}",
+    "black":         "{{day.crust}}",
+    "red":           "{{day.red}}",
+    "green":         "{{day.green}}",
+    "yellow":        "{{day.yellow}}",
+    "blue":          "{{day.blue}}",
+    "purple":        "{{day.purple}}",
+    "cyan":          "{{day.cyan}}",
+    "white":         "{{day.subtext1}}",
+    "brightBlack":   "{{day.overlay}}",
+    "brightRed":     "{{day.red}}",
+    "brightGreen":   "{{day.green}}",
+    "brightYellow":  "{{day.yellow}}",
+    "brightBlue":    "{{day.blue}}",
+    "brightPurple":  "{{day.purple}}",
+    "brightCyan":    "{{day.cyan}}",
+    "brightWhite":   "{{day.text}}"
+}
