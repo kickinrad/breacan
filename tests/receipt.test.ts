@@ -117,3 +117,21 @@ test("a theme's extended file outside the kit folder, and a helper the config im
   appendFileSync(join(dir, "lib/helpers.mjs"), "\n");
   expect(failure(dir)).toContain("lib/helpers.mjs changed since the last build");
 });
+
+test("extensionless and directory imports in the config are held by their real files, and a commented one is not", () => {
+  const dir = scratch("receipt-resolve-");
+  mkdirSync(join(dir, "lib"));
+  mkdirSync(join(dir, "tokens"));
+  writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ a: { $type: "number", $value: 1 } }));
+  writeFileSync(join(dir, "lib/index.mjs"), 'export const modules = ["css"];\n');
+  writeFileSync(join(dir, "lib/helpers.mjs"), "export const layer = \"tokens\";\n");
+  writeFileSync(join(dir, "ghost.mjs"), "export default 1;\n");
+  writeFileSync(join(dir, "breacan.config.mjs"), 'import { modules } from "./lib";\nimport { layer } from "./lib/helpers";\n// import ghost from "./ghost.mjs";\nexport default { modules, css: { layer } };\n');
+  expect(run(dir, "build").stderr.toString()).toBe("");
+  const inputs = Object.keys(receipt(dir).inputs);
+  expect(inputs).toEqual(expect.arrayContaining(["lib/index.mjs", "lib/helpers.mjs"]));
+  expect(inputs).not.toContain("ghost.mjs");
+  expect(inputs).not.toContain("lib");
+  appendFileSync(join(dir, "lib/helpers.mjs"), "\n");
+  expect(failure(dir)).toContain("lib/helpers.mjs changed since the last build");
+});

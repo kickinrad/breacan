@@ -236,6 +236,7 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Evidence: `claude plugin validate` passes the market and both plugins; `market-closure.py` passes over every market with the three branches in place; domains' own check passes. Runtime parity fails before and after on existing drift, none of it Breacán's.
   - Review (`reviewer`, FAIL, 2 Must): a new include-glob match escaped the receipt, and a receipt with no outputs checked nothing. Both fixed with tests: every input the build finds is a candidate, the receipt's shape is validated, and its outputs must equal the build's.
   - Review round 2 (FAIL, 1 Must, 2 Should): a receipt holding `null` fell back to the old compare; a theme `extends` outside the kit folder and helpers the config imports escaped the receipt. All three fixed with tests.
+  - Review round 3 (FAIL, 1 Must): the config-import scan broke directory imports and missed extensionless ones. It now uses Bun's own import scanner and resolver, with a test for both and for a commented-out import.
   - Left for acceptance 15: install the market in Claude Code and Codex after the merge, then `dispatch list design tokens`.
 
 ## Related

@@ -62,7 +62,9 @@ const localImports = (file, seen = new Set()) => {
   seen.add(resolve(file));
   let text;
   try { text = readFileSync(file, "utf8"); } catch { return []; }
-  const found = [...text.matchAll(/(?:from\s*|import\s*\(\s*|import\s+)["'](\.{1,2}\/[^"']+)["']/g)].map(([, spec]) => relative(".", resolve(dirname(file), spec)));
+  // Bun's own scanner (comments and strings are not imports) and resolver (extensionless and directory imports).
+  const found = new Bun.Transpiler({ loader: "js" }).scanImports(text).map(({ path }) => path).filter((spec) => /^\.{1,2}\//.test(spec))
+    .flatMap((spec) => { try { return [relative(".", Bun.resolveSync(spec, dirname(resolve(file))))]; } catch { return []; } });
   return found.flatMap((each) => [each, ...localImports(each, seen)]);
 };
 
