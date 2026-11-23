@@ -234,6 +234,7 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - The repo holds the Breacán market (`.claude-plugin/` and `.agents/plugins/` marketplaces) with `breacan` (skills `make-kit` and `use-kit`) and `breacan-material` (`material-reference`, now pointing at this repo's `material/`).
   - domains branch `feat/breacan` (8328495) deletes design-system, including its unread impeccable `context/` (no `IMPECCABLE_CONTEXT_DIR` is set anywhere), and makes WordPress depend on `breacan@breacan`. workflows branch `feat/breacan` (014a17b) points the stack skill at Breacán.
   - Evidence: `claude plugin validate` passes the market and both plugins; `market-closure.py` passes over every market with the three branches in place; domains' own check passes. Runtime parity fails before and after on existing drift, none of it Breacán's.
+  - Review (`reviewer`, FAIL, 2 Must): a new include-glob match escaped the receipt, and a receipt with no outputs checked nothing. Both fixed with tests: every input the build finds is a candidate, the receipt's shape is validated, and its outputs must equal the build's.
   - Left for acceptance 15: install the market in Claude Code and Codex after the merge, then `dispatch list design tokens`.
 
 ## Related

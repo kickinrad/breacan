@@ -1,6 +1,6 @@
 // The receipt: each build records its inputs and outputs, and `breacan check` holds the tree to that record.
 import { expect, test } from "bun:test";
-import { appendFileSync, cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { read, root, run, scratch } from "./helpers";
@@ -68,4 +68,25 @@ test("with no receipt (a kit kumiko built), check compares every output to a fre
   appendFileSync(join(dir, "ports/tmux/tokyo-mono.conf"), "# mine\n");
   expect(failure(dir)).toContain("ports/tmux/tokyo-mono.conf is stale");
   expect(readFileSync(join(dir, "ports/tmux/tokyo-mono.conf"), "utf8")).toEndWith("# mine\n");
+});
+
+test("a new file an include glob matches fails until the next build", () => {
+  const dir = scratch("receipt-glob-");
+  writeFileSync(join(dir, "VERSION"), "0.1.0\n");
+  mkdirSync(join(dir, "vendor"));
+  writeFileSync(join(dir, "vendor/a.tokens.json"), JSON.stringify({ a: { $type: "number", $value: 1 } }));
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { include: ["vendor/*.tokens.json"], modules: ["css"] };\n');
+  expect(run(dir, "build").stderr.toString()).toBe("");
+  expect(run(dir, "check").exitCode).toBe(0);
+  writeFileSync(join(dir, "vendor/b.tokens.json"), JSON.stringify({ b: { $type: "number", $value: 2 } }));
+  expect(failure(dir)).toContain("vendor/b.tokens.json is new since the last build");
+});
+
+test("a receipt that lost its outputs fails, rather than checking nothing", () => {
+  const dir = kit();
+  const held = receipt(dir);
+  writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify({ ...held, outputs: {} }));
+  expect(failure(dir)).toContain("is not in the receipt");
+  writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify({ engine: "0.0.0" }));
+  expect(failure(dir)).toContain("breacan.receipt.json is not a receipt this engine reads");
 });

@@ -215,7 +215,12 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const header = (output) => Boolean(kit.name && !output.shared && wantsHeader(output.path));
   if (check) {
     const held = await readReceipt();
-    if (held) { await checkReceipt(held, candidates.filter((path) => !outputs.some((output) => resolve(output.path) === resolve(path)))); return outputs; }
+    if (held) {
+      // Every input this build found is a candidate, globbed includes too, so one the receipt lacks is caught.
+      const written = new Set(outputs.map((output) => resolve(output.path)));
+      await checkReceipt(held, inputs.filter((path) => !written.has(resolve(path)) && existsSync(path)), outputs.map((output) => output.path));
+      return outputs;
+    }
     // No receipt yet (a kit last built by kumiko): every output must match a fresh build.
     for (const output of outputs) {
       const existing = await readExisting(output.path);

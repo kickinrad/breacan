@@ -37,18 +37,27 @@ export const readReceipt = async () => {
   catch (error) { throw new Error(`${RECEIPT} is not valid JSON (${error.message}); run breacan build`); }
 };
 
-// Holds the tree to the receipt. `candidates` are the input files that exist now, so a new one is caught too.
-export const checkReceipt = async (held, candidates) => {
-  const outputs = new Set(Object.keys(held.outputs ?? {}));
-  for (const path of [...new Set(candidates.map(rel))].filter((each) => !outputs.has(each) && each !== RECEIPT).sort()) {
-    if (!(path in (held.inputs ?? {}))) throw new Error(`${path} is new since the last build; run breacan build`);
+const isMap = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
+
+// Holds the tree to the receipt. `candidates` are the input files that exist now, so a new one is caught too;
+// `written` are the paths this build writes, which must be exactly the receipt's outputs.
+export const checkReceipt = async (held, candidates, written) => {
+  if (!isMap(held) || !isMap(held.inputs) || !isMap(held.outputs) || Object.values(held.outputs).some((entry) => !isMap(entry) || typeof entry.sha256 !== "string")) {
+    throw new Error(`${RECEIPT} is not a receipt this engine reads; run breacan build`);
   }
-  for (const [path, hash] of Object.entries(held.inputs ?? {})) {
+  const outputs = new Set(Object.keys(held.outputs));
+  const now = new Set(written.map(rel));
+  for (const path of [...now].sort()) if (!outputs.has(path)) throw new Error(`${path} is not in the receipt; run breacan build`);
+  for (const path of [...outputs].sort()) if (!now.has(path)) throw new Error(`${path} is in the receipt, but the build no longer writes it; run breacan build`);
+  for (const path of [...new Set(candidates.map(rel))].filter((each) => !outputs.has(each) && each !== RECEIPT).sort()) {
+    if (!(path in held.inputs)) throw new Error(`${path} is new since the last build; run breacan build`);
+  }
+  for (const [path, hash] of Object.entries(held.inputs)) {
     const text = await readOrUndefined(path);
     if (text === undefined) throw new Error(`${path} is gone since the last build; run breacan build`);
     if (sha(text) !== hash) throw new Error(`${path} changed since the last build; run breacan build`);
   }
-  for (const [path, { sha256, header }] of Object.entries(held.outputs ?? {})) {
+  for (const [path, { sha256, header }] of Object.entries(held.outputs)) {
     const text = await readOrUndefined(path);
     if (text === undefined) throw new Error(`${path} is missing; run breacan build`);
     if (header) checkHeader(path, text.toString());
