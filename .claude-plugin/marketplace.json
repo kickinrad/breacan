@@ -1,0 +1,26 @@
+{
+  "name": "breacan",
+  "owner": {
+    "name": "Wils",
+    "email": "wils@bestfootforward.business",
+    "url": "https://github.com/kickinrad"
+  },
+  "metadata": {
+    "description": "Breacán, one look on every platform: the skills to make a kit and build with it, and the platform language plugins",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "breacan",
+      "source": "./plugins/breacan",
+      "description": "Make a design kit with Breacán from seeds, a scheme or a brand, and build apps on its outputs, rules and lint.",
+      "category": "design"
+    },
+    {
+      "name": "breacan-material",
+      "source": "./plugins/breacan-material",
+      "description": "Material 3, Breacán's Android language: answer from Material's own tokens and guidance.",
+      "category": "design"
+    }
+  ]
+}
