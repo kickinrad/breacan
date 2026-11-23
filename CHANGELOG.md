@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.0](https://github.com/kickinrad/breacan/compare/v0.20.0...v0.21.0) (2026-11-23)
+
+
+### Features
+
+* ✨ rename kumiko to Breacán: modules, resolver, base, engines ([#99](https://github.com/kickinrad/breacan/issues/99)) ([069cfa9](https://github.com/kickinrad/breacan/commit/069cfa96579c0f397443628b70f591a0a6af9939))
+
 ## [0.20.0](https://github.com/kickinrad/kumiko/compare/v0.19.0...v0.20.0) (2026-11-17)
 
 
