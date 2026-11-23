@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.1](https://github.com/kickinrad/breacan/compare/v0.21.0...v0.21.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **check:** 🐛 name outputs kumiko never wrote instead of failing ([#101](https://github.com/kickinrad/breacan/issues/101)) ([c2893b4](https://github.com/kickinrad/breacan/commit/c2893b4c7a4afced6cf66927597ff4d894b232d7))
+
 ## [0.21.0](https://github.com/kickinrad/breacan/compare/v0.20.0...v0.21.0) (2026-11-23)
 
 
