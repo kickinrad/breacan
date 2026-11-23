@@ -1,5 +1,6 @@
 // DTCG 2025.10 tokens/*.tokens.json is the only value source. The engine loads and stacks the layers, resolves
 // them, runs the config's modules (src/modules.mjs) and writes or checks their files.
+import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import material from "./material.mjs";
@@ -9,6 +10,10 @@ import { checkContrast, contrastPairs } from "./checks/contrast.mjs";
 import { derive } from "./derived.mjs";
 import { loadTheme, withMedia } from "./theme.mjs";
 import { optionsFor, render, resolveModules, withDefaults } from "./modules.mjs";
+import { loadResolver } from "./resolver.mjs";
+import { checkReceipt, readReceipt, receipt, RECEIPT } from "./receipt.mjs";
+import { wantsHeader } from "./header.mjs";
+import pkg from "../package.json" with { type: "json" };
 
 // Built-in include layers, named in a config's `include` beside its file globs.
 const layers = { [material.name]: material };
@@ -48,19 +53,26 @@ const loadKit = async (kit) => {
 };
 
 // `preview` (breacan dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
-// the outputs instead of failing on them.
-export const build = async (config = {}, { check = false, preview = false, theme: themeText } = {}) => {
+// the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
+// the one in this directory.
+export const build = async (config = {}, { check = false, preview = false, theme: themeText,
+  configFile = ["breacan.config.mjs", "kumiko.config.mjs"].find((file) => existsSync(file)) } = {}) => {
   const modules = resolveModules(config);
   const kit = await loadKit(config.kit);
 
   // The layers, lowest first: built-in trees, include files, the kit's theme.toml, then the project's own tokens/
   // files, where a token set twice is an error. Each other mode adds its media layers on top.
   const theme = await loadTheme(kit, themeText);
-  const media = withMedia(theme, config.media);
-  const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
   // Sorted: directory listing order varies by filesystem and runtime, and output order must not.
-  const baseFiles = (await readdir("tokens").catch((error) => { if (error.code === "ENOENT") return []; throw error; }))
-    .filter((file) => file.endsWith(".tokens.json")).sort().map((file) => `tokens/${file}`)
+  const listed = (await readdir("tokens").catch((error) => { if (error.code === "ENOENT") return []; throw error; })).sort();
+  // A resolver in tokens/ governs the folder: its default input is the base layer, each other mode a media layer.
+  const resolvers = listed.filter((file) => file.endsWith(".resolver.json"));
+  if (resolvers.length > 1) throw new Error(`tokens/ holds ${resolvers.length} resolvers; a kit reads one`);
+  const standard = resolvers.length ? await loadResolver(`tokens/${resolvers[0]}`) : undefined;
+  const media = withMedia(theme, config.media, standard?.media);
+  const modes = theme.modes ?? standard?.modes;
+  const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
+  const baseFiles = standard ? [] : listed.filter((file) => file.endsWith(".tokens.json")).map((file) => `tokens/${file}`)
     .filter((file) => !mediaPaths.has(resolve(file)));
   const include = [];
   for (const spec of config.include ?? []) {
@@ -69,6 +81,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
     include.unshift({ tree: layers[spec].tokens(), file: spec });
   }
   if (theme.tree) include.push({ tree: theme.tree, file: "theme.toml" });
+  if (standard) include.push({ tree: standard.tree, file: `tokens/${resolvers[0]}` });
   const source = baseFiles.map((file) => ({ file, strict: true }));
   const modeLayers = (query) => [...include, ...source.map(({ file, tree }) => ({ file, tree })), ...media[query]];
 
@@ -131,8 +144,13 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens });
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
+  // Every file a module reads, and every folder it lists, is an input the receipt holds.
+  const reads = new Set();
+  const folders = new Set();
+  const scan = (dir) => { try { return [...new Bun.Glob("**/*").scanSync({ cwd: dir, dot: true })].sort().map((file) => `${dir}/${file}`); } catch { return []; } };
+  const list = (dir) => { folders.add(dir); return scan(dir).map((path) => path.slice(dir.length + 1)); };
   const readExisting = async (path) => {
-    try { return await readFile(path, "utf8"); }
+    try { const text = await readFile(path, "utf8"); reads.add(path); return text; }
     catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
   };
   // Every module's files, written or checked by the one loop below. A module reads the config with its resolved module
@@ -143,26 +161,37 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const moduleConfig = { ...config, targets: modules.map((module) => module.name),
     ...Object.fromEntries(modules.map((module) => [module.name, withDefaults(module, config[module.name])])) };
   for (const module of modules) {
-    const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, built, ...kit,
-      ...(kit.name && { title: theme.title ?? kit.name }), ...(theme.modes && { modes: theme.modes, theme }) };
+    const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, list, built, ...kit,
+      ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }) };
     const files = await module.run({ ...base, render: (name) => render(name, base), options: optionsFor(module, base, config[module.name]) });
     outputs.push(...(kit.name ? stamp(files, kit, module.name) : files));
   }
   if (preview) {
     // Each mode's tokens by name, the base first, for breacan dev's panel.
-    const modes = { [theme.modes?.base ?? "base"]: tokens };
-    for (const [query, files] of Object.entries(media)) modes[theme.modes?.media[query] ?? query] = await mediaTokens(files);
-    return { outputs, contrast, theme, modes };
+    const byMode = { [modes?.base ?? "base"]: tokens };
+    for (const [query, files] of Object.entries(media)) byMode[modes?.media[query] ?? query] = await mediaTokens(files);
+    return { outputs, contrast, theme, modes: byMode };
   }
-  for (const { path, content, shared } of outputs) {
-    if (check) {
-      const existing = await readExisting(path);
-      if (kit.name && !shared) checkHeader(path, existing);
-      if (existing !== content) throw new Error(`${path} is stale; run breacan`);
-      continue;
+  // The inputs: the config, VERSION, every file in the kit folder and tokens/, the layers' files and what modules read.
+  const candidates = [configFile, kit.name && "VERSION", ...(kit.root ? scan(kit.root) : []), ...scan("tokens"), ...[...folders].flatMap(scan)].filter(Boolean);
+  const layerFiles = [...include, ...source, ...Object.values(media).flat()].map((layer) => layer.file).filter((file) => file && !file.startsWith("builtin:"));
+  const inputs = [...candidates, ...layerFiles, ...(standard?.files ?? []), ...reads];
+  const header = (output) => Boolean(kit.name && !output.shared && wantsHeader(output.path));
+  if (check) {
+    const held = await readReceipt();
+    if (held) { await checkReceipt(held, candidates.filter((path) => !outputs.some((output) => resolve(output.path) === resolve(path)))); return outputs; }
+    // No receipt yet (a kit last built by kumiko): every output must match a fresh build.
+    for (const output of outputs) {
+      const existing = await readExisting(output.path);
+      if (header(output)) checkHeader(output.path, existing);
+      if (existing !== output.content) throw new Error(`${output.path} is stale; run breacan`);
     }
+    return outputs;
+  }
+  for (const { path, content } of outputs) {
     await mkdir(dirname(path), { recursive: true });
     await writeFile(path, content);
   }
+  await writeFile(RECEIPT, await receipt({ engine: pkg.version, inputs, outputs, header }));
   return outputs;
 };

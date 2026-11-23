@@ -5,7 +5,7 @@ Breacán (said BRAK-awn, Irish for tartan) builds DTCG design tokens → CSS, Be
 ```sh
 mise use github:kickinrad/breacan
 breacan build   # build every target in breacan.config.mjs
-breacan check   # fail if a committed output is stale
+breacan check   # fail if an input changed or an output was edited since the last build
 breacan --version
 ```
 
@@ -21,6 +21,10 @@ export default {
   css: { path: "src/styles/tokens.css", layer: "base", prelude: "", scheme: "dark" }, // scheme is optional
 };
 ```
+
+Each build writes `breacan.receipt.json`: the sha256 of every input it read (the config, `VERSION`, the kit folder, `tokens/`, include files and what modules read) and of every file it wrote. `breacan check` holds the tree to it, naming an input changed since the build or an output edited by hand, and it holds each generated file to the header rule. It does not rebuild to compare, so a newer engine never fails a check; the next build takes it. A project with no receipt yet (last built by kumiko) is checked against a fresh build, as `kumiko --check` did.
+
+A DTCG 2025.10 resolver in `tokens/` (`*.resolver.json`, read through [Terrazzo's parser](https://terrazzo.app/docs/reference/js-api/)) governs that folder: its default input is the base mode, and a single `mode` modifier gives each other context as a media layer, under the query its `$extensions["com.kickinrad.breacan"].media` names. The `dtcg` output writes that resolver beside its files, so another kit, Terrazzo or Swatchbook reads a kit as one document.
 
 Every part outside the engine is a module of one shape, `{ slot, name, reads, writes, run(ctx) → [{ path, content }] }`. `slot` says when it runs (only `output` runs today), `reads` names what of `ctx` it needs (`kit` makes a missing kit an error), and `writes` maps each option that says where it writes to its default, `null` when the config must set it. The old target shape `{ name, build }` still works. The `default` preset is `dtcg`, `css`, `beer`, `design-md`, `claude-design` and `playground`; a module that needs a sibling stylesheet the config leaves out makes it in memory.
 

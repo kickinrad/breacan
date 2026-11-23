@@ -52,7 +52,7 @@ test("--check flags a rendered file that no longer matches its template or palet
   writeFileSync(join(dir, "design/theme.toml"), THEME.replace('blue = "#7aa2f7"', 'blue = "#7da6ff"'));
   const stale = run(dir, "--check");
   expect(stale.exitCode).toBe(1);
-  expect(stale.stderr.toString()).toContain("ports/a.conf is stale");
+  expect(stale.stderr.toString()).toContain("design/theme.toml changed since the last build");
 });
 
 test("a slot the palette lacks fails, naming the template and the slot", () => {

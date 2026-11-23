@@ -12,10 +12,12 @@
   "author": "wils <wils@bestfootforward.business>",
   "dependencies": {
     "@material/material-color-utilities": "latest",
+    "@terrazzo/parser": "latest",
     "beercss": "latest",
     "yaml": "latest"
   },
   "devDependencies": {
+    "@unpunnyfuns/swatchbook-core": "latest",
     "happy-dom": "latest"
   }
 }

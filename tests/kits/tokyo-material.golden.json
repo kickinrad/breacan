@@ -81,5 +81,6 @@
   "ports/claude-design/project/tokens.css": "0ade7e68ae22434bf8044f815dadfc58cf7b82ff78bfbf25d78f3cc57be2bac7",
   "ports/claude-design/project/tokens.json": "2a42c7021505e75777ce13ed27455d77a4ff6eec7fa0c3bc54c9803839533087",
   "ports/tokens/tokyo-material.day.tokens.json": "af6c08fcec5d9cee5abdc8b7af612bb42cec6a3a44dd17005ff9e9c60b239a2e",
+  "ports/tokens/tokyo-material.resolver.json": "f4c106496a555fbff63c58b0e0156de1306a70614366f960b6de8e6114063a21",
   "ports/tokens/tokyo-material.tokens.json": "eef1c12b7366b45044b3818162a3344cda08f49b462bcb428445dd0c10c85dc9"
 }

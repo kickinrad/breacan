@@ -85,7 +85,7 @@ test("an edited notes.md makes the plugin stale", () => {
   writeFileSync(join(dir, "design/notes.md"), `${read(dir, "design/notes.md")}\n- A new rule.\n`);
   const result = run(dir, "--check");
   expect(result.exitCode).not.toBe(0);
-  expect(result.stderr.toString()).toContain("agent/tern/skills/tern/references/notes.md is stale");
+  expect(result.stderr.toString()).toContain("design/notes.md changed since the last build");
 });
 
 test("a kit without notes.md fails, naming it", () => {

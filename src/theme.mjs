@@ -234,9 +234,11 @@ export const loadTheme = async ({ root, name } = {}, given) => {
   };
 };
 
-// Each media query's layers: the theme's mode first, then the project's own files for that query, which win.
-export const withMedia = (theme, media = {}) => {
+// Each media query's layers: the theme's mode first, then a resolver's, then the project's own files for that
+// query, which win.
+export const withMedia = (theme, media = {}, standard = {}) => {
   const merged = Object.fromEntries(Object.entries(theme.media).map(([query, { tree, name }]) => [query, [{ tree, file: `theme.toml (${name})`, strict: true }]]));
+  for (const [query, layers] of Object.entries(standard)) merged[query] = [...(merged[query] ?? []), ...layers];
   for (const [query, files] of Object.entries(media)) merged[query] = [...(merged[query] ?? []), ...files.map((file) => ({ file, strict: true }))];
   return merged;
 };

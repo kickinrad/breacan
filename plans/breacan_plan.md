@@ -154,7 +154,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 1. [x] **Baseline and Issues** (prefactor). Record every kit's outputs and every consumer's CI result at d0d1c10 as golden files and red evidence. File the out-of-scope Issues. Route: implementation-light. Demo: goldens committed; Issues listed. Blocked by: none.
 2. [x] **Rename, expand** (prefactor). Rename the repo and binary, with the `kumiko` alias, the old config name and `--check` kept. Add AGENTS.md. Route: implementation. Demo: every consumer's CI green unchanged; acceptance 1. Blocked by: 1.
 3. [x] **Output contract** (prefactor). Put the targets behind the module shape and presets. Delete material-you, compose-tv and `builtin:material-tv`, which no consumer builds. Keep storybook, dev and audit until their replacements land. Route: implementation-hard. Demo: tokyo outputs byte-identical to the goldens; acceptance 2. Blocked by: 2.
-4. [ ] **Standard load, one kit first.** Load tokyo-material's tokens through `@terrazzo/parser` and write its resolver. Then compile theme.toml to DTCG and a resolver, then replace `--check` with the receipt, keeping the header rule. Route: implementation-hard. Demo: acceptance 3. Blocked by: 3.
+4. [x] **Standard load, one kit first.** Load tokyo-material's tokens through `@terrazzo/parser` and write its resolver. Then compile theme.toml to DTCG and a resolver, then replace `--check` with the receipt, keeping the header rule. Route: implementation-hard. Demo: acceptance 3. Blocked by: 3.
 5. [ ] **Role contract and neutral base.** Write the contract and the base that fills it, with the base check. Route: implementation-hard. Demo: acceptance 4 on a web-only kit. Blocked by: 4.
 6. [ ] **Seed starter.** Leonardo and Material colour modules and `breacan new --seed`. Route: implementation. Demo: walkthrough A on web; acceptance 8. Blocked by: 5.
 7. [ ] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
@@ -204,6 +204,11 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - The playground and Claude Design make a missing css or beer sibling in memory, so the default preset less css still builds. DESIGN.md is a `shared` output with no do-not-edit header, since its body is hand-written; before this, a kit could not build it at all.
   - Deleted: `compose-tv`, `material-you` and `builtin:material-tv`. The vendored tv-card defaults stay in `material/` for #95.
   - Evidence: 257 tests pass; the three kits build byte-identical to their goldens; `tests/modules.test.ts` proves acceptance 2.
+- Task 4, standard load (implementation-hard, Demo passed second try: a variable name clashed).
+  - The `dtcg` output also writes `<name>.resolver.json`: one `base` set and a `mode` modifier whose `$extensions["com.kickinrad.breacan"].media` maps each context to its query. tokyo-material's golden gains that one file; the rest is unchanged.
+  - A resolver in `tokens/` governs the folder, read through `@terrazzo/parser` (`src/resolver.mjs`). theme.toml compiles to DTCG and a resolver through the `dtcg` output.
+  - `breacan check` holds the tree to `breacan.receipt.json` (inputs and outputs by sha256, header rule kept) instead of rebuilding to compare, so a newer engine never fails a consumer's check. With no receipt it falls back to the old compare.
+  - Evidence: 267 tests pass from source and on the compiled binary. `tests/standard.test.ts` loads tokyo-material's resolver in Terrazzo's parser (two permutations) and Swatchbook's loader (axis `mode`: night, day), and builds a plain resolver folder with no theme.toml (acceptance 3). `tests/receipt.test.ts` covers acceptance 6's hand-edit case.
 
 ## Related
 

@@ -26,8 +26,8 @@ test("--check passes when current and names the stale file otherwise", () => {
   appendFileSync(join(dir, "src/styles/tokens.css"), "/* hand edit */\n");
   const stale = run(dir, "--check");
   expect(stale.exitCode).toBe(1);
-  expect(stale.stderr.toString()).toContain("src/styles/tokens.css is stale");
-  expect(stale.stderr.toString()).toContain("run breacan");
+  expect(stale.stderr.toString()).toContain("src/styles/tokens.css was edited by hand");
+  expect(stale.stderr.toString()).toContain("run breacan build");
 });
 
 test("a token file that isn't valid JSON fails the build with the parse error, not a hang", () => {
@@ -157,7 +157,7 @@ test("with no kit, a target's ctx carries no kit keys", () => {
   const dir = kitProject(undefined, null);
   expect(run(dir).exitCode).toBe(0);
   expect(JSON.parse(read(dir, "echo.json")).keys).toEqual(
-    ["built", "config", "media", "mediaTokens", "options", "readExisting", "render", "tokens"]);
+    ["built", "config", "list", "media", "mediaTokens", "options", "readExisting", "render", "tokens"]);
 });
 
 // A kit's tokens are not schema-checked: a hex-string colour builds and passes --check.

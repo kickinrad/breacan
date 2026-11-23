@@ -34,6 +34,7 @@ test("breacan.config.mjs is read, and kumiko.config.mjs while consumers move", (
   const dir = project();
   expect(run(dir, "build").exitCode).toBe(0);
   renameSync(join(dir, "kumiko.config.mjs"), join(dir, "breacan.config.mjs"));
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(run(dir, "check").exitCode).toBe(0);
   renameSync(join(dir, "breacan.config.mjs"), join(dir, "elsewhere.mjs"));
   const result = run(dir, "check");

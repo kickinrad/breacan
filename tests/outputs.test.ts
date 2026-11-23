@@ -36,7 +36,7 @@ test("--check passes on a fresh build and fails on a stale file", () => {
   run(dir);
   expect(run(dir, "--check").exitCode).toBe(0);
   writeFileSync(join(dir, "ports/mealie/acme.env"), `${read(dir, "ports/mealie/acme.env")}# edit\n`);
-  expect(run(dir, "--check").stderr.toString()).toContain("ports/mealie/acme.env is stale");
+  expect(run(dir, "--check").stderr.toString()).toContain("ports/mealie/acme.env was edited by hand");
 });
 
 test("tailwind: one @theme inline block, every value a variable of the kit's runtime CSS, in the kit's namespaces", () => {
