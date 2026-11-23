@@ -13,7 +13,7 @@
         "yaml": "latest",
       },
       "devDependencies": {
-        "@google/design.md": "^0.4.0",
+        "@google/design.md": "latest",
         "@unpunnyfuns/swatchbook-core": "latest",
         "happy-dom": "latest",
       },
