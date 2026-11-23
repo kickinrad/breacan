@@ -27,7 +27,7 @@ test("--check passes when current and names the stale file otherwise", () => {
   const stale = run(dir, "--check");
   expect(stale.exitCode).toBe(1);
   expect(stale.stderr.toString()).toContain("src/styles/tokens.css is stale");
-  expect(stale.stderr.toString()).toContain("run kumiko");
+  expect(stale.stderr.toString()).toContain("run breacan");
 });
 
 test("a token file that isn't valid JSON fails the build with the parse error, not a hang", () => {
@@ -250,7 +250,7 @@ test("an unknown subcommand or flag fails, naming it, and writes nothing", () =>
     const before = files();
     const result = run(dir, ...args);
     expect(result.exitCode).toBe(1);
-    expect(result.stderr.toString()).toContain(`kumiko: unknown ${args[0]}`);
+    expect(result.stderr.toString()).toContain(`breacan: unknown ${args[0]}`);
     expect(files()).toEqual(before);
   }
 });

@@ -3,7 +3,7 @@
   "packages": {
     ".": {
       "release-type": "node",
-      "package-name": "kumiko",
+      "package-name": "breacan",
       "include-component-in-tag": false
     }
   }

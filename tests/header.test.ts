@@ -67,7 +67,7 @@ test("--check fails a kit output whose header is gone, naming the path", () => {
   const message = result.stderr.toString();
   expect(message).toContain("out/a.css");
   expect(message).toContain("header");
-  expect(message).toContain("run kumiko");
+  expect(message).toContain("run breacan");
 });
 
 test("--check fails a header past the tenth line, naming the path", () => {

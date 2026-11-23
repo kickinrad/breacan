@@ -1,6 +1,6 @@
 // DTCG 2025.10 tokens/*.tokens.json is the only value source.
 // A target is a module exporting { name, build(ctx) → [{ path, content }] }: built in under ./targets (listed in its
-// index), or a project's own, imported by kumiko.config.mjs and listed as an object.
+// index), or a project's own, imported by breacan.config.mjs and listed as an object.
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import material, { tv } from "./material.mjs";
@@ -48,10 +48,10 @@ const loadKit = async (kit) => {
   return { root: resolve(kit.root ?? "design"), version, name: kit.name };
 };
 
-// `preview` (kumiko dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
+// `preview` (breacan dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
 // the outputs instead of failing on them.
 export const build = async (config = {}, { check = false, preview = false, theme: themeText } = {}) => {
-  if (!Array.isArray(config.targets) || !config.targets.length) throw new Error("kumiko.config.mjs names no targets");
+  if (!Array.isArray(config.targets) || !config.targets.length) throw new Error("breacan.config.mjs names no targets");
   // A built-in by name, or a project's own target: a module the config imports, listed as its object.
   const targets = config.targets.map((spec) => {
     const target = typeof spec === "string" ? builtins[spec] : spec;
@@ -154,7 +154,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
     outputs.push(...(kit.name ? stamp(files, kit, target.name) : files));
   }
   if (preview) {
-    // Each mode's tokens by name, the base first, for kumiko dev's panel.
+    // Each mode's tokens by name, the base first, for breacan dev's panel.
     const modes = { [theme.modes?.base ?? "base"]: tokens };
     for (const [query, files] of Object.entries(media)) modes[theme.modes?.media[query] ?? query] = await mediaTokens(files);
     return { outputs, contrast, theme, modes };
@@ -163,7 +163,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
     if (check) {
       const existing = await readExisting(path);
       if (kit.name) checkHeader(path, existing);
-      if (existing !== content) throw new Error(`${path} is stale; run kumiko`);
+      if (existing !== content) throw new Error(`${path} is stale; run breacan`);
       continue;
     }
     await mkdir(dirname(path), { recursive: true });

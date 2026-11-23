@@ -1,4 +1,4 @@
-// `kumiko audit`: the playground as a browser draws it. Opens the generated playground from disk in headless Chrome
+// `breacan audit`: the playground as a browser draws it. Opens the generated playground from disk in headless Chrome
 // (over the DevTools protocol, so the engine needs no browser library) at a desktop and a phone size, under a host's
 // reset as a page that embeds or publishes it would add, and runs src/audit.js on every destination and item in
 // every mode. Returns one line per failure: the audit's, a page error, or a request that failed.
@@ -19,13 +19,13 @@ const chrome = () => {
   const cache = join(homedir(), ".cache/ms-playwright");
   const [downloaded] = [...new Bun.Glob("chromium-*/chrome-linux*/chrome").scanSync({ cwd: cache, absolute: true, onlyFiles: true })].sort().reverse();
   if (downloaded) return downloaded;
-  throw new Error("kumiko audit needs Chrome: set CHROME, or put google-chrome or chromium on the PATH");
+  throw new Error("breacan audit needs Chrome: set CHROME, or put google-chrome or chromium on the PATH");
 };
 
 // One DevTools connection: send(method, params, session) and every event to `on`.
 const connect = async (url) => {
   const socket = new WebSocket(url);
-  await new Promise((open, fail) => { socket.onopen = open; socket.onerror = () => fail(new Error(`kumiko audit: cannot reach Chrome at ${url}`)); });
+  await new Promise((open, fail) => { socket.onopen = open; socket.onerror = () => fail(new Error(`breacan audit: cannot reach Chrome at ${url}`)); });
   let id = 0;
   const pending = new Map();
   const listeners = [];
@@ -99,7 +99,7 @@ const walk = async () => {
 };
 
 export const audit = async (dir) => {
-  if (!(await Bun.file(join(dir, "index.html")).exists())) throw new Error(`kumiko audit: no playground at ${dir} (run kumiko first)`);
+  if (!(await Bun.file(join(dir, "index.html")).exists())) throw new Error(`breacan audit: no playground at ${dir} (run breacan first)`);
   const profile = mkdtempSync(join(tmpdir(), "tokens-audit-"));
   const browser = Bun.spawn([chrome(), "--headless=new", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--no-first-run", "--no-default-browser-check", "about:blank"], { stderr: "pipe", stdout: "ignore" });
   const failures = [];
@@ -108,7 +108,7 @@ export const audit = async (dir) => {
     const reader = browser.stderr.getReader();
     while (!/DevTools listening on (ws:\S+)/.test(text)) {
       const { value, done } = await reader.read();
-      if (done) throw new Error(`kumiko audit: Chrome did not start\n${text}`);
+      if (done) throw new Error(`breacan audit: Chrome did not start\n${text}`);
       text += new TextDecoder().decode(value);
     }
     const devtools = await connect(text.match(/DevTools listening on (ws:\S+)/)[1]);

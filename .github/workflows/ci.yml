@@ -20,7 +20,7 @@ jobs:
       - run: mise run setup
       - run: mise run check
       # The playground's client is linted as a consumer would be.
-      - run: bun bin/kumiko.mjs lint src/web/playground.js src/web/foundations.js src/web/components.js src/web/cards.js src/web/pages.js src/web/examples.js src/web/tailwind.html
+      - run: bun bin/breacan.mjs lint src/web/playground.js src/web/foundations.js src/web/components.js src/web/cards.js src/web/pages.js src/web/examples.js src/web/tailwind.html
       - name: Material baseline matches androidx
         run: bun scripts/vendor-m3.mjs --check
         env:
@@ -28,4 +28,4 @@ jobs:
       - run: mise run build
       - run: bun test
         env:
-          KUMIKO_BIN: dist/kumiko-linux-x64
+          BREACAN_BIN: dist/breacan

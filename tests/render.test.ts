@@ -19,14 +19,14 @@ const kit = () => {
   return dir;
 };
 
-test("kumiko audit passes the sample kit's playground: every destination and item, its example included, both modes, desktop and phone, under a host reset", () => {
+test("breacan audit passes the sample kit's playground: every destination and item, its example included, both modes, desktop and phone, under a host reset", () => {
   const result = run(kit(), "audit");
   expect(result.stdout.toString()).toBe("");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
 }, 120_000);
 
-test("kumiko audit fails a page that breaks a rule or misses a file, naming the text or the file, the mode and the size", () => {
+test("breacan audit fails a page that breaks a rule or misses a file, naming the text or the file, the mode and the size", () => {
   const dir = kit();
   // A primary that reads under 4.5:1 as text on the Day surfaces, and an example's capture that is not there.
   const theme = join(dir, "design/theme.toml");
@@ -37,5 +37,5 @@ test("kumiko audit fails a page that breaks a rule or misses a file, naming the 
   expect(result.exitCode).toBe(1);
   expect(result.stdout.toString()).toMatch(/^1280px day #components\/button: contrast \d\.\d\d:1 .*: span "text"$/m);
   expect(result.stdout.toString()).toMatch(/^1280px: file:\S+\/preview\/home\.png failed/m);
-  expect(run(dir, "audit", "nowhere").stderr.toString()).toContain("kumiko audit: no playground at");
+  expect(run(dir, "audit", "nowhere").stderr.toString()).toContain("breacan audit: no playground at");
 }, 120_000);
