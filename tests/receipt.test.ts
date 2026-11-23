@@ -135,3 +135,16 @@ test("extensionless and directory imports in the config are held by their real f
   appendFileSync(join(dir, "lib/helpers.mjs"), "\n");
   expect(failure(dir)).toContain("lib/helpers.mjs changed since the last build");
 });
+
+test("a JSON file and a typed TypeScript helper the config imports are inputs, and both still build", () => {
+  const dir = scratch("receipt-langs-");
+  mkdirSync(join(dir, "tokens"));
+  writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ a: { $type: "number", $value: 1 } }));
+  writeFileSync(join(dir, "meta.json"), JSON.stringify({ layer: "tokens" }));
+  writeFileSync(join(dir, "helpers.ts"), 'export const modules: string[] = ["css"];\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'import meta from "./meta.json" with { type: "json" };\nimport { modules } from "./helpers.ts";\nexport default { modules, css: { layer: meta.layer } };\n');
+  expect(run(dir, "build").stderr.toString()).toBe("");
+  expect(Object.keys(receipt(dir).inputs)).toEqual(expect.arrayContaining(["meta.json", "helpers.ts"]));
+  writeFileSync(join(dir, "meta.json"), JSON.stringify({ layer: "base" }));
+  expect(failure(dir)).toContain("meta.json changed since the last build");
+});

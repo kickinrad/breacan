@@ -2,7 +2,7 @@
 // them, runs the config's modules (src/modules.mjs) and writes or checks their files.
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, extname, relative, resolve } from "node:path";
 import material from "./material.mjs";
 import { readTokens, resolve as resolveTokens, typography } from "./resolve.mjs";
 import { checkHeader, stamp } from "./header.mjs";
@@ -57,14 +57,24 @@ const loadKit = async (kit) => {
 
 // The local files a module imports, transitively (`./` and `../` specifiers), so a config split into helpers is held
 // by the receipt too.
+const SCANNED = { ".js": "js", ".mjs": "js", ".cjs": "js", ".jsx": "jsx", ".ts": "ts", ".mts": "ts", ".cts": "ts", ".tsx": "tsx" };
 const localImports = (file, seen = new Set()) => {
   if (!file || seen.has(resolve(file))) return [];
   seen.add(resolve(file));
   let text;
   try { text = readFileSync(file, "utf8"); } catch { return []; }
-  // Bun's own scanner (comments and strings are not imports) and resolver (extensionless and directory imports).
-  const found = new Bun.Transpiler({ loader: "js" }).scanImports(text).map(({ path }) => path).filter((spec) => /^\.{1,2}\//.test(spec))
-    .flatMap((spec) => { try { return [relative(".", Bun.resolveSync(spec, dirname(resolve(file))))]; } catch { return []; } });
+  // Bun's own scanner (comments and strings are not imports), by the file's language; a data file such as JSON has
+  // no imports, so it is an input and nothing more. Bun's resolver gives the real file of an extensionless or
+  // directory import; one it cannot resolve fails the build, naming it.
+  const loader = SCANNED[extname(file)];
+  if (!loader) return [];
+  let specs;
+  try { specs = new Bun.Transpiler({ loader }).scanImports(text).map(({ path }) => path); }
+  catch (error) { throw new Error(`${file}: cannot read its imports (${error.message})`); }
+  const found = specs.filter((spec) => /^\.{1,2}\//.test(spec)).map((spec) => {
+    try { return relative(".", Bun.resolveSync(spec, dirname(resolve(file)))); }
+    catch { throw new Error(`${file} imports ${spec}, which does not resolve`); }
+  });
   return found.flatMap((each) => [each, ...localImports(each, seen)]);
 };
 
