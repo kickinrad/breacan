@@ -38,6 +38,8 @@ test("every contract role has a value in both modes, and each on-role reads on i
   const roles = contract().filter((role) => role.startsWith("md.sys.color."));
   for (const role of roles) expect(hex(light, role), role).toMatch(/^#[0-9a-f]{6}$/);
   const pairs = [["on-surface", "surface"], ["on-surface-variant", "surface"], ["on-surface", "surface-container-highest"],
+    ["on-surface-variant", "surface-container-highest"], ["on-surface-variant", "surface-variant"],
+    ...["primary", "secondary", "tertiary"].flatMap((role) => [[`on-${role}-fixed`, `${role}-fixed`], [`on-${role}-fixed-variant`, `${role}-fixed`], [`on-${role}-fixed-variant`, `${role}-fixed-dim`]]),
     ...["primary", "secondary", "tertiary", "error"].flatMap((role) => [[`on-${role}`, role], [`on-${role}-container`, `${role}-container`], [role, "surface"]])];
   for (const tree of [light, dark]) {
     const value = (role: string) => hex(tree, `md.sys.color.${role}`) ?? hex(light, `md.sys.color.${role}`);

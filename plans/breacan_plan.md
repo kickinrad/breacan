@@ -158,7 +158,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 5. [x] **Role contract and neutral base.** Write the contract and the base that fills it, with the base check. Route: implementation-hard. Demo: acceptance 4 on a web-only kit. Blocked by: 4.
 6. [x] **Seed starter.** Leonardo and Material colour modules and `breacan new --seed`. Route: implementation. Demo: walkthrough A on web; acceptance 8. Blocked by: 5.
 7. [x] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
-8. [ ] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
+8. [x] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
 9. [ ] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
 10. [ ] **Tokyo merge.** Build `kickinrad/tokyo` with the palette, the Material kit and its kit-plugin market. Ports come from Base24, the terminal set and templates (Obsidian, Mealie, Home Assistant included). Fix the swapped day contrast notes (secondary 4.41, tertiary 4.31) and replace `audit` with the checks in CI. Route: implementation. Demo: acceptance 9; walkthrough C from the Tokyo scheme. Blocked by: 9.
 11. [ ] **Consumers migrate.** Move tokyo-mono-site, the dotfiles through chezmoi, Porchlight (lint and Home Assistant template), Skylight (lint only) and the stacks Astro template. Each moves alone, on green CI. Route: implementation. Demo: each consumer's CI green on Breacán. Blocked by: 10.
@@ -224,6 +224,12 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - The `rules` output writes `breacan.rules.json`; `breacan lint` reads it and adds `theme ref`, `usage` and `icon` (emoji) findings, from the static gates of plugin87/ux-ui-agent-skills (MIT, checked).
   - Contrast failures now name the mode (`the day mode (prefers-color-scheme: light)`).
   - Evidence: `tests/checks.test.ts` proves all four parts of acceptance 6 from outside the engine.
+- Task 8, agent outputs (implementation, Demo passed after two base fixes that design.md lint found).
+  - `design-md` on the contract writes the roles, type, corners, spacing and a component per on-colour pair, plus a body of usage rules when the file has none; off the contract it is unchanged (the 2.1.0 golden holds).
+  - `plugin` adds `references/index.md`, `DESIGN.md` (on the contract) and `breacan.rules.json`, starts a SKILL.md when the kit has none, and no longer needs notes.md or theme.toml. tokyo-material's golden gains index.md and breacan.rules.json.
+  - Base fixes from the lint: quieter text (`on-surface-variant`) and quieter fixed text now move toward step 12 until they hold 4.5:1 on every surface or fixed fill.
+  - `scripts/golden.mjs` refreshes a golden from a kit folder.
+  - Evidence: `tests/agent.test.ts`: both engines' DESIGN.md and the plugin copy pass `design.md lint` with no errors or warnings, the plugin copied into a consumer carries its skill, rules and lint config, its rules flag a planted breach, and `claude plugin validate` passes (acceptance 10).
 
 ## Related
 

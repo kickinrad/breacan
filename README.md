@@ -31,6 +31,8 @@ A colour engine is a `foundation` module: it gives every colour role it knows in
 
 A DTCG 2025.10 resolver in `tokens/` (`*.resolver.json`, read through [Terrazzo's parser](https://terrazzo.app/docs/reference/js-api/)) governs that folder: its default input is the base mode, and a single `mode` modifier gives each other context as a media layer, under the query its `$extensions["com.kickinrad.breacan"].media` names. The `dtcg` output writes that resolver beside its files, so another kit, Terrazzo or Swatchbook reads a kit as one document.
 
+`design-md` writes [Google's DESIGN.md format](https://github.com/google-labs-code/design.md). On the role contract it writes the colour roles by name, the fifteen type roles, the corners, the spacing scale and a component per on-colour pair, so `design.md lint` checks each pair's contrast; a file with no body yet gets one that states the usage rules. Off the contract it writes the project's tokens by their names.
+
 Every part outside the engine is a module of one shape, `{ slot, name, reads, writes, run(ctx) → [{ path, content }] }`. `slot` says when it runs (`foundation`, then `output`), `reads` names what of `ctx` it needs (`kit` makes a missing kit an error), and `writes` maps each option that says where it writes to its default, `null` when the config must set it. The old target shape `{ name, build }` still works. The `default` preset is `dtcg`, `css`, `beer`, `design-md`, `claude-design` and `playground`; a module that needs a sibling stylesheet the config leaves out makes it in memory.
 
 `kit` is optional. When set, `name` is required, `root` is the kit folder relative to the config and defaults to `design`, and `VERSION` in the working directory must hold a semantic version. Every target's `ctx` then also carries `root`, `version`, `name` and `title` (the theme's, else the name), and with a `theme.toml` `theme` (the parsed file) and `modes` (`{ base, media }`: the base mode's name, and each other mode's name by its media query); without `kit` it carries none of them. Every target also gets `config`, so it can read a sibling output's path. Each token a target reads has a `description` (its `$description`, if any).
@@ -182,16 +184,19 @@ A mode's `data-theme` is the colour scheme its surface is nearer to, so the swit
 
 ## The `plugin` output
 
-`"plugin"` writes the kit's agent plugin, one directory that Claude Code and Codex both install, for a declared kit with a `<kit root>/notes.md` and its own `skills/<name>/SKILL.md` beside the output: `plugin: { path: "plugins/acme" }`. The kit writes the skill itself, so its wording changes with the kit and needs no engine release; the output writes what the skill reads. Optional: `description`, the manifest's one line, when the kit's skill does more than build UI (by default it says the plugin builds UI on the kit); `repository`, a URL where the kit's files are; and `author`, the manifest's `{ name, email?, url? }`. It writes:
+`"plugin"` writes the kit's agent plugin, one directory that Claude Code and Codex both install, for a declared kit: `plugin: { path: "plugins/acme" }`. The kit writes its own `skills/<name>/SKILL.md`, so its wording changes with the kit and needs no engine release; with none, the output starts one (no header, since the kit then owns it) that points at the references and the lint. The output writes what the skill reads. Optional: `description`, the manifest's one line, when the kit's skill does more than build UI (by default it says the plugin builds UI on the kit); `repository`, a URL where the kit's files are; and `author`, the manifest's `{ name, email?, url? }`. It writes:
 
 | File | Holds |
 | --- | --- |
 | `.claude-plugin/plugin.json` | the manifest: the kit's name, a description, `author`, `repository` and keywords; no `version`, so the runtime keys the plugin by its commit |
-| `skills/<name>/references/notes.md` | the kit's `notes.md`, its rules |
+| `skills/<name>/references/index.md` | the references below, each with what it is for |
+| `skills/<name>/references/DESIGN.md` | for a kit on the role contract, its DESIGN.md: the roles, the components the contract pairs and the usage rules |
+| `skills/<name>/references/breacan.rules.json` | the lint config: `breacan lint --rules <this file> <paths>` in the consumer's repo |
+| `skills/<name>/references/notes.md` | the kit's `notes.md`, its rules, when it has one |
 | `skills/<name>/references/components.md` | with a `beer` output, each playground component in its Material 3 family with Beer's markup and Material 3's guidance where Material has a page; without one, only the components Material 3 documents, with their guidance |
-| `skills/<name>/references/theme.toml` | the kit's `theme.toml`, under a `#` header line, for agents outside the kit's checkout |
+| `skills/<name>/references/theme.toml` | the kit's `theme.toml`, under a `#` header line, when it has one |
 
-The plugin guides an agent; it enforces nothing. `--check` holds the files it writes current with `notes.md`, `theme.toml` and the config, like any output's; after `path` changes, the old directory stays until it is removed. Files the output does not write, such as a kit's own evaluations beside the skill, stay the kit's.
+The plugin guides an agent, and its rules file lets the agent's lint enforce the kit. `--check` holds the files it writes current with `notes.md`, `theme.toml` and the config, like any output's; after `path` changes, the old directory stays until it is removed. Files the output does not write, such as a kit's own evaluations beside the skill, stay the kit's.
 
 ## The `template` output
 

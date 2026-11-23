@@ -4,6 +4,7 @@
 // A kit's theme, and later its platform's language, override any of it.
 import { blue, blueDark, gray, grayDark, red, redDark, slate, slateDark, violet, violetDark } from "@radix-ui/colors";
 import { SPACING, TYPE_ROLES } from "./contract.mjs";
+import { textSafe } from "./color.mjs";
 
 const colour = (hex) => ({ $type: "color", $value: hex });
 const px = (value) => ({ $type: "dimension", $value: { value, unit: "px" } });
@@ -16,7 +17,8 @@ const WHITE = "#ffffff";
 const BLACK = "#000000";
 
 // One scheme's colour roles. Step 11 is Radix's accessible text step, so an accent reads as text and under white
-// (light) or its own step 1 (dark); containers take step 4 and their text step 12. Fixed roles are the light values.
+// (light) or its own step 1 (dark); containers take step 4 and their text step 12. Fixed roles are the light values;
+// the quieter fixed text is step 11 moved toward step 12 until it holds 4.5:1 on both fixed fills.
 export const colours = (scheme) => {
   const dark = scheme === "dark";
   const g = (n) => step(dark ? grayDark : gray, "gray", n);
@@ -30,7 +32,8 @@ export const colours = (scheme) => {
     });
     if (role !== "error") {
       Object.assign(roles, {
-        [`${role}-fixed`]: fixed(4), [`${role}-fixed-dim`]: fixed(6), [`on-${role}-fixed`]: fixed(12), [`on-${role}-fixed-variant`]: fixed(11),
+        [`${role}-fixed`]: fixed(4), [`${role}-fixed-dim`]: fixed(6), [`on-${role}-fixed`]: fixed(12),
+        [`on-${role}-fixed-variant`]: textSafe(fixed(11), fixed(12), [fixed(4), fixed(6)]).value,
       });
     }
   }
@@ -38,7 +41,9 @@ export const colours = (scheme) => {
     surface: g(1), "surface-dim": dark ? g(1) : g(3), "surface-bright": dark ? g(4) : g(1),
     "surface-container-lowest": dark ? g(1) : WHITE, "surface-container-low": g(2), "surface-container": g(3),
     "surface-container-high": g(4), "surface-container-highest": g(5), "surface-variant": g(5),
-    background: g(1), "on-background": g(12), "on-surface": g(12), "on-surface-variant": g(11),
+    background: g(1), "on-background": g(12), "on-surface": g(12),
+    // Quieter text: step 11 moved toward step 12 until it holds 4.5:1 on every surface, the highest included.
+    "on-surface-variant": textSafe(g(11), g(12), [1, 2, 3, 4, 5].map(g)).value,
     outline: g(9), "outline-variant": g(6),
     "inverse-surface": dark ? step(gray, "gray", 12) : step(grayDark, "gray", 12),
     "inverse-on-surface": dark ? step(gray, "gray", 1) : step(grayDark, "gray", 1),
