@@ -1,6 +1,6 @@
 {
   "name": "breacan",
-  "description": "Make a design kit with Breacán from seeds, a scheme or a brand, and build apps on its outputs, rules and lint.",
+  "description": "Design tokens and kits with Breacán: make a kit from seeds, a scheme or a brand, and build apps on its outputs, rules and lint.",
   "author": {
     "name": "Wils",
     "email": "wils@bestfootforward.business"

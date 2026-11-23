@@ -1,6 +1,6 @@
 ---
 name: make-kit
-description: Make or change a design kit with Breacán. Use when starting a kit from seed colours, a scheme or a brand, editing a kit's tokens, theme.toml or notes.md, choosing its outputs, or fixing a failed breacan build or check. Not for building UI on an existing kit (use use-kit) or visual craft (use impeccable).
+description: Make or change design tokens and a design kit with Breacán. Use when starting a kit from seed colours, a scheme or a brand, editing a kit's tokens, theme.toml or notes.md, choosing its outputs, or fixing a failed breacan build or check. Not for building UI on an existing kit (use use-kit) or visual craft (use impeccable).
 ---
 
 # Make a kit

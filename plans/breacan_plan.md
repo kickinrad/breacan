@@ -159,7 +159,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 6. [x] **Seed starter.** Leonardo and Material colour modules and `breacan new --seed`. Route: implementation. Demo: walkthrough A on web; acceptance 8. Blocked by: 5.
 7. [x] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
 8. [x] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
-9. [ ] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
+9. [x] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
 10. [ ] **Tokyo merge.** Build `kickinrad/tokyo` with the palette, the Material kit and its kit-plugin market. Ports come from Base24, the terminal set and templates (Obsidian, Mealie, Home Assistant included). Fix the swapped day contrast notes (secondary 4.41, tertiary 4.31) and replace `audit` with the checks in CI. Route: implementation. Demo: acceptance 9; walkthrough C from the Tokyo scheme. Blocked by: 9.
 11. [ ] **Consumers migrate.** Move tokyo-mono-site, the dotfiles through chezmoi, Porchlight (lint and Home Assistant template), Skylight (lint only) and the stacks Astro template. Each moves alone, on green CI. Route: implementation. Demo: each consumer's CI green on Breacán. Blocked by: 10.
 12. [ ] **Vault, phase 1.** Curator writes the Breacán ADR and hub and updates `systems.toml`; forge's `references/system.md` example moves to the new name. Route: here. Demo: acceptance 16. Blocked by: 11.
@@ -238,7 +238,9 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Review round 2 (FAIL, 1 Must, 2 Should): a receipt holding `null` fell back to the old compare; a theme `extends` outside the kit folder and helpers the config imports escaped the receipt. All three fixed with tests.
   - Review round 3 (FAIL, 1 Must): the config-import scan broke directory imports and missed extensionless ones. It now uses Bun's own import scanner and resolver, with a test for both and for a commented-out import.
   - Review round 4 (FAIL, 2 Must): that scanner read JSON and typed TypeScript as plain JavaScript and failed the build. It now picks the language by extension, treats data files as plain inputs, and names an import it cannot resolve; tests cover JSON and typed TypeScript.
-  - Left for acceptance 15: install the market in Claude Code and Codex after the merge, then `dispatch list design tokens`.
+  - Shipped: PR #99 merged and released as 0.21.0; 0.21.1 (#101) fixed a kit with no receipt failing its check on the files Breacán adds, which broke tokyo-material's CI on 0.21.0. Review went four FAIL rounds, all on the receipt's config-import tracking; the owner chose to merge after round 4's fix.
+  - Acceptance 1: `mise use github:kickinrad/breacan` installs 0.21.0 and `breacan --version` prints it; `github:kickinrad/kumiko` still installs and runs as `kumiko`. tokyo-mono and tokyo-material CI pass on 0.21.1.
+  - Market installed in Claude Code and Codex (`claude plugin install`, `codex plugin add`; chezmoi d5a0e9e holds it). domains #33 and workflows #153 merged; design-system uninstalled from both runtimes. The make-kit and plugin descriptions now say "design tokens", so `dispatch list design tokens` finds Breacán.
 
 ## Related
 
