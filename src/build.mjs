@@ -30,6 +30,7 @@ const entry = (token) => {
   return {
     path: token.path, segments: token.segments, name: token.name, type: token.type, value: token.css, raw: token.raw,
     alias: token.alias, description: token.description, derived: token.extensions?.["com.kickinrad.derived"] === true || undefined,
+    usage: token.extensions?.["com.kickinrad.breacan"]?.usage, review: token.extensions?.["com.kickinrad.breacan"]?.["needs-review"] === true || undefined,
     typography: token.type === "typography" ? typography(token.raw) : undefined,
   };
 };
@@ -169,12 +170,14 @@ export const build = async (config = {}, { check = false, preview = false, theme
     });
   };
 
+  const review = tokens.filter((token) => token.review);
+  if (review.length && !preview) console.log(`${review.length} token${review.length === 1 ? " needs" : "s need"} review (flagged by an import): ${review.map((token) => token.path).join(", ")}`);
   if (base) {
     const byMode = { [modes.base]: tokens };
     for (const [query, layers] of Object.entries(media)) byMode[modes.media[query] ?? query] = await mediaTokens(layers);
     checkContract(byMode);
   }
-  const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens });
+  const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens, names: modes });
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
   // Every file a module reads, and every folder it lists, is an input the receipt holds.

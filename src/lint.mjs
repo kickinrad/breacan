@@ -1,4 +1,7 @@
-// Drift guard: flag a value a consumer hand-typed that the theme defines. Text scanning, line by line.
+// Drift guard: flag a value a consumer hand-typed that the theme defines. Text scanning, line by line. With a kit's
+// rules (breacan.rules.json, the rules output) it also flags a kit variable the kit lacks, a token used against its
+// usage rule, and an emoji standing in for an icon in markup. The checks follow the static gates of
+// ux-ui-agent-skills (MIT): no hard-coded values, theme references, no emoji icons.
 import { readFileSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
 import beerCss from "beercss/dist/cdn/beer.min.css" with { type: "text" };
@@ -48,15 +51,55 @@ const files = (path) => {
   return EXTENSIONS.has(extname(path)) ? [path] : [];
 };
 
-// Returns one "path:line: rule: text" string per finding; throws on a missing path.
-export const lint = (paths) => {
+const COLOUR_PROPERTIES = new Set(["color", "fill", "stroke", "caret-color", "-webkit-text-fill-color"]);
+const STYLED = new Set([".css", ".scss", ".html", ".jinja"]);
+const EMOJI = /\p{Extended_Pictographic}/u;
+const matches = (property, patterns) => patterns.some((pattern) => pattern.endsWith("*") ? property.startsWith(pattern.slice(0, -1)) : property === pattern);
+const vars = (value) => [...value.matchAll(/var\(\s*(--[\w-]+)/g)].map(([, name]) => name);
+
+// The rules checks over one file's text: each block's declarations, a kit variable it lacks, and usage.
+const ruled = (file, text, rules) => {
+  const found = [];
+  const lineAt = (offset) => text.slice(0, offset).split("\n").length;
+  const namespaces = new Set(rules.variables.map((name) => name.split("-")[2]));
+  const known = new Set(rules.variables);
+  for (const block of text.matchAll(/\{([^{}]*)\}/g)) {
+    const declarations = [];
+    let at = block.index + 1;
+    for (const part of block[1].split(";")) {
+      const match = part.match(/^\s*([\w-]+)\s*:\s*([\s\S]*?)\s*$/);
+      if (match && !OWN.test(part)) declarations.push({ property: match[1].toLowerCase(), value: match[2], line: lineAt(at + part.search(/\S|$/)) });
+      at += part.length + 1;
+    }
+    const background = declarations.filter(({ property }) => property === "background" || property === "background-color").flatMap(({ value }) => vars(value)).at(-1);
+    for (const { property, value, line } of declarations) {
+      for (const name of vars(value)) {
+        if (!known.has(name) && namespaces.has(name.split("-")[2])) found.push(`${file}:${line}: theme ref: ${name} is not one of the kit's variables`);
+        const rule = rules.usage[name];
+        if (!rule) continue;
+        if (rule.properties && !matches(property, rule.properties)) found.push(`${file}:${line}: usage: ${name} is for ${rule.properties.join(", ")}, not ${property}`);
+        if (rule.on && COLOUR_PROPERTIES.has(property) && background && !rule.on.includes(background)) {
+          found.push(`${file}:${line}: usage: ${name} sits on ${background}; its rule allows ${rule.on.join(", ")}`);
+        }
+      }
+    }
+  }
+  return found.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+};
+
+// Returns one "path:line: rule: text" string per finding; throws on a missing path. `rules` is a kit's
+// breacan.rules.json, parsed.
+export const lint = (paths, rules) => {
   const found = [];
   for (const file of paths.flatMap(files)) {
     const text = readFileSync(file, "utf8");
     if (hasHeader(text)) continue;
-    const beer = MARKUP.has(extname(file)) && BEER.test(text);
+    const markup = MARKUP.has(extname(file));
+    const beer = markup && BEER.test(text);
+    if (rules && STYLED.has(extname(file))) found.push(...ruled(file, text, rules));
     text.split("\n").forEach((line, index) => {
       if (OWN.test(line)) return;
+      if (rules && markup && EMOJI.test(line.replace(/<!--[\s\S]*?-->/g, ""))) found.push(`${file}:${index + 1}: icon: an emoji stands in for an icon; use the kit's icon set`);
       for (const [rule, pattern] of RULES) {
         for (const [match] of line.matchAll(pattern)) {
           if (parseFloat(match) !== 0) found.push(`${file}:${index + 1}: ${rule}: ${match}`);

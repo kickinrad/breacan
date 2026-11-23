@@ -247,6 +247,8 @@ A site follows edits when it loads the bridge and its styles read the kit's vari
 
 ## Drift guard: `breacan lint`
 
+With a kit's rules (`breacan lint --rules <file>`, else `breacan.rules.json` in the working directory, which the `rules` output writes), lint also flags a `var(--…)` in a kit namespace that the kit lacks (`theme ref`), a token used against its usage rule (`usage`: a text colour on a background its rule does not allow, or a token on a property its rule does not allow) and an emoji standing in for an icon in markup (`icon`). The contract gives Material's on-colours their backgrounds and `outline-variant` its border-only use; a token adds or changes its own in `$extensions["com.kickinrad.breacan"].usage` (`{ "on": [paths], "properties": ["border*", …] }`). A token an import marks `"needs-review": true` there is named by each build and listed in the rules. These follow the static gates of [ux-ui-agent-skills](https://github.com/plugin87/ux-ui-agent-skills) (MIT).
+
 `breacan lint <path> [<path>...]` fails when a consumer's source hand-types a value the theme defines, instead of reading the theme's variable, or builds markup on Beer with classes and controls Beer doesn't have. A path is a file or a directory (walked; `node_modules`, `.git` and dot-directories are skipped). It scans `.css .scss .yaml .yml .py .js .mjs .ts .jinja .html .kt .kts`; other files are ignored.
 
 | Rule | Finding |

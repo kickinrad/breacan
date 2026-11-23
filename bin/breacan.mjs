@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Build a kit's tokens into the outputs its breacan.config.mjs names. The binary also answers to `kumiko`, with
 // `--check` and kumiko.config.mjs, until every consumer has moved (plans/breacan_plan.md, the contract task).
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import pkg from "../package.json" with { type: "json" };
@@ -36,9 +36,19 @@ if (verb === "new") {
   } catch (error) { fail(error.message); }
 }
 
+// breacan lint [--rules <file>] <path>…: the kit's rules come from --rules, else breacan.rules.json here if present.
 if (verb === "lint") {
   const { lint } = await import("../src/lint.mjs");
-  try { exit(lint(rest)); } catch (error) { fail(error.message); }
+  try {
+    const at = rest.indexOf("--rules");
+    const file = at >= 0 ? rest[at + 1] : existsSync("breacan.rules.json") ? "breacan.rules.json" : undefined;
+    const paths = at >= 0 ? rest.filter((_, i) => i !== at && i !== at + 1) : rest;
+    let rules;
+    if (file) {
+      try { rules = JSON.parse(readFileSync(file, "utf8")); } catch (error) { throw new Error(`breacan lint: cannot read rules ${file} (${error.message})`); }
+    }
+    exit(lint(paths, rules));
+  } catch (error) { fail(error.message); }
 }
 
 // breacan.config.mjs, or the old kumiko.config.mjs while consumers move.

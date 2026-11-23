@@ -157,7 +157,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 4. [x] **Standard load, one kit first.** Load tokyo-material's tokens through `@terrazzo/parser` and write its resolver. Then compile theme.toml to DTCG and a resolver, then replace `--check` with the receipt, keeping the header rule. Route: implementation-hard. Demo: acceptance 3. Blocked by: 3.
 5. [x] **Role contract and neutral base.** Write the contract and the base that fills it, with the base check. Route: implementation-hard. Demo: acceptance 4 on a web-only kit. Blocked by: 4.
 6. [x] **Seed starter.** Leonardo and Material colour modules and `breacan new --seed`. Route: implementation. Demo: walkthrough A on web; acceptance 8. Blocked by: 5.
-7. [ ] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
+7. [x] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
 8. [ ] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
 9. [ ] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
 10. [ ] **Tokyo merge.** Build `kickinrad/tokyo` with the palette, the Material kit and its kit-plugin market. Ports come from Base24, the terminal set and templates (Obsidian, Mealie, Home Assistant included). Fix the swapped day contrast notes (secondary 4.41, tertiary 4.31) and replace `audit` with the checks in CI. Route: implementation. Demo: acceptance 9; walkthrough C from the Tokyo scheme. Blocked by: 9.
@@ -219,6 +219,11 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - `breacan new --seed <hex>… [--engine material] [<dir>]` writes a starter config and VERSION on the default preset.
   - Shortcut: Leonardo 1.1 warns about its own internal `colorspace` argument; `src/foundations/leonardo.mjs` hides that one message while it runs.
   - Evidence: `tests/seed.test.ts` builds walkthrough A on web from two seeds (every default output, every colour role, check passes), proves Leonardo meets its targets, and proves the Material engine equals `SchemeTonalSpot` for #6750a4 role by role in both schemes (acceptance 8).
+- Task 7, checks (implementation, Demo passed after re-planting the contrast failure on a pair the check covers).
+  - Usage rules: the contract gives Material's on-colours their backgrounds and `outline-variant` its border-only use; a token adds its own in `$extensions["com.kickinrad.breacan"].usage`. A token marked `needs-review` is named by each build and listed in the rules.
+  - The `rules` output writes `breacan.rules.json`; `breacan lint` reads it and adds `theme ref`, `usage` and `icon` (emoji) findings, from the static gates of plugin87/ux-ui-agent-skills (MIT, checked).
+  - Contrast failures now name the mode (`the day mode (prefers-color-scheme: light)`).
+  - Evidence: `tests/checks.test.ts` proves all four parts of acceptance 6 from outside the engine.
 
 ## Related
 

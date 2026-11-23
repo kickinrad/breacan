@@ -28,6 +28,30 @@ export const contract = () => [
   "breacan.sys.density",
 ];
 
+// The contract's usage rules, by token path: `on` lists the backgrounds a text or icon colour may sit on, and
+// `properties` the CSS properties a token may set. A kit adds its own in a token's $extensions["com.kickinrad.breacan"]
+// usage, which wins.
+export const usage = () => {
+  const color = (role) => `md.sys.color.${role}`;
+  const surfaces = ["surface", "surface-dim", "surface-bright", "surface-container-lowest", "surface-container-low", "surface-container",
+    "surface-container-high", "surface-container-highest", "surface-variant", "background"].map(color);
+  const rules = {};
+  for (const accent of ["primary", "secondary", "tertiary", "error"]) {
+    rules[color(`on-${accent}`)] = { on: [color(accent)] };
+    rules[color(`on-${accent}-container`)] = { on: [color(`${accent}-container`)] };
+  }
+  for (const accent of ["primary", "secondary", "tertiary"]) {
+    rules[color(`on-${accent}-fixed`)] = { on: [color(`${accent}-fixed`), color(`${accent}-fixed-dim`)] };
+    rules[color(`on-${accent}-fixed-variant`)] = { on: [color(`${accent}-fixed`), color(`${accent}-fixed-dim`)] };
+  }
+  for (const text of ["on-surface", "on-surface-variant", "on-background"]) rules[color(text)] = { on: surfaces };
+  rules[color("inverse-on-surface")] = { on: [color("inverse-surface")] };
+  // A decorative line under 3:1: borders and dividers only, never text.
+  rules[color("outline-variant")] = { properties: ["border*", "outline*", "column-rule*", "text-decoration-color"] };
+  rules[color("scrim")] = { properties: ["background*", "box-shadow"] };
+  return rules;
+};
+
 // The base check: every contract role has a value in every mode given ({ mode: tokens }).
 export const checkContract = (modes) => {
   const roles = contract();
