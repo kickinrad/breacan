@@ -148,3 +148,16 @@ test("a JSON file and a typed TypeScript helper the config imports are inputs, a
   writeFileSync(join(dir, "meta.json"), JSON.stringify({ layer: "base" }));
   expect(failure(dir)).toContain("meta.json changed since the last build");
 });
+
+test("with no receipt, a file kumiko never wrote is named, not failed, and an edited one still fails", () => {
+  const dir = scratch("receipt-legacy-");
+  cpSync(join(root, "tests/kits/tokyo-material"), dir, { recursive: true });
+  expect(run(dir, "build").exitCode).toBe(0);
+  rmSync(join(dir, "breacan.receipt.json"));
+  rmSync(join(dir, "ports/tokens/tokyo-material.resolver.json"));
+  const result = run(dir, "--check");
+  expect(result.exitCode).toBe(0);
+  expect(result.stdout.toString()).toContain("ports/tokens/tokyo-material.resolver.json is new in breacan");
+  appendFileSync(join(dir, "docs/playground/tokyo-material.css"), "/* mine */\n");
+  expect(failure(dir)).toContain("docs/playground/tokyo-material.css is stale");
+});
