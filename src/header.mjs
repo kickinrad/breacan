@@ -28,8 +28,9 @@ export const text = ({ name, version }, target) => {
 
 // Returns the target's outputs with the header added to each text file that lacks one. An output's `lead` is how
 // many of its first lines its format needs first (a marker its reader looks for on line 1); the header follows them.
+// A `shared` output also holds hand-written text (DESIGN.md's body), so it gets no do-not-edit header.
 export const stamp = (outputs, kit, target) => outputs.map(({ lead = 0, ...output }) => {
-  if (!wantsHeader(output.path) || hasHeader(output.content)) return output;
+  if (output.shared || !wantsHeader(output.path) || hasHeader(output.content)) return output;
   const lines = output.content.split("\n");
   let head = lead ? `${lines.slice(0, lead).join("\n")}\n` : "";
   let rest = lead ? lines.slice(lead).join("\n") : output.content;
@@ -48,6 +49,6 @@ export const stamp = (outputs, kit, target) => outputs.map(({ lead = 0, ...outpu
 // Under --check: the file on disk must carry the header, whatever else differs.
 export const checkHeader = (path, existing) => {
   if (wantsHeader(path) && existing !== undefined && !hasHeader(existing)) {
-    throw new Error(`${path} has no generated header in its first ${WINDOW} lines; run kumiko`);
+    throw new Error(`${path} has no generated header in its first ${WINDOW} lines; run breacan`);
   }
 };

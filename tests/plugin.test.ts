@@ -46,12 +46,14 @@ test("writes the manifest and the skill's references beside the kit's own SKILL.
   expect(run(dir, "--check").exitCode).toBe(0);
 });
 
-test("a kit without its own SKILL.md fails, naming it", () => {
+test("a kit without its own SKILL.md gets a starter that points at the references and the lint", () => {
   const dir = tern();
   rmSync(join(dir, "agent/tern/skills/tern/SKILL.md"));
-  const result = run(dir);
-  expect(result.exitCode).not.toBe(0);
-  expect(result.stderr.toString()).toContain("plugin needs agent/tern/skills/tern/SKILL.md: the kit writes its own skill");
+  expect(run(dir).stderr.toString()).toBe("");
+  const skill = read(dir, "agent/tern/skills/tern/SKILL.md");
+  expect(skill).toStartWith("---\nname: tern\n");
+  expect(skill).toContain("references/index.md");
+  expect(skill).toContain("breacan lint --rules references/breacan.rules.json");
 });
 
 test("components.md lists every component with Material's guidance, and Beer's markup only with a beer output", () => {
@@ -85,15 +87,14 @@ test("an edited notes.md makes the plugin stale", () => {
   writeFileSync(join(dir, "design/notes.md"), `${read(dir, "design/notes.md")}\n- A new rule.\n`);
   const result = run(dir, "--check");
   expect(result.exitCode).not.toBe(0);
-  expect(result.stderr.toString()).toContain("agent/tern/skills/tern/references/notes.md is stale");
+  expect(result.stderr.toString()).toContain("design/notes.md changed since the last build");
 });
 
-test("a kit without notes.md fails, naming it", () => {
+test("a kit without notes.md builds its plugin without that reference", () => {
   const dir = acme();
   renameSync(join(dir, "design/notes.md"), join(dir, "design/other.md"));
-  const result = run(dir);
-  expect(result.exitCode).not.toBe(0);
-  expect(result.stderr.toString()).toContain("plugin needs design/notes.md");
+  expect(run(dir).stderr.toString()).toBe("");
+  expect(read(dir, "plugins/acme/skills/acme/references/index.md")).not.toContain("notes.md");
 });
 
 test("the output needs a path and a declared kit", () => {

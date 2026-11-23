@@ -44,10 +44,11 @@ export const contrastPairs = ({ name, contrast: floors, derived }, tokens) => {
 export const toHex = (value) => typeof value === "string" && /^#[0-9a-f]{6}$/.test(value) ? value : undefined;
 
 // Returns each pair under its floor, one line each (none when the theme sets no floors).
-export const checkContrast = async (pairs, { tokens, media, mediaTokens }) => {
+// `names` are the kit's mode names ({ base, media: { query: name } }), so a failure says which mode.
+export const checkContrast = async (pairs, { tokens, media, mediaTokens, names }) => {
   if (pairs === undefined) return [];
-  const modes = [["base", tokens]];
-  for (const [query, files] of Object.entries(media)) modes.push([query, await mediaTokens(files)]);
+  const modes = [[names?.base ? `the ${names.base} mode (base)` : "base", tokens]];
+  for (const [query, files] of Object.entries(media)) modes.push([names?.media[query] ? `the ${names.media[query]} mode ${query}` : query, await mediaTokens(files)]);
   const failures = [];
   for (const [mode, set] of modes) {
     const byPath = new Map(set.map((token) => [token.path, token]));

@@ -1,0 +1,19 @@
+{
+  "base": "{{night.base}}",
+  "blue": "{{night.blue}}",
+  "crust": "{{night.crust}}",
+  "cyan": "{{night.cyan}}",
+  "green": "{{night.green}}",
+  "mantle": "{{night.mantle}}",
+  "orange": "{{night.orange}}",
+  "overlay": "{{night.overlay}}",
+  "purple": "{{night.purple}}",
+  "red": "{{night.red}}",
+  "subtext0": "{{night.subtext0}}",
+  "subtext1": "{{night.subtext1}}",
+  "surface0": "{{night.surface0}}",
+  "surface1": "{{night.surface1}}",
+  "teal": "{{night.teal}}",
+  "text": "{{night.text}}",
+  "yellow": "{{night.yellow}}"
+}

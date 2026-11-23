@@ -1,0 +1,10 @@
+{
+  "name": "breacan",
+  "description": "Make a design kit with Breacán from seeds, a scheme or a brand, and build apps on its outputs, rules and lint.",
+  "author": {
+    "name": "Wils",
+    "email": "wils@bestfootforward.business"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["design-tokens", "dtcg", "design-system", "breacan"]
+}

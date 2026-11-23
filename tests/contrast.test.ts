@@ -79,7 +79,7 @@ test("toHex takes an opaque colour as the build writes it, and nothing else", ()
 
 describe("a kit's contrast pairs", () => {
   const root = resolve(import.meta.dir, "..");
-  const command = process.env.KUMIKO_BIN ? [resolve(process.env.KUMIKO_BIN)] : ["bun", join(root, "bin/kumiko.mjs")];
+  const command = process.env.BREACAN_BIN ? [resolve(process.env.BREACAN_BIN)] : ["bun", join(root, "bin/breacan.mjs")];
   const run = (cwd: string, ...args: string[]) => Bun.spawnSync([...command, ...args], { cwd, stderr: "pipe" });
   const pairs = `
 [[contrast.pairs]]

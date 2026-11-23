@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>name</key>
+  <string>Tokyo Mono Night</string>
+  <key>settings</key>
+  <array>
+    <dict>
+      <key>settings</key>
+      <dict>
+        <key>background</key><string>{{night.base}}</string>
+        <key>caret</key><string>{{night.blue}}</string>
+        <key>foreground</key><string>{{night.text}}</string>
+        <key>invisibles</key><string>{{night.overlay}}</string>
+        <key>lineHighlight</key><string>{{night.surface0}}</string>
+        <key>selection</key><string>{{night.surface1}}</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Comments</string>
+      <key>scope</key><string>comment, punctuation.definition.comment</string>
+      <key>settings</key><dict><key>fontStyle</key><string>italic</string><key>foreground</key><string>{{night.subtext0}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Strings</string>
+      <key>scope</key><string>string, constant.other.symbol</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.cyan}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Numbers and constants</string>
+      <key>scope</key><string>constant.numeric, constant.language, constant.character, variable.language</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.orange}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Keywords</string>
+      <key>scope</key><string>keyword, storage, meta.annotation, punctuation.definition.annotation</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.purple}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Functions</string>
+      <key>scope</key><string>entity.name.function, support.function, meta.function-call</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.blue}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Types</string>
+      <key>scope</key><string>entity.name.type, entity.name.namespace, support.type, support.class</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.teal}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Classes and attributes</string>
+      <key>scope</key><string>entity.name.class, entity.other.attribute-name, variable.other.property</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.yellow}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Variables and parameters</string>
+      <key>scope</key><string>variable, variable.parameter</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.subtext1}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Punctuation</string>
+      <key>scope</key><string>punctuation, meta.brace, meta.delimiter</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.subtext0}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Invalid</string>
+      <key>scope</key><string>invalid, invalid.illegal</string>
+      <key>settings</key><dict><key>fontStyle</key><string>bold underline</string><key>foreground</key><string>{{night.red}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Markup headings</string>
+      <key>scope</key><string>markup.heading, markup.heading entity.name</string>
+      <key>settings</key><dict><key>fontStyle</key><string>bold</string><key>foreground</key><string>{{night.blue}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Markup links</string>
+      <key>scope</key><string>markup.underline.link, string.other.link</string>
+      <key>settings</key><dict><key>fontStyle</key><string>underline</string><key>foreground</key><string>{{night.cyan}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Diff inserted</string>
+      <key>scope</key><string>markup.inserted, meta.diff.header.to-file</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.green}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Diff deleted</string>
+      <key>scope</key><string>markup.deleted, meta.diff.header.from-file</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.red}}</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Diff changed</string>
+      <key>scope</key><string>markup.changed</string>
+      <key>settings</key><dict><key>foreground</key><string>{{night.yellow}}</string></dict>
+    </dict>
+  </array>
+</dict>
+</plist>

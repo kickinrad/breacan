@@ -75,8 +75,14 @@ test("the cover carries the theme's tagline when it has one", () => {
   expect(file(built(dir), "components/Cover/preview.html")).toContain("Ink on paper.");
 });
 
-test.each(["css", "beer"])("a config without the %s output before it fails, naming it", (target) => {
+test.each(["css", "beer"])("a config without the %s output still builds, with that stylesheet made in memory", (target) => {
   const result = run(project(`c.targets = c.targets.filter((each) => each !== "${target}" && each !== "playground");`));
+  expect(result.stderr.toString()).toBe("");
+  expect(result.exitCode).toBe(0);
+});
+
+test.each(["css", "beer"])("a config with the %s output after it fails, naming it", (target) => {
+  const result = run(project(`c.targets = [...c.targets.filter((each) => each !== "${target}" && each !== "playground"), "${target}"];`));
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain(`claude-design needs the ${target} output, listed before it`);
 });

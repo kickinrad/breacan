@@ -1,18 +1,24 @@
-// DTCG 2025.10 tokens/*.tokens.json is the only value source.
-// A target is a module exporting { name, build(ctx) → [{ path, content }] }: built in under ./targets (listed in its
-// index), or a project's own, imported by kumiko.config.mjs and listed as an object.
+// DTCG 2025.10 tokens/*.tokens.json is the only value source. The engine loads and stacks the layers, resolves
+// them, runs the config's modules (src/modules.mjs) and writes or checks their files.
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import material, { tv } from "./material.mjs";
+import { dirname, extname, relative, resolve } from "node:path";
+import material from "./material.mjs";
 import { readTokens, resolve as resolveTokens, typography } from "./resolve.mjs";
 import { checkHeader, stamp } from "./header.mjs";
 import { checkContrast, contrastPairs } from "./checks/contrast.mjs";
 import { derive } from "./derived.mjs";
 import { loadTheme, withMedia } from "./theme.mjs";
-import builtins from "./targets/index.mjs";
+import { optionsFor, render, resolveModules, withDefaults } from "./modules.mjs";
+import { loadResolver } from "./resolver.mjs";
+import { colours, shared } from "./base.mjs";
+import { checkContract } from "./contract.mjs";
+import { checkReceipt, readReceipt, receipt, RECEIPT } from "./receipt.mjs";
+import { wantsHeader } from "./header.mjs";
+import pkg from "../package.json" with { type: "json" };
 
 // Built-in include layers, named in a config's `include` beside its file globs.
-const layers = { [material.name]: material, [tv.name]: tv };
+const layers = { [material.name]: material };
 
 const cssTypes = new Set(["color", "dimension", "duration", "fontFamily", "fontWeight", "number", "string", "typography", "shadow", "cubicBezier"]);
 // One resolved token as targets see it: value is the CSS scalar.
@@ -24,6 +30,7 @@ const entry = (token) => {
   return {
     path: token.path, segments: token.segments, name: token.name, type: token.type, value: token.css, raw: token.raw,
     alias: token.alias, description: token.description, derived: token.extensions?.["com.kickinrad.derived"] === true || undefined,
+    usage: token.extensions?.["com.kickinrad.breacan"]?.usage, review: token.extensions?.["com.kickinrad.breacan"]?.["needs-review"] === true || undefined,
     typography: token.type === "typography" ? typography(token.raw) : undefined,
   };
 };
@@ -48,35 +55,85 @@ const loadKit = async (kit) => {
   return { root: resolve(kit.root ?? "design"), version, name: kit.name };
 };
 
-// `preview` (kumiko dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
-// the outputs instead of failing on them.
-export const build = async (config = {}, { check = false, preview = false, theme: themeText } = {}) => {
-  if (!Array.isArray(config.targets) || !config.targets.length) throw new Error("kumiko.config.mjs names no targets");
-  // A built-in by name, or a project's own target: a module the config imports, listed as its object.
-  const targets = config.targets.map((spec) => {
-    const target = typeof spec === "string" ? builtins[spec] : spec;
-    if (!target) throw new Error(`Unknown token target ${spec}`);
-    if (typeof target.build !== "function") throw new Error(`Token target ${target.name ?? spec} has no build()`);
-    return target;
+// The local files a module imports, transitively (`./` and `../` specifiers), so a config split into helpers is held
+// by the receipt too.
+const SCANNED = { ".js": "js", ".mjs": "js", ".cjs": "js", ".jsx": "jsx", ".ts": "ts", ".mts": "ts", ".cts": "ts", ".tsx": "tsx" };
+const localImports = (file, seen = new Set()) => {
+  if (!file || seen.has(resolve(file))) return [];
+  seen.add(resolve(file));
+  let text;
+  try { text = readFileSync(file, "utf8"); } catch { return []; }
+  // Bun's own scanner (comments and strings are not imports), by the file's language; a data file such as JSON has
+  // no imports, so it is an input and nothing more. Bun's resolver gives the real file of an extensionless or
+  // directory import; one it cannot resolve fails the build, naming it.
+  const loader = SCANNED[extname(file)];
+  if (!loader) return [];
+  let specs;
+  try { specs = new Bun.Transpiler({ loader }).scanImports(text).map(({ path }) => path); }
+  catch (error) { throw new Error(`${file}: cannot read its imports (${error.message})`); }
+  const found = specs.filter((spec) => /^\.{1,2}\//.test(spec)).map((spec) => {
+    try { return relative(".", Bun.resolveSync(spec, dirname(resolve(file)))); }
+    catch { throw new Error(`${file} imports ${spec}, which does not resolve`); }
   });
+  return found.flatMap((each) => [each, ...localImports(each, seen)]);
+};
+
+// `preview` (breacan dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
+// the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
+// the one in this directory.
+export const build = async (config = {}, { check = false, preview = false, theme: themeText,
+  configFile = ["breacan.config.mjs", "kumiko.config.mjs"].find((file) => existsSync(file)) } = {}) => {
+  const modules = resolveModules(config);
+  const foundations = modules.filter((module) => module.slot === "foundation");
   const kit = await loadKit(config.kit);
 
   // The layers, lowest first: built-in trees, include files, the kit's theme.toml, then the project's own tokens/
   // files, where a token set twice is an error. Each other mode adds its media layers on top.
   const theme = await loadTheme(kit, themeText);
-  const media = withMedia(theme, config.media);
-  const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
   // Sorted: directory listing order varies by filesystem and runtime, and output order must not.
-  const baseFiles = (await readdir("tokens").catch((error) => { if (error.code === "ENOENT") return []; throw error; }))
-    .filter((file) => file.endsWith(".tokens.json")).sort().map((file) => `tokens/${file}`)
+  const listed = (await readdir("tokens").catch((error) => { if (error.code === "ENOENT") return []; throw error; })).sort();
+  // A resolver in tokens/ governs the folder: its default input is the base layer, each other mode a media layer.
+  const resolvers = listed.filter((file) => file.endsWith(".resolver.json"));
+  if (resolvers.length > 1) throw new Error(`tokens/ holds ${resolvers.length} resolvers; a kit reads one`);
+  const standard = resolvers.length ? await loadResolver(`tokens/${resolvers[0]}`) : undefined;
+  const media = withMedia(theme, config.media, standard?.media);
+  let modes = theme.modes ?? standard?.modes;
+  // builtin:base fills every contract role: Material beneath, the base's shared values, then its colours in the
+  // scheme of the kit's base mode, and the other scheme under the colour-scheme query. A kit with no modes takes
+  // light, with dark under (prefers-color-scheme: dark).
+  // A colour engine (a foundation module) builds on the base, which fills every role it leaves.
+  const base = (config.include ?? []).includes("builtin:base") || foundations.length > 0;
+  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]) })));
+  const schemeQuery = Object.keys(media).find((query) => /prefers-color-scheme:\s*(light|dark)/.test(query));
+  if (base && !modes) {
+    modes = { base: "light", media: { "(prefers-color-scheme: dark)": "dark" } };
+    media["(prefers-color-scheme: dark)"] = [];
+  }
+  const baseScheme = /prefers-color-scheme:\s*light/.test(schemeQuery ?? "") ? "dark" : "light";
+  if (base) {
+    const query = schemeQuery ?? "(prefers-color-scheme: dark)";
+    const other = baseScheme === "dark" ? "light" : "dark";
+    media[query]?.unshift({ tree: colours(other), file: "builtin:base" }, ...engines.map((engine, i) => ({ tree: engine[other], file: foundations[i].name })));
+  }
+  const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
+  const baseFiles = standard ? [] : listed.filter((file) => file.endsWith(".tokens.json")).map((file) => `tokens/${file}`)
     .filter((file) => !mediaPaths.has(resolve(file)));
+  const builtins = [];
   const include = [];
   for (const spec of config.include ?? []) {
     if (!spec.startsWith("builtin:")) { include.push(...expand([spec]).map((file) => ({ file }))); continue; }
+    if (spec === "builtin:base") continue;
     if (!layers[spec]) throw new Error(`Unknown built-in include ${spec}`);
-    include.unshift({ tree: layers[spec].tokens(), file: spec });
+    builtins.push({ tree: layers[spec].tokens(), file: spec });
   }
+  if (base) {
+    if (!builtins.some((layer) => layer.file === material.name)) builtins.push({ tree: material.tokens(), file: material.name });
+    builtins.push({ tree: shared(), file: "builtin:base" }, { tree: colours(baseScheme), file: "builtin:base" },
+      ...engines.map((engine, i) => ({ tree: engine[baseScheme], file: foundations[i].name })));
+  }
+  include.unshift(...builtins);
   if (theme.tree) include.push({ tree: theme.tree, file: "theme.toml" });
+  if (standard) include.push({ tree: standard.tree, file: `tokens/${resolvers[0]}` });
   const source = baseFiles.map((file) => ({ file, strict: true }));
   const modeLayers = (query) => [...include, ...source.map(({ file, tree }) => ({ file, tree })), ...media[query]];
 
@@ -136,38 +193,69 @@ export const build = async (config = {}, { check = false, preview = false, theme
     });
   };
 
-  const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens });
+  const review = tokens.filter((token) => token.review);
+  if (review.length && !preview) console.log(`${review.length} token${review.length === 1 ? " needs" : "s need"} review (flagged by an import): ${review.map((token) => token.path).join(", ")}`);
+  if (base) {
+    const byMode = { [modes.base]: tokens };
+    for (const [query, layers] of Object.entries(media)) byMode[modes.media[query] ?? query] = await mediaTokens(layers);
+    checkContract(byMode);
+  }
+  const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens, names: modes });
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
+  // Every file a module reads, and every folder it lists, is an input the receipt holds.
+  const reads = new Set();
+  const folders = new Set();
+  const scan = (dir) => { try { return [...new Bun.Glob("**/*").scanSync({ cwd: dir, dot: true })].sort().map((file) => `${dir}/${file}`); } catch { return []; } };
+  const list = (dir) => { folders.add(dir); return scan(dir).map((path) => path.slice(dir.length + 1)); };
   const readExisting = async (path) => {
-    try { return await readFile(path, "utf8"); }
+    try { const text = await readFile(path, "utf8"); reads.add(path); return text; }
     catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
   };
-  // Every target's files, written or checked by the one loop below.
+  // Every module's files, written or checked by the one loop below. A module reads the config with its resolved module
+  // names as `targets`, so a sibling's place is found the same way whether a preset or a list named it.
   const outputs = [];
   // What an earlier target in this run made at a path (stamped, as written), so a later one reads it current.
   const built = (path) => outputs.find((output) => resolve(output.path) === resolve(path))?.content;
-  for (const target of targets) {
-    const options = config[target.name] ?? {};
-    const files = await target.build({ tokens, media, mediaTokens, options, config, readExisting, built, ...kit,
-      ...(kit.name && { title: theme.title ?? kit.name }), ...(theme.modes && { modes: theme.modes, theme }) });
-    outputs.push(...(kit.name ? stamp(files, kit, target.name) : files));
+  const moduleConfig = { ...config, targets: modules.map((module) => module.name),
+    ...Object.fromEntries(modules.map((module) => [module.name, withDefaults(module, config[module.name])])) };
+  for (const module of modules.filter((each) => each.slot === "output")) {
+    const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, list, built, ...kit,
+      ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }) };
+    const files = await module.run({ ...base, render: (name) => render(name, base), options: optionsFor(module, base, config[module.name]) });
+    outputs.push(...(kit.name ? stamp(files, kit, module.name) : files));
   }
   if (preview) {
-    // Each mode's tokens by name, the base first, for kumiko dev's panel.
-    const modes = { [theme.modes?.base ?? "base"]: tokens };
-    for (const [query, files] of Object.entries(media)) modes[theme.modes?.media[query] ?? query] = await mediaTokens(files);
-    return { outputs, contrast, theme, modes };
+    // Each mode's tokens by name, the base first, for breacan dev's panel.
+    const byMode = { [modes?.base ?? "base"]: tokens };
+    for (const [query, files] of Object.entries(media)) byMode[modes?.media[query] ?? query] = await mediaTokens(files);
+    return { outputs, contrast, theme, modes: byMode };
+  }
+  // The inputs: the config, VERSION, every file in the kit folder and tokens/, the layers' files and what modules read.
+  const candidates = [configFile, ...localImports(configFile), ...(theme.files ?? []), kit.name && "VERSION", ...(kit.root ? scan(kit.root) : []), ...scan("tokens"), ...[...folders].flatMap(scan)].filter(Boolean);
+  const layerFiles = [...include, ...source, ...Object.values(media).flat()].map((layer) => layer.file).filter((file) => file && !file.startsWith("builtin:"));
+  const inputs = [...candidates, ...layerFiles, ...(standard?.files ?? []), ...reads];
+  const header = (output) => Boolean(kit.name && !output.shared && wantsHeader(output.path));
+  if (check) {
+    const held = await readReceipt();
+    if (held !== undefined) {
+      // Every input this build found is a candidate, globbed includes too, so one the receipt lacks is caught.
+      const written = new Set(outputs.map((output) => resolve(output.path)));
+      await checkReceipt(held, inputs.filter((path) => !written.has(resolve(path)) && existsSync(path)), outputs.map((output) => output.path));
+      return outputs;
+    }
+    // No receipt yet (a kit last built by kumiko): every output must match a fresh build.
+    for (const output of outputs) {
+      const existing = await readExisting(output.path);
+      if (header(output)) checkHeader(output.path, existing);
+      if (existing !== output.content) throw new Error(`${output.path} is stale; run breacan`);
+    }
+    return outputs;
   }
   for (const { path, content } of outputs) {
-    if (check) {
-      const existing = await readExisting(path);
-      if (kit.name) checkHeader(path, existing);
-      if (existing !== content) throw new Error(`${path} is stale; run kumiko`);
-      continue;
-    }
     await mkdir(dirname(path), { recursive: true });
     await writeFile(path, content);
   }
+  await writeFile(RECEIPT, await receipt({ engine: pkg.version, inputs, outputs, header }));
   return outputs;
 };

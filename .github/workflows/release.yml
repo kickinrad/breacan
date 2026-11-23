@@ -37,8 +37,8 @@ jobs:
       - run: mise run build
       - run: bun test
         env:
-          KUMIKO_BIN: dist/kumiko-linux-x64
-      - run: gh release upload "$TAG" dist/kumiko-linux-x64 --clobber
+          BREACAN_BIN: dist/breacan
+      - run: gh release upload "$TAG" dist/breacan-linux-x64.tar.gz --clobber
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.release-please.outputs.tag }}

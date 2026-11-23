@@ -5,10 +5,16 @@ bun = "latest"
 run = "bun install"
 
 [tasks.check]
-run = "bun build bin/kumiko.mjs --target=bun --outdir=dist/check >/dev/null"
+run = "bun build bin/breacan.mjs --target=bun --outdir=dist/check >/dev/null"
 
 [tasks.test]
 run = "bun test"
 
 [tasks.build]
-run = "bun build --compile --target=bun-linux-x64 --asset src/color.mjs --asset src/web --asset node_modules/beercss/dist/cdn bin/kumiko.mjs --outfile dist/kumiko-linux-x64"
+# One release asset holds the binary under both names, so `mise use github:kickinrad/breacan` (or the old
+# kickinrad/kumiko, which GitHub redirects) puts `breacan` and `kumiko` on the PATH.
+run = [
+  "bun build --compile --target=bun-linux-x64 --asset src/color.mjs --asset src/web --asset node_modules/beercss/dist/cdn bin/breacan.mjs --outfile dist/breacan",
+  "cp dist/breacan dist/kumiko",
+  "tar -czf dist/breacan-linux-x64.tar.gz -C dist breacan kumiko",
+]

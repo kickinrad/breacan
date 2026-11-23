@@ -1,4 +1,4 @@
-// What every CLI test shares: the repo root, the binary (KUMIKO_BIN, or the source under Bun), run/read, and scratch
+// What every CLI test shares: the repo root, the binary (BREACAN_BIN, or the source under Bun), run/read, and scratch
 // directories that are removed when the test run ends.
 import { afterAll } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 export const root = resolve(import.meta.dir, "..");
-export const command = process.env.KUMIKO_BIN ? [resolve(process.env.KUMIKO_BIN)] : ["bun", join(root, "bin/kumiko.mjs")];
+export const command = process.env.BREACAN_BIN ? [resolve(process.env.BREACAN_BIN)] : ["bun", join(root, "bin/breacan.mjs")];
 export const run = (cwd: string, ...args: string[]) => Bun.spawnSync([...command, ...args], { cwd, stderr: "pipe" });
 export const read = (dir: string, file: string) => readFileSync(join(dir, file), "utf8");
 const scratches: string[] = [];

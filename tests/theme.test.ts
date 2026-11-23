@@ -56,7 +56,7 @@ test("a kit with a theme.toml builds, writing only its outputs", () => {
   const result = run(dir);
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
-  expect(written(dir)).toEqual(["VERSION", "design/theme.toml", "kumiko.config.mjs", "src/styles/tokens.css", "tokens/own.tokens.json"]);
+  expect(written(dir)).toEqual(["VERSION", "breacan.receipt.json", "design/theme.toml", "kumiko.config.mjs", "src/styles/tokens.css", "tokens/own.tokens.json"]);
   const css = read(dir, "src/styles/tokens.css");
   expect(css).toContain("--md-sys-color-primary: #7aa2f7;");
   expect(css).toContain("--acme-palette-ink: #101418;");
@@ -137,7 +137,7 @@ test("the outputs pass --check, and a changed theme.toml makes them stale", () =
   writeFileSync(join(dir, "design/theme.toml"), theme.replace("#2e7de9", "#2e7de8"));
   const stale = run(dir, "--check");
   expect(stale.exitCode).toBe(1);
-  expect(stale.stderr.toString()).toContain("src/styles/tokens.css is stale");
+  expect(stale.stderr.toString()).toContain("design/theme.toml changed since the last build");
 });
 
 test("a kit with no theme.toml builds from its token files", () => {

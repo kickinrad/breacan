@@ -1,0 +1,34 @@
+# Tokyo Mono Night — hello-zsh theme definition
+# Add this block to your ~/.config/hello-zsh/config.toml
+# then set: theme = "tokyo-mono"
+#
+# Colors: https://github.com/kickinrad/tokyo-mono
+
+[themes.tokyo-mono]
+name = "Tokyo Mono Night"
+red = "{{night.red}}"          # Errors, destructive
+orange = "{{night.orange}}"       # Constants, numbers, warnings
+yellow = "{{night.yellow}}"       # Attributes, keys, modified
+light_yellow = "{{night.yellow}}" # Alias — same as yellow
+green = "{{night.green}}"        # Success, git additions
+teal = "{{night.teal}}"         # Types, interfaces, info
+light_teal = "{{night.teal}}"   # Alias — same as teal
+cyan = "{{night.cyan}}"         # Strings, tags, inline code
+light_cyan = "{{night.cyan}}"   # Alias — same as cyan
+blue = "{{night.blue}}"         # Functions, links, focus
+purple = "{{night.purple}}"       # Keywords, decorators, brand
+white = "{{night.text}}"        # Primary text
+foreground = "{{night.subtext1}}"   # Secondary text (subtext1)
+text = "{{night.subtext0}}"         # Hints, metadata (subtext0)
+dim = "{{night.overlay}}"          # Comments, placeholders (overlay)
+black = "{{night.surface1}}"        # Borders, dividers (surface1)
+background = "{{night.base}}"   # Main background (base)
+
+[themes.tokyo-mono.weather]
+sunny = "yellow"
+cloudy = "dim"
+rainy = "blue"
+stormy = "purple"
+snowy = "light_cyan"
+windy = "white"
+danger = "red"

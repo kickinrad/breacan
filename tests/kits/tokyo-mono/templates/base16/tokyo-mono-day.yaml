@@ -1,0 +1,40 @@
+system: "base16"
+name: "Tokyo Mono Day"
+author: "kickinrad (https://github.com/kickinrad/tokyo-mono)"
+variant: "light"
+
+# base00–base07: strict light→dark luminance ramp (base16 spec for light variant)
+#
+# Background tones (light → less light):
+#   base00  {{day.base}}  base     — Default background, pure white (Win11 native)
+#   base01  {{day.mantle}}  mantle   — Panel/sidebar background (Win11 grey96)
+#   base02  {{day.crust}}  crust    — Selection background, active sidebar, borders
+# Midtone:
+#   base03  {{day.subtext0}}  subtext0 — Comments, invisibles, line numbers (readable muted)
+# Foreground tones (mid-dark → darkest):
+#   base04  {{day.subtext1}}  subtext1 — Dark foreground: status bar text, secondary labels
+#   base05  {{day.text}}  text     — Default foreground: main readable content (Win11 dark text)
+#   base06  {{day.text}}  text     — Light foreground (same — {{day.text}} is near-black floor)
+#   base07  {{day.text}}  text     — Darkest (same — no darker token in Day palette)
+#
+# Note: surface0 ({{day.surface0}}), surface1 ({{day.surface1}}), and overlay ({{day.overlay}}) are in the
+# palette for UI-specific roles (cards, borders, disabled elements) but aren't
+# needed in the base16 ramp. All mapped colors exist in design/theme.toml.
+
+palette:
+  base00: "{{day.base}}"  # Default Background (base — Win11 pure white)
+  base01: "{{day.mantle}}"  # Panel Background (mantle — sidebar, panels, Win11 grey96)
+  base02: "{{day.crust}}"  # Selection Background (crust — borders, active sidebar)
+  base03: "{{day.subtext0}}"  # Comments, Invisibles (subtext0 — readable muted text)
+  base04: "{{day.subtext1}}"  # Dark Foreground (subtext1 — status bars, secondary labels)
+  base05: "{{day.text}}"  # Default Foreground (text — Win11 native dark text)
+  base06: "{{day.text}}"  # Light Foreground (text — near-black is the luminance floor)
+  base07: "{{day.text}}"  # Darkest (text — no darker token in Day palette)
+  base08: "{{day.red}}"  # Red — errors, deletions
+  base09: "{{day.orange}}"  # Orange — constants, warnings
+  base0A: "{{day.yellow}}"  # Yellow — attributes, classes
+  base0B: "{{day.green}}"  # Green — strings, success
+  base0C: "{{day.cyan}}"  # Cyan — support, escape characters
+  base0D: "{{day.blue}}"  # Blue — functions, headings
+  base0E: "{{day.purple}}"  # Purple — keywords, storage
+  base0F: "{{day.teal}}"  # Teal — types, embedded language tags

@@ -1,0 +1,23 @@
+gui:
+  theme:
+    activeBorderColor:
+      - '{{night.blue}}'
+      - bold
+    inactiveBorderColor:
+      - '{{night.surface1}}'
+    searchingActiveBorderColor:
+      - '{{night.cyan}}'
+      - bold
+    optionsTextColor:
+      - '{{night.blue}}'
+    selectedLineBgColor:
+      - '{{night.surface0}}'
+    cherryPickedCommitBgColor:
+      - '{{night.teal}}'
+    cherryPickedCommitFgColor:
+      - '{{night.crust}}'
+    unstagedChangesColor:
+      - '{{night.red}}'
+    defaultFgColor:
+      - '{{night.text}}'
+  nerdFontsVersion: '3'

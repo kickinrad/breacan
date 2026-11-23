@@ -9,7 +9,7 @@ import { build } from "./build.mjs";
 import { contrastPairs } from "./checks/contrast.mjs";
 import { setValue } from "./toml-edit.mjs";
 import { fontLinks, iconLink } from "./web/foundations.js";
-import { bundle, inline, source } from "./targets/playground.mjs";
+import { bundle, inline, source } from "./outputs/playground.mjs";
 
 const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2" };
 // Pages elsewhere (a WordPress copy, a Storybook) read the live CSS and its events.

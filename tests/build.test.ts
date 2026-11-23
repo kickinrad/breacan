@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { appendFileSync, cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { command, read, root, run, scratch } from "./helpers";
-import { reads } from "../src/targets/beer.mjs";
+import { reads } from "../src/outputs/beer.mjs";
 
 const project = () => {
   const dir = scratch("tokens-");
@@ -26,8 +26,8 @@ test("--check passes when current and names the stale file otherwise", () => {
   appendFileSync(join(dir, "src/styles/tokens.css"), "/* hand edit */\n");
   const stale = run(dir, "--check");
   expect(stale.exitCode).toBe(1);
-  expect(stale.stderr.toString()).toContain("src/styles/tokens.css is stale");
-  expect(stale.stderr.toString()).toContain("run kumiko");
+  expect(stale.stderr.toString()).toContain("src/styles/tokens.css was edited by hand");
+  expect(stale.stderr.toString()).toContain("run breacan build");
 });
 
 test("a token file that isn't valid JSON fails the build with the parse error, not a hang", () => {
@@ -157,7 +157,7 @@ test("with no kit, a target's ctx carries no kit keys", () => {
   const dir = kitProject(undefined, null);
   expect(run(dir).exitCode).toBe(0);
   expect(JSON.parse(read(dir, "echo.json")).keys).toEqual(
-    ["built", "config", "media", "mediaTokens", "options", "readExisting", "tokens"]);
+    ["built", "config", "list", "media", "mediaTokens", "options", "readExisting", "render", "tokens"]);
 });
 
 // A kit's tokens are not schema-checked: a hex-string colour builds and passes --check.
@@ -217,10 +217,9 @@ const tokensOf = (dir: string) => {
   return JSON.parse(read(dir, "tokens.json")) as { path: string; builtin?: boolean }[];
 };
 
-test("builtin:material is Material 3 only; builtin:material-tv adds tv-material's card defaults", () => {
+test("builtin:material is Material 3 only, with no TV layer beside it", () => {
   expect(tokensOf(materialProject('"builtin:material"')).some((token) => token.path.startsWith("md.comp.tv-card."))).toBe(false);
-  const tv = tokensOf(materialProject('"builtin:material", "builtin:material-tv"'));
-  expect(tv.find((token) => token.path === "md.comp.tv-card.focused-scale")?.builtin).toBe(true);
+  expect(run(materialProject('"builtin:material", "builtin:material-tv"')).stderr.toString()).toContain("Unknown built-in include builtin:material-tv");
 });
 
 test("css writes Material's own component tokens only where Beer's layer reads them, and a project's own always", () => {
@@ -250,7 +249,7 @@ test("an unknown subcommand or flag fails, naming it, and writes nothing", () =>
     const before = files();
     const result = run(dir, ...args);
     expect(result.exitCode).toBe(1);
-    expect(result.stderr.toString()).toContain(`kumiko: unknown ${args[0]}`);
+    expect(result.stderr.toString()).toContain(`breacan: unknown ${args[0]}`);
     expect(files()).toEqual(before);
   }
 });

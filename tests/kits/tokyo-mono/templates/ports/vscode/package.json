@@ -1,0 +1,18 @@
+{
+  "name": "tokyo-mono",
+  "displayName": "Tokyo Mono",
+  "description": "Tokyo Night's soul, grounded in Windows 11. Built for Cascadia Code NF.",
+  "version": "0.1.0",
+  "publisher": "kickinrad",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Themes"],
+  "keywords": ["tokyo night", "windows 11", "dark theme", "light theme", "cascadia"],
+  "contributes": {
+    "themes": [
+      { "label": "Tokyo Mono Night", "uiTheme": "vs-dark", "path": "./themes/tokyo-mono-night-color-theme.json" },
+      { "label": "Tokyo Mono Day", "uiTheme": "vs", "path": "./themes/tokyo-mono-day-color-theme.json" }
+    ]
+  },
+  "repository": { "type": "git", "url": "https://github.com/kickinrad/tokyo-mono" },
+  "license": "MIT"
+}

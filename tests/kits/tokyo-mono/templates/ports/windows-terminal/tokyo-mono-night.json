@@ -1,0 +1,23 @@
+{
+    "name": "Tokyo Mono Night",
+    "background": "{{night.base}}",
+    "foreground": "{{night.text}}",
+    "cursorColor": "{{night.blue}}",
+    "selectionBackground": "{{night.surface0}}",
+    "black":         "{{night.crust}}",
+    "red":           "{{night.red}}",
+    "green":         "{{night.green}}",
+    "yellow":        "{{night.yellow}}",
+    "blue":          "{{night.blue}}",
+    "purple":        "{{night.purple}}",
+    "cyan":          "{{night.cyan}}",
+    "white":         "{{night.subtext1}}",
+    "brightBlack":   "{{night.overlay}}",
+    "brightRed":     "{{night.red}}",
+    "brightGreen":   "{{night.green}}",
+    "brightYellow":  "{{night.yellow}}",
+    "brightBlue":    "{{night.blue}}",
+    "brightPurple":  "{{night.purple}}",
+    "brightCyan":    "{{night.cyan}}",
+    "brightWhite":   "{{night.text}}"
+}

@@ -1,20 +1,26 @@
 {
-  "name": "kumiko",
+  "name": "breacan",
   "version": "0.20.0",
-  "description": "Build DTCG 2025.10 design tokens into each platform's native theme files, as one binary named kumiko.",
+  "description": "Build one look into each platform's native theme files from DTCG 2025.10 design tokens, as one binary named breacan.",
   "type": "module",
   "bin": {
-    "kumiko": "bin/kumiko.mjs"
+    "breacan": "bin/breacan.mjs",
+    "kumiko": "bin/breacan.mjs"
   },
   "license": "UNLICENSED",
   "private": true,
   "author": "wils <wils@bestfootforward.business>",
   "dependencies": {
+    "@adobe/leonardo-contrast-colors": "latest",
     "@material/material-color-utilities": "latest",
+    "@radix-ui/colors": "latest",
+    "@terrazzo/parser": "latest",
     "beercss": "latest",
     "yaml": "latest"
   },
   "devDependencies": {
+    "@google/design.md": "latest",
+    "@unpunnyfuns/swatchbook-core": "latest",
     "happy-dom": "latest"
   }
 }

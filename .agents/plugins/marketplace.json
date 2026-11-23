@@ -1,0 +1,20 @@
+{
+  "name": "breacan",
+  "interface": {
+    "displayName": "Breacán"
+  },
+  "plugins": [
+    {
+      "name": "breacan",
+      "source": {"source": "local", "path": "./plugins/breacan"},
+      "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+      "category": "Productivity"
+    },
+    {
+      "name": "breacan-material",
+      "source": {"source": "local", "path": "./plugins/breacan-material"},
+      "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+      "category": "Productivity"
+    }
+  ]
+}

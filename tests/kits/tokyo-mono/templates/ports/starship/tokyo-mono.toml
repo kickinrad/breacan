@@ -1,0 +1,176 @@
+# Tokyo Mono — Starship preset
+# Switch palette to "tokyo-mono-day" for light terminals.
+
+palette = "tokyo-mono-night"
+
+format = """
+[](fg:surface0)\
+$directory\
+([](fg:surface0 bg:mantle)$git_branch$git_status)\
+([](fg:prev_bg bg:base)$bun$nodejs$python$rust$golang$java)\
+[](fg:prev_bg)\
+$fill\
+$cmd_duration\
+$line_break\
+$character"""
+
+add_newline = false
+
+[profiles]
+claude-code = """
+[](fg:surface0)\
+$claude_model\
+([](fg:prev_bg bg:mantle)$git_branch)\
+([](fg:prev_bg bg:base)$claude_context$claude_cost)\
+[](fg:prev_bg)"""
+
+[palettes.tokyo-mono-night]
+crust = "{{night.crust}}"
+mantle = "{{night.mantle}}"
+base = "{{night.base}}"
+surface0 = "{{night.surface0}}"
+surface1 = "{{night.surface1}}"
+text = "{{night.text}}"
+subtext1 = "{{night.subtext1}}"
+subtext0 = "{{night.subtext0}}"
+overlay = "{{night.overlay}}"
+blue = "{{night.blue}}"
+cyan = "{{night.cyan}}"
+purple = "{{night.purple}}"
+green = "{{night.green}}"
+red = "{{night.red}}"
+orange = "{{night.orange}}"
+yellow = "{{night.yellow}}"
+teal = "{{night.teal}}"
+
+[palettes.tokyo-mono-day]
+crust = "{{day.crust}}"
+mantle = "{{day.mantle}}"
+base = "{{night.text}}"
+surface0 = "{{day.surface0}}"
+surface1 = "{{day.surface1}}"
+text = "{{day.text}}"
+subtext1 = "{{day.subtext1}}"
+subtext0 = "{{day.subtext0}}"
+overlay = "{{day.overlay}}"
+blue = "{{day.blue}}"
+cyan = "{{day.cyan}}"
+purple = "{{day.purple}}"
+green = "{{day.green}}"
+red = "{{day.red}}"
+orange = "{{day.orange}}"
+yellow = "{{day.yellow}}"
+teal = "{{day.teal}}"
+
+[directory]
+style = "bg:surface0 fg:text"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+truncate_to_repo = true
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Music" = "󰝚"
+
+[git_branch]
+symbol = "git "
+style = "bg:mantle fg:blue"
+format = "[ $symbol$branch ]($style)"
+
+[git_status]
+style = "bg:mantle fg:subtext1"
+format = "([$all_status$ahead_behind ]($style))"
+conflicted = "[=](bg:mantle fg:red)"
+ahead = "[⇡${count}](bg:mantle fg:green)"
+behind = "[⇣${count}](bg:mantle fg:red)"
+diverged = "[⇕⇡${ahead_count}⇣${behind_count}](bg:mantle fg:red)"
+up_to_date = ""
+untracked = "[?](bg:mantle fg:teal)"
+stashed = "[\\$](bg:mantle fg:subtext0)"
+modified = "[!](bg:mantle fg:yellow)"
+staged = "[+](bg:mantle fg:green)"
+renamed = "[»](bg:mantle fg:yellow)"
+deleted = "[✘](bg:mantle fg:red)"
+
+[nodejs]
+style = "bg:base fg:teal"
+format = "[ node $version ]($style)"
+version_format = "${major}.${minor}"
+
+[bun]
+style = "bg:base fg:teal"
+format = "[ bun $version ]($style)"
+version_format = "${major}.${minor}"
+
+[python]
+style = "bg:base fg:teal"
+format = "[ py $version ]($style)"
+version_format = "${major}.${minor}"
+
+[rust]
+style = "bg:base fg:teal"
+format = "[ rust $version ]($style)"
+version_format = "${major}.${minor}"
+
+[golang]
+style = "bg:base fg:teal"
+format = "[ go $version ]($style)"
+version_format = "${major}.${minor}"
+
+[java]
+style = "bg:base fg:teal"
+format = "[ java $version ]($style)"
+version_format = "${major}.${minor}"
+
+[fill]
+symbol = " "
+
+[cmd_duration]
+style = "fg:subtext0"
+format = "[ $duration]($style)"
+min_time = 2_000
+
+[character]
+success_symbol = "[❯](bold fg:green)"
+error_symbol = "[❯](bold fg:red)"
+
+[claude_model]
+symbol = "✦ "
+style = "bg:surface0 fg:blue bold"
+format = "[ $symbol$model ]($style)"
+
+[claude_context]
+gauge_width = 5
+gauge_full_symbol = "█"
+gauge_partial_symbol = "▒"
+gauge_empty_symbol = "░"
+format = "[ ctx $gauge $percentage ]($style)"
+
+[[claude_context.display]]
+threshold = 0
+style = "bg:base fg:green"
+
+[[claude_context.display]]
+threshold = 60
+style = "bg:base fg:yellow"
+
+[[claude_context.display]]
+threshold = 80
+style = "bg:base fg:orange"
+
+[[claude_context.display]]
+threshold = 90
+style = "bg:base fg:red bold"
+
+[claude_cost]
+symbol = ""
+format = "[· \\$$cost ]($style)"
+
+[[claude_cost.display]]
+threshold = 0
+hidden = true
+
+[[claude_cost.display]]
+threshold = 0.01
+style = "bg:base fg:teal"
