@@ -12,6 +12,7 @@
   "author": "wils <wils@bestfootforward.business>",
   "dependencies": {
     "@material/material-color-utilities": "latest",
+    "@radix-ui/colors": "latest",
     "@terrazzo/parser": "latest",
     "beercss": "latest",
     "yaml": "latest"

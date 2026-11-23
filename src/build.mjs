@@ -11,6 +11,8 @@ import { derive } from "./derived.mjs";
 import { loadTheme, withMedia } from "./theme.mjs";
 import { optionsFor, render, resolveModules, withDefaults } from "./modules.mjs";
 import { loadResolver } from "./resolver.mjs";
+import { colours, shared } from "./base.mjs";
+import { checkContract } from "./contract.mjs";
 import { checkReceipt, readReceipt, receipt, RECEIPT } from "./receipt.mjs";
 import { wantsHeader } from "./header.mjs";
 import pkg from "../package.json" with { type: "json" };
@@ -70,16 +72,37 @@ export const build = async (config = {}, { check = false, preview = false, theme
   if (resolvers.length > 1) throw new Error(`tokens/ holds ${resolvers.length} resolvers; a kit reads one`);
   const standard = resolvers.length ? await loadResolver(`tokens/${resolvers[0]}`) : undefined;
   const media = withMedia(theme, config.media, standard?.media);
-  const modes = theme.modes ?? standard?.modes;
+  let modes = theme.modes ?? standard?.modes;
+  // builtin:base fills every contract role: Material beneath, the base's shared values, then its colours in the
+  // scheme of the kit's base mode, and the other scheme under the colour-scheme query. A kit with no modes takes
+  // light, with dark under (prefers-color-scheme: dark).
+  const base = (config.include ?? []).includes("builtin:base");
+  const schemeQuery = Object.keys(media).find((query) => /prefers-color-scheme:\s*(light|dark)/.test(query));
+  if (base && !modes) {
+    modes = { base: "light", media: { "(prefers-color-scheme: dark)": "dark" } };
+    media["(prefers-color-scheme: dark)"] = [];
+  }
+  const baseScheme = /prefers-color-scheme:\s*light/.test(schemeQuery ?? "") ? "dark" : "light";
+  if (base) {
+    const query = schemeQuery ?? "(prefers-color-scheme: dark)";
+    media[query]?.unshift({ tree: colours(baseScheme === "dark" ? "light" : "dark"), file: "builtin:base" });
+  }
   const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
   const baseFiles = standard ? [] : listed.filter((file) => file.endsWith(".tokens.json")).map((file) => `tokens/${file}`)
     .filter((file) => !mediaPaths.has(resolve(file)));
+  const builtins = [];
   const include = [];
   for (const spec of config.include ?? []) {
     if (!spec.startsWith("builtin:")) { include.push(...expand([spec]).map((file) => ({ file }))); continue; }
+    if (spec === "builtin:base") continue;
     if (!layers[spec]) throw new Error(`Unknown built-in include ${spec}`);
-    include.unshift({ tree: layers[spec].tokens(), file: spec });
+    builtins.push({ tree: layers[spec].tokens(), file: spec });
   }
+  if (base) {
+    if (!builtins.some((layer) => layer.file === material.name)) builtins.push({ tree: material.tokens(), file: material.name });
+    builtins.push({ tree: shared(), file: "builtin:base" }, { tree: colours(baseScheme), file: "builtin:base" });
+  }
+  include.unshift(...builtins);
   if (theme.tree) include.push({ tree: theme.tree, file: "theme.toml" });
   if (standard) include.push({ tree: standard.tree, file: `tokens/${resolvers[0]}` });
   const source = baseFiles.map((file) => ({ file, strict: true }));
@@ -141,6 +164,11 @@ export const build = async (config = {}, { check = false, preview = false, theme
     });
   };
 
+  if (base) {
+    const byMode = { [modes.base]: tokens };
+    for (const [query, layers] of Object.entries(media)) byMode[modes.media[query] ?? query] = await mediaTokens(layers);
+    checkContract(byMode);
+  }
   const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens });
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
