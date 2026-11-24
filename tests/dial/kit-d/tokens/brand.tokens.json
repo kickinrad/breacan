@@ -1,0 +1,26 @@
+{
+  "$description": "Kit D's brand guide: its colours, its type and its icons.",
+  "md": {
+    "ref": {
+      "typeface": {
+        "brand": { "$type": "fontFamily", "$value": ["Fraunces", "serif"] },
+        "plain": { "$type": "fontFamily", "$value": ["Inter", "sans-serif"] }
+      }
+    },
+    "sys": {
+      "color": {
+        "primary": { "$type": "color", "$value": "#8a2be2" },
+        "on-primary": { "$type": "color", "$value": "#ffffff" }
+      },
+      "typescale": {
+        "display-large": { "size": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } } },
+        "body-large": { "size": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } } }
+      }
+    }
+  },
+  "breacan": {
+    "sys": {
+      "icon-set": { "$type": "string", "$value": "Phosphor" }
+    }
+  }
+}

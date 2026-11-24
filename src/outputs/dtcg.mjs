@@ -3,7 +3,8 @@
 // <path>/<name>.<mode>.tokens.json holds each other mode's tokens whose value differs from the base. Aliases are
 // resolved. Material's own component tokens that the kit leaves alone stay out: a project that wants them includes
 // builtin:material beneath these files. <path>/<name>.resolver.json is a DTCG resolver over those files, the modes as
-// one modifier, so Terrazzo, Swatchbook and Breacán itself read the kit as one document.
+// one modifier, so Terrazzo, Swatchbook and Breacán itself read the kit as one document. <path>/<name>.<platform>.tokens.json
+// holds each platform's base-mode tokens that differ from the base file (src/dial.mjs).
 // Options: path (a directory).
 import { join, resolve } from "node:path";
 import { text } from "../header.mjs";
@@ -35,7 +36,7 @@ export default {
   name: "dtcg",
   reads: ["tokens", "media", "kit"],
   writes: { path: null },
-  async run({ tokens, media, mediaTokens, options, name, version, modes = { media: {} } }) {
+  async run({ tokens, media, mediaTokens, options, name, version, modes = { media: {} }, platforms = {} }) {
     const dir = options.path;
     if (resolve(dir) === resolve("tokens")) throw new Error("dtcg: tokens/ is the project's own token source; write the output elsewhere");
     const header = text({ name, version }, "dtcg");
@@ -52,6 +53,12 @@ export default {
       files.push({ path: join(dir, `${name}.${mode}.tokens.json`), content: file(differ, `${header}; the ${mode} mode (${query}), over ${name}.tokens.json`) });
       contexts[mode] = [{ $ref: `${name}.${mode}.tokens.json` }];
       queries[mode] = query;
+    }
+    // Each platform's tokens that differ from the base mode, as its language and dial level made them.
+    for (const [platform, { level, tokens: own }] of Object.entries(platforms)) {
+      if (contexts[platform]) throw new Error(`dtcg: the platform ${platform} has a mode's name`);
+      const differ = own.filter((token) => kept(token) && JSON.stringify(token.raw) !== baseRaw.get(token.path));
+      files.push({ path: join(dir, `${name}.${platform}.tokens.json`), content: file(differ, `${header}; the ${platform} platform at ${level}, over ${name}.tokens.json`) });
     }
     const moded = Object.keys(queries).length > 0;
     const resolver = {
