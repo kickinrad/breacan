@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.22.0](https://github.com/kickinrad/breacan/compare/v0.21.1...v0.22.0) (2026-11-24)
+
+
+### Features
+
+* **source:** ✨ read Base16 and Base24 schemes as a kit's colours ([#104](https://github.com/kickinrad/breacan/issues/104)) ([5718bcb](https://github.com/kickinrad/breacan/commit/5718bcbcab3f5e36ec2652db18c13a9f9bf4f4d3))
+
 ## [0.21.1](https://github.com/kickinrad/breacan/compare/v0.21.0...v0.21.1) (2026-11-23)
 
 
