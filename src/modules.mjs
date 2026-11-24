@@ -4,12 +4,14 @@
 import outputs from "./outputs/index.mjs";
 import leonardo from "./foundations/leonardo.mjs";
 import materialColour from "./foundations/material.mjs";
+import scheme from "./sources/scheme.mjs";
 import { needKit } from "./system.mjs";
 
-// The slots that run today, in run order. Each new slot joins here when its first two modules land. A foundation
-// gives every colour role in both schemes ({ light, dark } token trees) over the base; an output writes files.
-export const SLOTS = ["foundation", "output"];
-const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour };
+// The slots that run today, in run order. A source reads a look from outside (a scheme file) and a foundation
+// generates one (a colour engine); each gives colour roles in both schemes ({ light, dark } token trees) over the
+// base, later modules over earlier ones. An output writes files.
+export const SLOTS = ["source", "foundation", "output"];
+const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour, [scheme.name]: scheme };
 
 // The kumiko target shape { name, build }, still read until every consumer has moved.
 const normalize = (module) => module && typeof module.build === "function" && module.run === undefined

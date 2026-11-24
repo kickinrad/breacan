@@ -84,7 +84,8 @@ const localImports = (file, seen = new Set()) => {
 export const build = async (config = {}, { check = false, preview = false, theme: themeText,
   configFile = ["breacan.config.mjs", "kumiko.config.mjs"].find((file) => existsSync(file)) } = {}) => {
   const modules = resolveModules(config);
-  const foundations = modules.filter((module) => module.slot === "foundation");
+  // Sources, then foundations: each gives { light, dark } colour trees over the base.
+  const foundations = ["source", "foundation"].flatMap((slot) => modules.filter((module) => module.slot === slot));
   const kit = await loadKit(config.kit);
 
   // The layers, lowest first: built-in trees, include files, the kit's theme.toml, then the project's own tokens/
