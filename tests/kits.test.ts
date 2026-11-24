@@ -1,8 +1,9 @@
 // The real kits, frozen at kumiko d0d1c10: each builds byte-identical to its golden manifest (path → sha256).
 // tests/kits/<kit>/ holds the Tokyo kits' inputs. Boombox's inputs stay in its private repo, so its golden runs only
-// when BOOMBOX_DESIGN names a checkout of it.
+// when BOOMBOX_DESIGN names a checkout of it. That checkout's config from before it moved to Swatchbook still lists the
+// removed `storybook` output, so the test drops it and the golden holds everything else.
 import { expect, test } from "bun:test";
-import { cpSync, existsSync, readFileSync } from "node:fs";
+import { cpSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { root, run, scratch } from "./helpers";
@@ -10,9 +11,10 @@ import { root, run, scratch } from "./helpers";
 const golden = (kit: string): Record<string, string> => JSON.parse(readFileSync(join(root, "tests/kits", `${kit}.golden.json`), "utf8"));
 const sha = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
 
-const expectGolden = (kit: string, source: string, inputs?: string[]) => {
+const expectGolden = (kit: string, source: string, inputs?: string[], edit?: (config: string) => string) => {
   const dir = scratch(`kit-${kit}-`);
   for (const entry of inputs ?? ["."]) if (existsSync(join(source, entry))) cpSync(join(source, entry), join(dir, entry), { recursive: true });
+  if (edit) writeFileSync(join(dir, "kumiko.config.mjs"), edit(readFileSync(join(dir, "kumiko.config.mjs"), "utf8")));
   const result = run(dir);
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
@@ -26,4 +28,5 @@ for (const kit of ["tokyo-mono", "tokyo-material"]) {
 
 const boombox = process.env.BOOMBOX_DESIGN;
 test.skipIf(!boombox)("boombox-design builds byte-identical to its golden", () =>
-  expectGolden("boombox-design", boombox!, ["kumiko.config.mjs", "VERSION", "design", "tokens", "preview"]), 60_000);
+  expectGolden("boombox-design", boombox!, ["kumiko.config.mjs", "VERSION", "design", "tokens", "preview"],
+    (config) => config.replace(' "storybook",', "").replace(/^ *storybook:.*\n/m, "")), 60_000);

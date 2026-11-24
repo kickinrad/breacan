@@ -11,6 +11,8 @@ import { needKit } from "./system.mjs";
 // generates one (a colour engine); each gives colour roles in both schemes ({ light, dark } token trees) over the
 // base, later modules over earlier ones. An output writes files.
 export const SLOTS = ["source", "foundation", "output"];
+// Outputs deleted, with what to say; a config that still lists one fails by name instead of as an unknown target.
+const removed = { storybook: "the storybook output was removed; use Swatchbook, configured in the project" };
 const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour, [scheme.name]: scheme };
 
 // The kumiko target shape { name, build }, still read until every consumer has moved.
@@ -30,6 +32,7 @@ export const resolveModules = (config) => {
   const listed = [...(presets[config.preset] ?? []).filter((name) => !without.has(name)), ...(config.modules ?? config.targets ?? [])];
   if (!listed.length) throw new Error("breacan.config.mjs names no modules");
   return listed.map((spec) => {
+    if (typeof spec === "string" && removed[spec]) throw new Error(`Removed output ${spec}: ${removed[spec]}`);
     const module = normalize(typeof spec === "string" ? builtin[spec] : spec);
     if (!module) throw new Error(`Unknown token target ${spec}`);
     const name = module.name ?? spec;

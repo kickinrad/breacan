@@ -1,4 +1,4 @@
-// The Tune panel's page, served by kumiko dev at /_kumiko/panel (Storybook shows it as an addon panel). It reads the
+// The Tune panel's page, served by kumiko dev at /_kumiko/panel. It reads the
 // kit from the server, sends every edit to it, and the server builds the edit and sends the result here and to every
 // page that loads its bridge. Inputs stay put while the rest redraws, so an open colour picker stays open.
 import { controls, tuneView, valueOf } from "./tune.js";

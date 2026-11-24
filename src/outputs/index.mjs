@@ -10,9 +10,8 @@ import playground from "./playground.mjs";
 import plugin from "./plugin.mjs";
 import reactNative from "./react-native.mjs";
 import rules from "./rules.mjs";
-import storybook from "./storybook.mjs";
 import tailwind from "./tailwind.mjs";
 import template from "./template.mjs";
 
 export default Object.fromEntries([beer, claudeDesign, css, designMd, dtcg, mealie, obsidian, playground, plugin, reactNative,
-  rules, storybook, tailwind, template].map((module) => [module.name, module]));
+  rules, tailwind, template].map((module) => [module.name, module]));
