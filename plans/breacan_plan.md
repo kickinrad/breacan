@@ -166,7 +166,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 
 ### Phase 2: dial, Apple and Boombox
 
-13. [ ] **Dial on one foundation.** The platform layer and resolve rule for type only, end to end, with a fixture Apple stub. Route: implementation-hard. Demo: type differs by level on fixture kit D. Blocked by: 12.
+13. [x] **Dial on one foundation.** The platform layer and resolve rule for type only, end to end, with a fixture Apple stub. Route: implementation-hard. Demo: type differs by level on fixture kit D. Blocked by: 12.
 14. [ ] **Dial for every foundation.** Levels, per-foundation overrides and the chrome rule across all foundations and component tokens. Route: implementation-hard. Demo: acceptance 5. Blocked by: 13.
 15. [ ] **breacan-apple.** Foundations-only Apple language plugin with HIG links. Route: implementation. Demo: walkthrough A on iOS. Blocked by: 14.
 16. [ ] **Expo output.** The typed Expo theme from the react-native code, per platform. Route: implementation. Demo: a fixture Expo project typechecks. Blocked by: 14.
@@ -179,7 +179,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 20. [ ] **Website, image and Figma imports.** Dembrandt with `needs-review`, an image palette, and `tz import` for Figma. Route: implementation. Demo: acceptance 11. Blocked by: 19.
 21. [ ] **Local editor.** Live swatches and contrast that save back to token files; the dev server is then deleted. Route: implementation. Demo: acceptance 12. Blocked by: 18.
 22. [ ] **Penpot plugin.** Push and pull a kit's tokens through Penpot's plugin API, mapping Penpot themes to resolver sets. Route: implementation-hard. Demo: acceptance 13. Blocked by: 21.
-23. [ ] **Contract.** Remove the `kumiko` alias, the old config name and `--check`; archive tokyo-mono and tokyo-material. Route: implementation-light. Demo: acceptance 14. Blocked by: 11, 17.
+23. [ ] **Contract.** Remove the `kumiko` alias, the old config name and `--check`; archive tokyo-material (tokyo-mono stays). Route: implementation-light. Demo: acceptance 14. Blocked by: 11, 17.
 24. [ ] **Public-ready.** LICENSE, NOTICE, CLA, SPDX headers, the licence audit in CI and the trademark search; Curator updates the hub. Route: here. Demo: acceptance 17. Blocked by: 22, 23.
 
 ## Run
@@ -257,6 +257,10 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Curator wrote ADR-026 (`026-kumiko-becomes-breacan-a-small-engine-and-modules-on-dtcg`), superseding ADR-021 and ADR-023 where they conflict, and the hub `Agent Ecosystem/Systems/Breacan`, which replaces the deleted Kumiko hub. It fixed the current-state notes the move made wrong: Tokyo Mono, Tokyo Mono Kit, Component Architecture, the Astro and Base stack notes, and Using mise.
   - `systems.toml` names Breacan (core #131), forge's card example uses Breacán, and `vault-cards check` reports 10 cards current.
   - Phase 1 is done. Phase 2 (the dial, Apple, Expo, Boombox, playground columns) starts at task 13.
+- Task 13, dial on one foundation (implementation-hard, Demo passed first try; merged).
+  - `src/dial.mjs` adds the platform layer and the dial: a kit sets `platforms: { ios: { language, dial } }`, and the level picks the theme's or the language's values per foundation, type only so far. `dtcg` writes `<name>.<platform>.tokens.json` with each platform's differences. Shortcut in the README: a platform resolves in the base mode only, and the resolver has no platform modifier yet.
+  - Fixture kit D (`tests/dial/kit-d`) with a fixture Apple language; `tests/dial.test.ts` builds it at each level through the binary against `tests/dial/kit-d.golden.json`. Native and Tinted take SF Pro; Branded and Signature keep the brand's type. Every existing golden is unchanged.
+  - Shipped: PR #111 merged and released as 0.23.0.
 
 ## Related
 
