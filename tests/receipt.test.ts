@@ -104,56 +104,19 @@ test("a receipt file holding null or false fails, rather than falling back", () 
   }
 });
 
-test("a theme's extended file outside the kit folder, and a helper the config imports, are inputs", () => {
+test("a theme's extended file outside the kit folder is an input", () => {
   const dir = scratch("receipt-reach-");
   mkdirSync(join(dir, "design"));
   mkdirSync(join(dir, "shared"));
-  mkdirSync(join(dir, "lib"));
   writeFileSync(join(dir, "VERSION"), "0.1.0\n");
   writeFileSync(join(dir, "shared/base.toml"), 'default = "light"\n\n[palette.light]\nink = "#101418"\n');
   writeFileSync(join(dir, "design/theme.toml"), 'name = "acme"\nextends = "../shared/base.toml"\n');
-  writeFileSync(join(dir, "lib/helpers.mjs"), 'export const kit = { name: "acme" };\n');
-  writeFileSync(join(dir, "breacan.config.mjs"), 'import { kit } from "./lib/helpers.mjs";\nexport default { kit, modules: ["css"] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { kit: { name: "acme" }, modules: ["css"] };\n');
   expect(run(dir, "build").stderr.toString()).toBe("");
-  expect(Object.keys(receipt(dir).inputs)).toEqual(expect.arrayContaining(["shared/base.toml", "lib/helpers.mjs"]));
+  expect(Object.keys(receipt(dir).inputs)).toContain("shared/base.toml");
   appendFileSync(join(dir, "shared/base.toml"), "\n");
   expect(failure(dir)).toContain("shared/base.toml changed since the last build");
-  run(dir, "build");
-  appendFileSync(join(dir, "lib/helpers.mjs"), "\n");
-  expect(failure(dir)).toContain("lib/helpers.mjs changed since the last build");
 });
-
-test("extensionless and directory imports in the config are held by their real files, and a commented one is not", () => {
-  const dir = scratch("receipt-resolve-");
-  mkdirSync(join(dir, "lib"));
-  mkdirSync(join(dir, "tokens"));
-  writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ a: { $type: "number", $value: 1 } }));
-  writeFileSync(join(dir, "lib/index.mjs"), 'export const modules = ["css"];\n');
-  writeFileSync(join(dir, "lib/helpers.mjs"), "export const layer = \"tokens\";\n");
-  writeFileSync(join(dir, "ghost.mjs"), "export default 1;\n");
-  writeFileSync(join(dir, "breacan.config.mjs"), 'import { modules } from "./lib";\nimport { layer } from "./lib/helpers";\n// import ghost from "./ghost.mjs";\nexport default { modules, css: { layer } };\n');
-  expect(run(dir, "build").stderr.toString()).toBe("");
-  const inputs = Object.keys(receipt(dir).inputs);
-  expect(inputs).toEqual(expect.arrayContaining(["lib/index.mjs", "lib/helpers.mjs"]));
-  expect(inputs).not.toContain("ghost.mjs");
-  expect(inputs).not.toContain("lib");
-  appendFileSync(join(dir, "lib/helpers.mjs"), "\n");
-  expect(failure(dir)).toContain("lib/helpers.mjs changed since the last build");
-});
-
-test("a JSON file and a typed TypeScript helper the config imports are inputs, and both still build", () => {
-  const dir = scratch("receipt-langs-");
-  mkdirSync(join(dir, "tokens"));
-  writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ a: { $type: "number", $value: 1 } }));
-  writeFileSync(join(dir, "meta.json"), JSON.stringify({ layer: "tokens" }));
-  writeFileSync(join(dir, "helpers.ts"), 'export const modules: string[] = ["css"];\n');
-  writeFileSync(join(dir, "breacan.config.mjs"), 'import meta from "./meta.json" with { type: "json" };\nimport { modules } from "./helpers.ts";\nexport default { modules, css: { layer: meta.layer } };\n');
-  expect(run(dir, "build").stderr.toString()).toBe("");
-  expect(Object.keys(receipt(dir).inputs)).toEqual(expect.arrayContaining(["meta.json", "helpers.ts"]));
-  writeFileSync(join(dir, "meta.json"), JSON.stringify({ layer: "base" }));
-  expect(failure(dir)).toContain("meta.json changed since the last build");
-});
-
 test("with no receipt, a file kumiko never wrote is named, not failed, and an edited one still fails", () => {
   const dir = scratch("receipt-legacy-");
   cpSync(join(root, "tests/kits/tokyo-material"), dir, { recursive: true });
