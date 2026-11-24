@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.26.0](https://github.com/kickinrad/breacan/compare/v0.25.0...v0.26.0) (2026-11-24)
+
+
+### Features
+
+* **apple:** ✨ breacan-apple, iOS foundations (task 15) ([#122](https://github.com/kickinrad/breacan/issues/122)) ([3fd2f08](https://github.com/kickinrad/breacan/commit/3fd2f0873c998a92ec95a4b91bc845a2de04d9b0))
+
 ## [0.25.0](https://github.com/kickinrad/breacan/compare/v0.24.0...v0.25.0) (2026-11-24)
 
 
