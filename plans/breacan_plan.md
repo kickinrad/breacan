@@ -171,7 +171,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 15. [x] **breacan-apple.** Foundations-only Apple language plugin with HIG links. Route: implementation. Demo: walkthrough A on iOS. Blocked by: 14.
 16. [x] **Expo output.** The typed Expo theme from the react-native code, per platform. Route: implementation. Demo: a fixture Expo project typechecks. Blocked by: 14.
 17. [x] **Boombox moves.** boombox-design becomes the Boombox theme repo with web, iOS and Android kits at their levels. The Swatchbook Storybook config replaces the storybook output, which is then deleted. Route: implementation. Demo: acceptance 7; walkthrough D. Blocked by: 15, 16.
-18. [ ] **Playground columns.** Base, Theme, Platform and Kit side by side. Route: implementation. Demo: the owner reviews Tokyo and Boombox in the playground. Blocked by: 17.
+18. [x] **Playground columns.** Base, Theme, Platform and Kit side by side. Route: implementation. Demo: the owner reviews Tokyo and Boombox in the playground. Blocked by: 17.
 
 ### Phase 3: inputs, editing and public-ready
 
@@ -282,6 +282,12 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Acceptance 7: `tsc --noEmit` passes in the Boombox Expo app against the generated theme, checked in place and removed; nothing was committed to the app.
   - Walkthrough D: the phones keep Boombox's colour, type and shape, and take each platform's touch target, icons and, on iOS, system bars and sheets. Their motion and elevation equal the web's: Apple publishes none, and Material's baseline is what the kit already inherits.
   - C: the storybook output is deleted (#127, breaking, released as 0.28.0). A config still listing it fails naming Swatchbook. The Boombox golden loses its `.storybook` entries only, checked against the `pre-breacan` checkout.
+- Task 18, playground columns (implementation, Claude; Demo passed, owner approved; merged).
+  - A Columns view, opened from the top app bar, shows the same specimen as Base, Theme, Platform (the platform's language at Native) and Kit (the dial at the kit's level), with a platform picker. Each column is the existing specimen under its own variables from the `css` output's code. A kit with no `platforms` shows Base and Theme. Columns stack on a phone, and the mode switch moves all of them.
+  - Owner reviewed Tokyo and Boombox screenshots at 1440 and 390 in both modes and approved. On Boombox, Kit matches Theme, as Branded keeps colour, type and shape.
+  - Both playground goldens moved for `docs/playground/index.html` only, the Boombox one checked against the `pre-breacan` checkout. Found on the way and filed: #131 (a six-item bottom bar scrolls sideways on a phone) and #132 (Rules is blank below 840px).
+  - Shipped: PR #130, released as 0.29.0. Phase 2 is done.
+  - Phase 3 shape (owner's call): task 21's editor is `breacan edit`, which replaces `breacan dev`.
 
 ## Related
 
