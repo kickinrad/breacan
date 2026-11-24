@@ -12,7 +12,7 @@ import { fontLinks, iconLink } from "./web/foundations.js";
 import { bundle, inline, source } from "./outputs/playground.mjs";
 
 const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2" };
-// Pages elsewhere (a WordPress copy, a Storybook) read the live CSS and its events.
+// Pages elsewhere (a WordPress copy) read the live CSS and its events.
 const OPEN = { "Access-Control-Allow-Origin": "*", "Cache-Control": "no-store" };
 
 // The bridge a consuming page loads in development only: it applies the kit's live CSS and faces, reads only from the
@@ -30,7 +30,7 @@ const bridge = `// kumiko's live bridge: the kit's CSS from kumiko dev, updated 
     for (const href of fonts) if (!document.querySelector('link[href="' + CSS.escape(href) + '"]')) document.head.append(Object.assign(document.createElement("link"), { rel: "stylesheet", href }));
   };
   fetch(origin + "/_kumiko/live").then((response) => response.json()).then(apply);
-  // A host page (a Storybook story framing this one) may switch the mode: { kumiko: "theme", scheme: "light" | "dark" }.
+  // A host page (a page framing this one) may switch the mode: { kumiko: "theme", scheme: "light" | "dark" }.
   window.addEventListener("message", ({ data }) => { if (data?.kumiko === "theme" && ["light", "dark"].includes(data.scheme)) document.documentElement.dataset.theme = data.scheme; });
   new EventSource(origin + "/_kumiko/events").addEventListener("live", (event) => apply(JSON.parse(event.data)));
 })();

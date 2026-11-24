@@ -82,6 +82,14 @@ test("an unknown target fails loudly", () => {
   expect(result.stderr.toString()).toContain("Unknown token target nope");
 });
 
+test("a config that still lists the removed storybook output fails naming it", () => {
+  const dir = project();
+  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css", "storybook"] };\n');
+  const result = run(dir);
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr.toString()).toContain("Removed output storybook");
+});
+
 test("include files are a silent base: project tokens override them, in the base and in media", () => {
   const dir = scratch("tokens-include-");
   mkdirSync(join(dir, "tokens"));
