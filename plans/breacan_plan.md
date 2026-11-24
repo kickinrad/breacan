@@ -128,7 +128,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 8. **Colour engines.** For a fixed seed, the Material engine's roles equal `material-color-utilities`' own scheme for that seed. Leonardo's roles meet every contrast target.
 9. **App hubs.**
    - The Base24 output renders through tinted-theming's builder with one of its templates.
-   - The Windows Terminal and Ghostty schemes validate against their schemas.
+   - The Windows Terminal scheme validates against its schema. (The owner dropped Ghostty: nobody here runs it.)
    - Every visible change to a Tokyo port has the owner's sign-off.
 10. **Agent rules.**
     - Every DESIGN.md passes `design.md lint`.
@@ -160,7 +160,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 7. [x] **Checks.** Usage rules on tokens with `needs-review`, and the rules lint seeded from the gate list, beside the existing contrast and consumer lint. Route: implementation. Demo: acceptance 6. Blocked by: 4.
 8. [x] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
 9. [x] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
-10. [ ] **Tokyo merge.** Build `kickinrad/tokyo` with the palette, the Material kit and its kit-plugin market. Ports come from Base24, the terminal set and templates (Obsidian, Mealie, Home Assistant included). Fix the swapped day contrast notes (secondary 4.41, tertiary 4.31) and replace `audit` with the checks in CI. Route: implementation. Demo: acceptance 9; walkthrough C from the Tokyo scheme. Blocked by: 9.
+10. [x] **Tokyo merge.** Build `kickinrad/tokyo` with the palette, the Material kit and its kit-plugin market. Ports come from Base24, the terminal set and templates (Obsidian, Mealie, Home Assistant included). Fix the swapped day contrast notes (secondary 4.41, tertiary 4.31) and replace `audit` with the checks in CI. Route: implementation. Demo: acceptance 9; walkthrough C from the Tokyo scheme. Blocked by: 9.
 11. [ ] **Consumers migrate.** Move tokyo-mono-site, the dotfiles through chezmoi, Porchlight (lint and Home Assistant template), Skylight (lint only) and the stacks Astro template. Each moves alone, on green CI. Route: implementation. Demo: each consumer's CI green on Breacán. Blocked by: 10.
 12. [ ] **Vault, phase 1.** Curator writes the Breacán ADR and hub and updates `systems.toml`; forge's `references/system.md` example moves to the new name. Route: here. Demo: acceptance 16. Blocked by: 11.
 
@@ -241,11 +241,16 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Shipped: PR #99 merged and released as 0.21.0; 0.21.1 (#101) fixed a kit with no receipt failing its check on the files Breacán adds, which broke tokyo-material's CI on 0.21.0. Review went four FAIL rounds, all on the receipt's config-import tracking; the owner chose to merge after round 4's fix.
   - Acceptance 1: `mise use github:kickinrad/breacan` installs 0.21.0 and `breacan --version` prints it; `github:kickinrad/kumiko` still installs and runs as `kumiko`. tokyo-mono and tokyo-material CI pass on 0.21.1.
   - Market installed in Claude Code and Codex (`claude plugin install`, `codex plugin add`; chezmoi d5a0e9e holds it). domains #33 and workflows #153 merged; design-system uninstalled from both runtimes. The make-kit and plugin descriptions now say "design tokens", so `dispatch list design tokens` finds Breacán. `~/projects/markets/breacan` links to this checkout, so dispatch ranks it with the other markets: `make-kit` is first.
-- Task 10, Tokyo merge (implementation; in progress, waiting on the owner's look).
+- Task 10, Tokyo merge (implementation, Demo passed; merged).
   - The owner kept the name: kickinrad/tokyo-mono takes Tokyo Material into `material/` with its history ([PR #124](https://github.com/kickinrad/tokyo-mono/pull/124)), extending the root palette directly. Both repos are tagged `pre-breacan`. One market lists both plugins; CI checks both kits and releases the kit as `material-v<VERSION>`.
-  - New ports: Base24 schemes and a Ghostty theme with the Windows Terminal colours. `scripts/check-ports.sh` validates Windows Terminal against Microsoft's schema and renders tinted-terminal's templates from the Base24 schemes (acceptance 9, first two parts); Ghostty's own validation runs where Ghostty is installed, and its CI install route waits on the owner.
+  - New port: Base24 schemes with the Windows Terminal colours. `scripts/check-ports.sh` (in CI) validates Windows Terminal against Microsoft's schema and renders tinted-terminal's templates from the Base24 schemes (acceptance 9, first two parts). The owner dropped the Ghostty theme and its acceptance line.
+  - Merged as tokyo-mono #124; CI released the kit as `material-v0.6.0` from tokyo-mono. Both runtimes install `tokyo-material@tokyo-mono`; the tokyo-material market is retired (chezmoi 20ff79c).
   - The swapped Day contrast notes are fixed (secondary 4.41, tertiary 4.31). Every existing port and kit output is byte-identical.
   - Walkthrough C: the `scheme` source (this repo, `src/sources/scheme.mjs`) builds a whole kit from Tokyo's Base24 schemes (`tests/scheme.test.ts`).
+- Task 11, consumers (implementation; in progress).
+  - Moved, each on green CI: Skylight lint (#43), Porchlight lint (#25), the dotfiles' mise install (chezmoi 2991971), and the stacks template (#28, released 0.10.0; `migrate_token_config.py` carries `tokens.config.mjs` or `kumiko.config.mjs` to `breacan.config.mjs`). Stacks also fixed two template bugs newer Biome trips. Each repo is tagged `pre-breacan`.
+  - Porchlight's Home Assistant theme stays pinned at tokyo-mono v4.0.0, which `material-you` wrote before it was deleted; the owner chose to leave it, in [porchlight#26](https://github.com/kickinrad/porchlight/issues/26).
+  - Left: tokyo-mono-site. Its sync reads the old tokyo-material repo at v0.5.0, it has no CI, and `breacan lint src` finds 22 hand-typed values in its own CSS.
 
 ## Related
 
