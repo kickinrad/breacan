@@ -167,7 +167,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 ### Phase 2: dial, Apple and Boombox
 
 13. [x] **Dial on one foundation.** The platform layer and resolve rule for type only, end to end, with a fixture Apple stub. Route: implementation-hard. Demo: type differs by level on fixture kit D. Blocked by: 12.
-14. [ ] **Dial for every foundation.** Levels, per-foundation overrides and the chrome rule across all foundations and component tokens. Route: implementation-hard. Demo: acceptance 5. Blocked by: 13.
+14. [x] **Dial for every foundation.** Levels, per-foundation overrides and the chrome rule across all foundations and component tokens. Route: implementation-hard. Demo: acceptance 5. Blocked by: 13.
 15. [ ] **breacan-apple.** Foundations-only Apple language plugin with HIG links. Route: implementation. Demo: walkthrough A on iOS. Blocked by: 14.
 16. [ ] **Expo output.** The typed Expo theme from the react-native code, per platform. Route: implementation. Demo: a fixture Expo project typechecks. Blocked by: 14.
 17. [ ] **Boombox moves.** boombox-design becomes the Boombox theme repo with web, iOS and Android kits at their levels. The Swatchbook Storybook config replaces the storybook output, which is then deleted. Route: implementation. Demo: acceptance 7; walkthrough D. Blocked by: 15, 16.
@@ -261,6 +261,11 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - `src/dial.mjs` adds the platform layer and the dial: a kit sets `platforms: { ios: { language, dial } }`, and the level picks the theme's or the language's values per foundation, type only so far. `dtcg` writes `<name>.<platform>.tokens.json` with each platform's differences. Shortcut in the README: a platform resolves in the base mode only, and the resolver has no platform modifier yet.
   - Fixture kit D (`tests/dial/kit-d`) with a fixture Apple language; `tests/dial.test.ts` builds it at each level through the binary against `tests/dial/kit-d.golden.json`. Native and Tinted take SF Pro; Branded and Signature keep the brand's type. Every existing golden is unchanged.
   - Shipped: PR #111 merged and released as 0.23.0.
+- Task 14, dial for every foundation (implementation-hard, Demo passed first try; merged).
+  - The dial covers colour, type, shape, spacing, motion, elevation, icons and component tokens. `FOUNDATIONS` in `src/dial.mjs` names the token groups each owns, and a language that sets a token outside its foundation's groups fails the build. Tinted keeps colour; Branded keeps colour, type and shape; Signature keeps everything.
+  - Per-foundation overrides: `dial: { level, <foundation>: "theme" | "platform" }`. Chrome rule: below Signature a language's `chrome` tree (under `breacan.comp`) stays native, tinted with the theme's primary through `breacan.sys.tint`. Shortcut in the README: overrides do not reach chrome yet.
+  - Acceptance 5: `tests/dial.test.ts` builds kit D at each level against its golden, and a `motion: "theme"` override changes only motion tokens.
+  - Shipped: PR #114 merged and released as 0.24.0.
 
 ## Related
 
