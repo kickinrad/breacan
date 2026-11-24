@@ -15,6 +15,7 @@ import { colours, shared } from "./base.mjs";
 import { checkContract } from "./contract.mjs";
 import { checkReceipt, readReceipt, receipt, RECEIPT } from "./receipt.mjs";
 import { wantsHeader } from "./header.mjs";
+import { platformLayers } from "./dial.mjs";
 import pkg from "../package.json" with { type: "json" };
 
 // Built-in include layers, named in a config's `include` beside its file globs.
@@ -146,7 +147,13 @@ export const build = async (config = {}, { check = false, preview = false, theme
   for (const layer of [...include, ...source, ...Object.values(media).flat()]) {
     if (!layer.file?.startsWith("builtin:")) collect(layer.tree ?? await readTokens(layer.file));
   }
-  const tokens = resolved.map(entry).map((token) => own.has(token.path) ? token : { ...token, builtin: true });
+  const mark = (token) => own.has(token.path) ? token : { ...token, builtin: true };
+  const tokens = resolved.map(entry).map(mark);
+  // Each platform's tokens in the base mode: its language's layers, as the dial picks them, over the theme.
+  const platforms = {};
+  for (const { platform, level, layers } of await platformLayers(config.platforms)) {
+    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...layers])).map(entry).map(mark) };
+  }
 
   // Each other mode resolves once, when a target or the contrast check first asks for it. A target passes back the
   // layers it was given in ctx.media.
@@ -199,7 +206,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
     ...Object.fromEntries(modules.map((module) => [module.name, withDefaults(module, config[module.name])])) };
   for (const module of modules.filter((each) => each.slot === "output")) {
     const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, list, built, ...kit,
-      ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }) };
+      ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }), ...(config.platforms && { platforms }) };
     const files = await module.run({ ...base, render: (name) => render(name, base), options: optionsFor(module, base, config[module.name]) });
     outputs.push(...(kit.name ? stamp(files, kit, module.name) : files));
   }
