@@ -2,7 +2,6 @@
 // builds every edit in memory as the engine builds it, and pushes the result live to every page that listens to
 // /_breacan/events. Save writes the edits into the kit's token files (theme.toml, else the colours of tokens/*.tokens.json),
 // one changed value each, and rebuilds; a change to the kit's sources on disk rebuilds every output and sends "reload".
-// `breacan dev` is a hidden alias for it, until the contract task removes aliases.
 import { existsSync, watch } from "node:fs";
 import { readFile, readdir, realpath, writeFile } from "node:fs/promises";
 import { basename, extname, join, resolve, sep } from "node:path";
