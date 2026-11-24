@@ -51,12 +51,22 @@ export default {
     const second = await ctx.mediaTokens(other.files);
     const tokens = { [base.name]: modeTokens(ctx.tokens), [other.name]: modeTokens(second) };
     const textStyles = { [base.name]: modeStyles(ctx.tokens), [other.name]: modeStyles(second) };
+    const platforms = Object.entries(ctx.platforms ?? {});
+    const themes = Object.fromEntries(platforms.map(([platform, values]) => [platform, {
+      [base.name]: { tokens: modeTokens(values.tokens), textStyles: modeStyles(values.tokens) },
+      [other.name]: { tokens: modeTokens(values.media[other.name]), textStyles: modeStyles(values.media[other.name]) },
+    }]));
     const content = [
       "// Dimensions are React Native points (a rem is 16), durations are milliseconds, and font families name the first installed face.",
       `export const tokens = ${JSON.stringify(tokens, null, 2)} as const;`,
       `export const textStyles = ${JSON.stringify(textStyles, null, 2)} as const;`,
       "export type ThemeMode = keyof typeof tokens;",
       "export type ThemeTokens = (typeof tokens)[ThemeMode];",
+      ...(platforms.length ? [
+        `export const themes = ${JSON.stringify(themes, null, 2)} as const;`,
+        "export type ThemePlatform = keyof typeof themes;",
+        "export type Theme = (typeof themes)[ThemePlatform][ThemeMode];",
+      ] : []),
       "",
     ].join("\n");
     return [{ path, content }];

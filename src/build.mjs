@@ -149,14 +149,18 @@ export const build = async (config = {}, { check = false, preview = false, theme
   }
   const mark = (token) => own.has(token.path) ? token : { ...token, builtin: true };
   const tokens = resolved.map(entry).map(mark);
-  // Each platform's tokens in the base mode: its language's layers, as the dial picks them, over the theme.
+  // Resolve each platform after each mode's theme layers, so the dial's selected language values win in both modes.
   const platforms = {};
   const tint = tokens.find((token) => token.path === "md.sys.color.primary")?.value;
   for (const { platform, level, layers } of await platformLayers(config.platforms, { tint })) {
     const ownHere = new Set(own);
     for (const layer of layers) collect(layer.tree, [], ownHere);
     const markHere = (token) => ownHere.has(token.path) ? token : { ...token, builtin: true };
-    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...layers])).map(entry).map(markHere) };
+    const platformModes = {};
+    for (const [query] of Object.entries(media)) {
+      platformModes[modes?.media?.[query] ?? query] = (await resolveLayers([...modeLayers(query), ...layers])).map(entry).map(markHere);
+    }
+    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...layers])).map(entry).map(markHere), media: platformModes };
   }
 
   // Each other mode resolves once, when a target or the contrast check first asks for it. A target passes back the
