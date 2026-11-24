@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.32.1](https://github.com/kickinrad/breacan/compare/v0.32.0...v0.32.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **dial:** 🐛 phase 2 review: platform contrast, per-mode tint, one-mode kits ([#143](https://github.com/kickinrad/breacan/issues/143)) ([0e98d3a](https://github.com/kickinrad/breacan/commit/0e98d3a541d556fdf7616bc16debeb0e9a833671))
+* **dial:** 🐛 platform contrast, per-mode tint, one-mode kits ([0e98d3a](https://github.com/kickinrad/breacan/commit/0e98d3a541d556fdf7616bc16debeb0e9a833671))
+
 ## [0.32.0](https://github.com/kickinrad/breacan/compare/v0.31.0...v0.32.0) (2026-11-24)
 
 
