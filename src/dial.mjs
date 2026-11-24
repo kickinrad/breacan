@@ -28,7 +28,7 @@ const KEEPS = { native: [], tinted: ["colour"], branded: ["colour", "type", "sha
 
 // System chrome (bars, sheets, system controls): the language's `chrome` tree, its tokens under breacan.comp. Below
 // Signature it stays native, whatever the foundations say, and its tint is the brand's: the language aliases
-// {breacan.sys.tint}, which the dial sets to the theme's primary colour. At Signature the kit's own components draw it.
+// {breacan.sys.tint}, which the dial sets to the mode's primary colour. At Signature the kit's own components draw it.
 const CHROME = ["breacan.comp"];
 
 const leaves = (node, path = []) => Object.entries(node).filter(([key]) => !key.startsWith("$"))
@@ -49,16 +49,16 @@ const readDial = (platform, dial) => {
 };
 
 // Each platform's level and its language's layers over the theme: [{ platform, level, layersFor, nativeFor }], where
-// `layersFor({ mode, scheme })` runs the language for a mode (the kit's own name for it) and its colour scheme, "light" or "dark",
+// `layersFor({ mode, scheme, tint })` runs the language for a mode (the kit's own name for it), its colour scheme, "light" or "dark",
+// and that mode's primary colour, the brand tint on system chrome,
 // at the kit's dial, and `nativeFor` the same at Native, the language alone (the playground's Platform column).
-// `tint` is the theme's primary colour, the brand tint on system chrome.
-export const platformLayers = (platforms = {}, { tint } = {}) => Promise.all(Object.entries(platforms).map(async ([platform, { language, dial } = {}]) => {
+export const platformLayers = (platforms = {}) => Promise.all(Object.entries(platforms).map(async ([platform, { language, dial } = {}]) => {
   const { level } = readDial(platform, dial);
   if (typeof language === "string") language = BUILT_IN[language] ?? language;
   if (language?.slot !== "language" || typeof language.run !== "function") {
     throw new Error(`platforms.${platform}.language must be a language module ({ slot: "language", name, run })`);
   }
-  const layersAt = (dial) => async ({ mode, scheme }) => {
+  const layersAt = (dial) => async ({ mode, scheme, tint }) => {
     const { level, takes } = readDial(platform, dial);
     const trees = await language.run({ platform, mode, scheme }) ?? {};
     const groups = { ...FOUNDATIONS, chrome: CHROME };
