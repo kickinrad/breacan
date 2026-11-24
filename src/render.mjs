@@ -13,13 +13,13 @@ const HOST_RESET = ":root { color-scheme: light; } body { margin: 0; font: 14px 
 const VIEWPORTS = [{ width: 1280, height: 800, mobile: false }, { width: 412, height: 915, mobile: true }];
 
 // Chrome: $CHROME, else one on the PATH, else Playwright's download.
-const chrome = () => {
+export const chrome = () => {
   const found = [process.env.CHROME, ...["google-chrome", "google-chrome-stable", "chromium", "chromium-browser", "chrome"].map((name) => Bun.which(name))].find(Boolean);
   if (found) return found;
   const cache = join(homedir(), ".cache/ms-playwright");
   const [downloaded] = [...new Bun.Glob("chromium-*/chrome-linux*/chrome").scanSync({ cwd: cache, absolute: true, onlyFiles: true })].sort().reverse();
   if (downloaded) return downloaded;
-  throw new Error("breacan audit needs Chrome: set CHROME, or put google-chrome or chromium on the PATH");
+  throw new Error("Chrome not found: set CHROME, or put google-chrome or chromium on the PATH");
 };
 
 // One DevTools connection: send(method, params, session) and every event to `on`.
