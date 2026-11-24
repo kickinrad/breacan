@@ -51,3 +51,20 @@ test("two schemes of one variant, and a scheme missing a slot, fail, naming why"
   writeFileSync(join(dir, "schemes/broken.yaml"), 'system: "base16"\nvariant: "dark"\npalette:\n  base00: "#000000"\n');
   expect(run(dir, "build").stderr.toString()).toContain("has no colour for base01");
 });
+
+test("an iTerm2 scheme builds a whole kit: its ANSI, background, foreground and selection colours become the roles", () => {
+  const dir = kit(["schemes/dracula.itermcolors"]);
+  expect(run(dir, "build").stderr.toString()).toBe("");
+  const dark = tokens(dir, ".dark");
+  expect(hex(dark, "md.sys.color.surface")).toBe("#282a36");
+  expect(hex(dark, "md.sys.color.on-surface")).toBe("#f8f8f2");
+  expect(hex(dark, "md.sys.color.surface-variant")).toBe("#44475a");
+  expect(hex(tokens(dir), "scheme.ansi.1")).toBe("#ff5555");
+  expect(hex(tokens(dir), "scheme.ansi.4")).toBe("#bd93f9");
+  expect(hex(tokens(dir), "scheme.ansi.15")).toBe("#ffffff");
+  for (const role of ["primary", "secondary", "tertiary", "error"]) {
+    expect(contrast(hex(dark, `md.sys.color.${role}`), hex(dark, "md.sys.color.surface")), role).toBeGreaterThanOrEqual(4.5);
+  }
+  expect(hex(tokens(dir), "md.sys.color.surface")).toBe("#fcfcfc");
+  expect(run(dir, "check").exitCode).toBe(0);
+});
