@@ -2,7 +2,7 @@
 // scripts/vendor-m3.mjs, plus the Material values those files lack, hand-written with their sources in
 // material-guidance.tokens.json. Both are bundled JSON imports, so a compiled binary carries them. A config lists
 // "builtin:material" in `include`; it sits beneath every file include and the project's own tokens. The vendored
-// tv-material card defaults stay out of it; they wait for a Compose TV output (kickinrad/kumiko#95).
+// tv-material card defaults stay out of it; they wait for a Compose TV output (kickinrad/breacan#95).
 import vendored from "../material/material.tokens.json" with { type: "json" };
 import guidance from "./material-guidance.tokens.json" with { type: "json" };
 

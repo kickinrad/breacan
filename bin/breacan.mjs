@@ -1,8 +1,7 @@
 #!/usr/bin/env bun
-// Build a kit's tokens into the outputs its breacan.config.mjs names. The binary also answers to `kumiko`, with
-// `--check` and kumiko.config.mjs, until every consumer has moved (plans/breacan_plan.md, the contract task).
+// Build a kit's tokens into the outputs its breacan.config.mjs names. The old kumiko spellings fail naming their replacement.
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import pkg from "../package.json" with { type: "json" };
 import { build } from "../src/build.mjs";
@@ -11,10 +10,12 @@ const USAGE = "breacan [build | check | new --seed <hex>… [<dir>] | lint <file
 const fail = (message) => { console.error(message); process.exit(1); };
 const exit = (findings) => { if (findings.length) console.log(findings.join("\n")); process.exit(findings.length ? 1 : 0); };
 
-// The old spellings map onto the verbs: no verb builds, `--check` checks.
-const args = process.argv.slice(2);
-const [first, ...rest] = args.length === 0 ? ["build"] : args[0] === "--check" ? ["check", ...args.slice(1)] : args;
-const verb = first === "dev" ? "edit" : first; // dev is a hidden alias of edit, until the contract task
+// The old spellings are gone; each fails naming its replacement.
+if ([process.argv0, process.execPath].some((path) => basename(path, ".exe") === "kumiko")) fail("kumiko is now breacan: run the same command as breacan");
+const [verb, ...rest] = process.argv.slice(2);
+if (verb === undefined) fail(`breacan: name a verb; breacan build is what a bare breacan did (${USAGE})`);
+if (verb === "--check") fail("breacan: --check is now the check verb: run breacan check");
+if (verb === "dev") fail("breacan: dev is now the edit verb: run breacan edit");
 
 if (verb === "--version") {
   if (rest.length) fail(`breacan: unknown ${rest[0]} (${USAGE})`);
@@ -52,8 +53,7 @@ if (verb === "lint") {
   } catch (error) { fail(error.message); }
 }
 
-// breacan.config.mjs, or the old kumiko.config.mjs while consumers move.
-const configPath = ["breacan.config.mjs", "kumiko.config.mjs"].map((name) => resolve(name)).find((path) => existsSync(path));
+const configPath = existsSync("breacan.config.mjs") ? resolve("breacan.config.mjs") : undefined;
 const loadConfig = async () => (await import(pathToFileURL(configPath).href)).default ?? {};
 
 // breacan audit [<dir>]: the playground (the config's playground path by default) in headless Chrome.
@@ -66,13 +66,13 @@ if (verb === "audit") {
   } catch (error) { fail(error.message); }
 }
 
-if (!configPath) fail("No breacan.config.mjs in this directory");
+if (!configPath) fail(existsSync("kumiko.config.mjs") ? "kumiko.config.mjs is now breacan.config.mjs: rename it" : "No breacan.config.mjs in this directory");
 const config = await loadConfig();
 if (verb === "edit") {
   const { edit } = await import("../src/edit.mjs");
   try {
     const server = await edit({ config, port });
-    console.log(`breacan edit: http://localhost:${server.port}/ (the Kit panel is /_kumiko/panel); it answers only to localhost and 127.0.0.1`);
+    console.log(`breacan edit: http://localhost:${server.port}/ (the Kit panel is /_breacan/panel); it answers only to localhost and 127.0.0.1`);
   } catch (error) { fail(error.message); }
 } else {
   try { await build(config, { check: verb === "check" }); } catch (error) { fail(error.message); }

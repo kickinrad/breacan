@@ -20,7 +20,7 @@ const kit = (signal: string) => ({
 });
 const live = (signal: string) => ({ css: ":root {}", fonts: [], kit: kit(signal), contrast: [], edits: {} });
 
-const window = new Window({ url: "http://127.0.0.1:4400/_kumiko/panel" });
+const window = new Window({ url: "http://127.0.0.1:4400/_breacan/panel" });
 window.document.body.innerHTML = '<style id="kit-css"></style><div id="app"></div>';
 const listeners: Record<string, (event: { data: string }) => void> = {};
 const posts: { path: string; body: object }[] = [];
@@ -44,7 +44,7 @@ Object.assign(globalThis, {
     if (!init) return Response.json(live("#922906"));
     if (failPosts) throw new TypeError("Failed to fetch");
     posts.push({ path, body: JSON.parse(init.body) });
-    return Response.json(path === "/_kumiko/save" ? { saved: [] } : { contrast: [] });
+    return Response.json(path === "/_breacan/save" ? { saved: [] } : { contrast: [] });
   },
 });
 await import("../src/web/panel.js");
@@ -70,7 +70,7 @@ test("a failed edit says so, frees the panel, and the next edit carries its valu
   expect($('[role="alert"]')?.textContent).toContain("Not sent");
   failPosts = false;
   await edit("palette.night.ink", "#000000");
-  expect(posts.at(-1)).toEqual({ path: "/_kumiko/edit", body: { "palette.night.signal": "#111111", "palette.night.ink": "#000000" } });
+  expect(posts.at(-1)).toEqual({ path: "/_breacan/edit", body: { "palette.night.signal": "#111111", "palette.night.ink": "#000000" } });
   expect($('[role="alert"]')).toBeNull();
 });
 
@@ -87,7 +87,7 @@ test("Save refuses while an edit is unsent, and sends the queue before saving", 
   expect($("[data-changes]")?.textContent).toContain("unsaved change");
   failPosts = false;
   await click("[data-tune-save]");
-  expect(posts.slice(-2)).toEqual([{ path: "/_kumiko/edit", body: { "palette.night.paper": "#dddddd" } }, { path: "/_kumiko/save", body: {} }]);
+  expect(posts.slice(-2)).toEqual([{ path: "/_breacan/edit", body: { "palette.night.paper": "#dddddd" } }, { path: "/_breacan/save", body: {} }]);
   expect($("[data-changes]")?.textContent).toContain("No changes");
 });
 
@@ -96,7 +96,7 @@ test("an edit after a Save still reaches the server", async () => {
   await click("[data-tune-save]");
   const before = posts.length;
   await edit("palette.night.signal", "#444444");
-  expect(posts.slice(before)).toEqual([{ path: "/_kumiko/edit", body: { "palette.night.signal": "#444444" } }]);
+  expect(posts.slice(before)).toEqual([{ path: "/_breacan/edit", body: { "palette.night.signal": "#444444" } }]);
   expect($("[data-changes]")?.textContent).toContain("1 unsaved change");
 });
 

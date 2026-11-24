@@ -12,9 +12,9 @@ const golden = (file: string) => readFileSync(join(root, "tests/web/expected", f
 const project = (config?: string) => {
   const dir = scratch("tokens-web-");
   cpSync(join(root, "tests/web/tokens"), join(dir, "tokens"), { recursive: true });
-  cpSync(join(root, "tests/web/kumiko.config.mjs"), join(dir, "kumiko.config.mjs"));
+  cpSync(join(root, "tests/web/breacan.config.mjs"), join(dir, "breacan.config.mjs"));
   writeFileSync(join(dir, "VERSION"), "1.0.0\n");
-  if (config) writeFileSync(join(dir, "kumiko.config.mjs"), config);
+  if (config) writeFileSync(join(dir, "breacan.config.mjs"), config);
   return dir;
 };
 const only = (target: string, options: string) => `export default {
@@ -24,16 +24,16 @@ const only = (target: string, options: string) => `export default {
 
 test("css with scheme names the base mode and lets data-theme pin either, byte-identical to the golden", () => {
   const dir = project(only("css", '{ path: "out/tokens.css", scheme: "dark" }'));
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   expect(read(dir, "out/tokens.css")).toBe(golden("tokens.css"));
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
 });
 
 test("css without scheme sets no colour scheme and leaves data-theme alone", () => {
   const dir = project(only("css", '{ path: "out/tokens.css" }'));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   const css = read(dir, "out/tokens.css");
   expect(css).not.toMatch(/^\s*color-scheme:/m);
   expect(css).not.toContain("data-theme");
@@ -43,12 +43,12 @@ test("css without scheme sets no colour scheme and leaves data-theme alone", () 
 test("css emits each Material spring as an easing and a settle time when the tokens hold springs, and nothing otherwise", () => {
   const withScheme = only("css", '{ path: "out/tokens.css", scheme: "dark" }');
   const without = project(withScheme);
-  run(without);
+  run(without, "build");
   expect(read(without, "out/tokens.css")).not.toMatch(/-easing|-settle/);
 
   const dir = project(withScheme);
   cpSync(join(root, "tests/web/springs.tokens.json"), join(dir, "tokens/springs.tokens.json"));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   const css = read(dir, "out/tokens.css");
   const base = css.slice(0, css.indexOf("@media"));
   expect(base).toContain("--md-sys-motion-spring-snappy-spatial-damping: 0.8;");
@@ -59,14 +59,14 @@ test("css emits each Material spring as an easing and a settle time when the tok
 
 test("beer sets Beer's system variables from Material and reads the kit's own tokens, byte-identical to the golden", () => {
   const dir = project();
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(read(dir, "out/beer.css")).toBe(golden("beer.css"));
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
 });
 
 test("beer leaves Beer's own icon font and shadows without a kit to name them", () => {
   const dir = project(only("beer", '{ path: "out/beer.css" }'));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   const css = read(dir, "out/beer.css");
   expect(css).not.toMatch(/--font-icon|--elevate/);
   expect(css).toContain("--speed1: var(--md-sys-motion-duration-short2);");
@@ -81,7 +81,7 @@ const beerRoles = (css: string) => {
 
 test("every colour role the installed Beer declares is set to Material's role of the same name", () => {
   const dir = project(`export default { targets: ["beer"], include: ["builtin:material"], media: { "(prefers-color-scheme: light)": ["tokens/day.tokens.json"] }, beer: { path: "out/beer.css" } };\n`);
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   const set = new Map([...read(dir, "out/beer.css").matchAll(/^  --([a-z0-9-]+): (.+);$/gm)].map((m) => [m[1], m[2]]));
   const roles = beerRoles(beerCss);
   expect(roles.length).toBeGreaterThanOrEqual(36);
@@ -116,7 +116,7 @@ test("material.css draws the rail's top space, gap and labels, the hover layer, 
   ]) expect(css).toContain(`var(--${name})`);
   expect(css.replace(/\/\*[\s\S]*?\*\//g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|\d(px|rem|ms)\b/i);
   const dir = project();
-  run(dir);
+  run(dir, "build");
   expect(read(dir, "out/beer.css")).toContain("var(--md-comp-list-segmented-gap)");
 });
 
@@ -127,7 +127,7 @@ test("layout.css lays out Material's panes inside Beer's main with Material's gu
   for (const literal of ["(max-width: 839px)", "(min-width: 600px)", "(min-width: 840px)", "(min-width: 1200px)", "360px minmax(0, 1fr); gap: 24px;", "412px minmax(0, 1fr);", "--_padding: 16px;", "--_padding: 24px;"]) expect(css).toContain(literal);
   expect(css.replace(/\/\*[\s\S]*?\*\//g, "")).not.toMatch(/#[0-9a-f]{3,8}\b/i);
   const dir = project();
-  run(dir);
+  run(dir, "build");
   const out = read(dir, "out/beer.css");
   expect(out.indexOf("main > .panes > *")).toBeLessThan(out.indexOf("main > .panes { display: grid;"));
   expect(out.trimEnd().endsWith("main > .panes:has(> :only-child) { grid-template-columns: minmax(0, 1fr); } }")).toBe(true);

@@ -97,7 +97,7 @@ min = 3
     const dir = scratch("tokens-contrast-");
     mkdirSync(join(dir, "design"));
     writeFileSync(join(dir, "VERSION"), "1.0.0\n");
-    writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
+    writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
     writeFileSync(join(dir, "design/theme.toml"), `name = "acme"
 default = "light"
 
@@ -128,13 +128,13 @@ ${contrast}`);
 
   test("pairs that pass in every mode build and check cleanly", () => {
     const dir = kit(pairs);
-    expect(run(dir).stderr.toString()).toBe("");
-    expect(run(dir, "--check").exitCode).toBe(0);
+    expect(run(dir, "build").stderr.toString()).toBe("");
+    expect(run(dir, "check").exitCode).toBe(0);
   });
 
   test("a pair under its floor in a media mode fails, naming fg, bg, mode, ratio and floor", () => {
     const dir = kit(pairs, { dark: "#4e4e4e" });
-    for (const args of [[], ["--check"]]) {
+    for (const args of [["build"], ["check"]]) {
       const result = run(dir, ...args);
       expect(result.exitCode).toBe(1);
       const message = result.stderr.toString();
@@ -149,41 +149,41 @@ ${contrast}`);
 
   test("a pair under its floor in the base tokens names the base mode", () => {
     const dir = kit('[[contrast.pairs]]\nfg = "c.mark"\nbg = "c.bg"\nmin = 4.6\n');
-    const result = run(dir);
+    const result = run(dir, "build");
     expect(result.exitCode).toBe(1);
     expect(result.stderr.toString()).toMatch(/c\.mark.*c\.bg.*4\.54.*base.*4\.6/);
   });
 
   test("a failing build writes nothing", () => {
     const dir = kit('[[contrast.pairs]]\nfg = "c.mark"\nbg = "c.bg"\nmin = 4.6\n');
-    run(dir);
+    run(dir, "build");
     expect(() => readFileSync(join(dir, "src/styles/tokens.css"))).toThrow();
   });
 
   test("a named exception lowers one pair's floor, with its reason", () => {
     const low = '[[contrast.pairs]]\nfg = "c.mark"\nbg = "c.bg"\nmin = 4.6\n';
     const exception = '[[contrast.exceptions]]\nfg = "c.mark"\nbg = "c.bg"\nmin = 3\nwhy = "A mark, not text"\n';
-    expect(run(kit(`${low}\n${exception}`)).exitCode).toBe(0);
-    const unnamed = run(kit(`${low}\n${exception.replace('why = "A mark, not text"\n', "")}`));
+    expect(run(kit(`${low}\n${exception}`), "build").exitCode).toBe(0);
+    const unnamed = run(kit(`${low}\n${exception.replace('why = "A mark, not text"\n', "")}`), "build");
     expect(unnamed.stderr.toString()).toContain("[contrast] exceptions[0] why must be a non-empty string");
-    const stray = run(kit(exception.replace('"c.mark"', '"c.fg"')));
+    const stray = run(kit(exception.replace('"c.mark"', '"c.fg"')), "build");
     expect(stray.stderr.toString()).toContain("exception c.fg on c.bg is not a pair the build checks");
   });
 
   test("a path that is not a token fails, naming it", () => {
-    const result = run(kit('[[contrast.pairs]]\nfg = "c.nope"\nbg = "c.bg"\nmin = 4.5\n'));
+    const result = run(kit('[[contrast.pairs]]\nfg = "c.nope"\nbg = "c.bg"\nmin = 4.5\n'), "build");
     expect(result.exitCode).toBe(1);
     expect(result.stderr.toString()).toContain("c.nope is not a token");
   });
 
   test("a path that is not a colour fails, naming it", () => {
-    const result = run(kit('[[contrast.pairs]]\nfg = "c.fg"\nbg = "size.gap"\nmin = 4.5\n'));
+    const result = run(kit('[[contrast.pairs]]\nfg = "c.fg"\nbg = "size.gap"\nmin = 4.5\n'), "build");
     expect(result.exitCode).toBe(1);
     expect(result.stderr.toString()).toContain("size.gap is not an opaque colour");
   });
 
   test("a pair with no numeric min fails, naming the pair", () => {
-    const result = run(kit('[[contrast.pairs]]\nfg = "c.fg"\nbg = "c.bg"\n'));
+    const result = run(kit('[[contrast.pairs]]\nfg = "c.fg"\nbg = "c.bg"\n'), "build");
     expect(result.exitCode).toBe(1);
     expect(result.stderr.toString()).toContain("[contrast] pairs[0] min must be a contrast ratio");
   });
@@ -191,7 +191,7 @@ ${contrast}`);
   test("with no kit, nothing is checked and the golden outputs stay byte-identical", () => {
     const dir = scratch("tokens-contrast-golden-");
     cpSync(join(root, "tests/fixture"), dir, { recursive: true });
-    expect(run(dir).exitCode).toBe(0);
+    expect(run(dir, "build").exitCode).toBe(0);
     for (const file of ["src/styles/tokens.css", "DESIGN.md"]) {
       expect(readFileSync(join(dir, file), "utf8")).toBe(readFileSync(join(root, "tests/expected", file), "utf8"));
     }
@@ -200,7 +200,7 @@ ${contrast}`);
 
   test("a hex string in a token that is not a colour is refused", () => {
     const dir = kit('[[contrast.pairs]]\nfg = "label.ink"\nbg = "c.bg"\nmin = 4.5\n', { tokens: '"label.ink" = { value = "#000000", type = "string" }' });
-    const result = run(dir);
+    const result = run(dir, "build");
     expect(result.exitCode).toBe(1);
     expect(result.stderr.toString()).toContain("label.ink is not an opaque colour");
   });

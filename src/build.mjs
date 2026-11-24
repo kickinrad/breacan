@@ -60,7 +60,7 @@ const loadKit = async (kit) => {
 // nothing, and return contrast failures beside the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
 // the one in this directory.
 export const build = async (config = {}, { check = false, preview = false, theme: themeText, drafts = {},
-  configFile = ["breacan.config.mjs", "kumiko.config.mjs"].find((file) => existsSync(file)) } = {}) => {
+  configFile = existsSync("breacan.config.mjs") ? "breacan.config.mjs" : undefined } = {}) => {
   const modules = resolveModules(config);
   // Sources, then foundations: each gives { light, dark } colour trees over the base.
   const foundations = ["source", "foundation"].flatMap((slot) => modules.filter((module) => module.slot === slot));
@@ -268,13 +268,13 @@ export const build = async (config = {}, { check = false, preview = false, theme
       await checkReceipt(held, inputs.filter((path) => !written.has(resolve(path)) && existsSync(path)), outputs.map((output) => output.path));
       return outputs;
     }
-    // No receipt yet (a kit last built by kumiko): every output must match a fresh build. A file this engine writes
-    // that is not there at all is one kumiko never wrote, so it is named, not failed; the next build adds it.
+    // No receipt yet (a kit last built before receipts): every output must match a fresh build. A file this engine writes
+    // that is not there at all is one the last build never wrote, so it is named, not failed; the next build adds it.
     for (const output of outputs) {
       const existing = await readExisting(output.path);
       if (existing === undefined) { console.log(`${output.path} is new in breacan; run breacan build to add it`); continue; }
       if (header(output)) checkHeader(output.path, existing);
-      if (existing !== output.content) throw new Error(`${output.path} is stale; run breacan`);
+      if (existing !== output.content) throw new Error(`${output.path} is stale; run breacan build`);
     }
     return outputs;
   }

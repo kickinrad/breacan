@@ -1,5 +1,5 @@
-// Builds the kit's outputs from design/theme.toml with `kumiko` (github:kickinrad/kumiko): run `kumiko`,
-// check with `kumiko --check` and `kumiko audit`. This file says where each output goes; the values are theme.toml's.
+// Builds the kit's outputs from design/theme.toml with `breacan` (github:kickinrad/breacan): run `breacan build`,
+// check with `breacan check` and `breacan audit`. This file says where each output goes; the values are theme.toml's.
 // An app builds its own platform's files from the dtcg output, so the kit makes only these.
 export default {
   targets: ['css', 'beer', 'dtcg', 'playground', 'claude-design', 'plugin'],
@@ -17,7 +17,7 @@ export default {
     ].join('\n'),
   },
   beer: { path: 'docs/playground/tokyo-material-beer.css' },
-  // The universal tokens: any tool reads them, and an app's kumiko includes them after builtin:material.
+  // The universal tokens: any tool reads them, and an app's breacan includes them after builtin:material.
   dtcg: { path: 'ports/tokens' },
   playground: { path: 'docs/playground' },
   // The kit's Claude Design System: publish ports/claude-design/project/ to the artifact each release (CONTRIBUTING).
