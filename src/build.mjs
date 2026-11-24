@@ -139,10 +139,10 @@ export const build = async (config = {}, { check = false, preview = false, theme
   // A token no layer but a built-in one sets is marked `builtin`, so a target can tell Material's untouched tokens
   // from a project's own.
   const own = new Set();
-  const collect = (node, path = []) => {
+  const collect = (node, path = [], into = own) => {
     if (!node || typeof node !== "object" || Array.isArray(node)) return;
-    if ("$value" in node) return own.add(path.join("."));
-    for (const [key, child] of Object.entries(node)) if (!key.startsWith("$")) collect(child, [...path, key]);
+    if ("$value" in node) return into.add(path.join("."));
+    for (const [key, child] of Object.entries(node)) if (!key.startsWith("$")) collect(child, [...path, key], into);
   };
   for (const layer of [...include, ...source, ...Object.values(media).flat()]) {
     if (!layer.file?.startsWith("builtin:")) collect(layer.tree ?? await readTokens(layer.file));
@@ -151,8 +151,12 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const tokens = resolved.map(entry).map(mark);
   // Each platform's tokens in the base mode: its language's layers, as the dial picks them, over the theme.
   const platforms = {};
-  for (const { platform, level, layers } of await platformLayers(config.platforms)) {
-    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...layers])).map(entry).map(mark) };
+  const tint = tokens.find((token) => token.path === "md.sys.color.primary")?.value;
+  for (const { platform, level, layers } of await platformLayers(config.platforms, { tint })) {
+    const ownHere = new Set(own);
+    for (const layer of layers) collect(layer.tree, [], ownHere);
+    const markHere = (token) => ownHere.has(token.path) ? token : { ...token, builtin: true };
+    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...layers])).map(entry).map(markHere) };
   }
 
   // Each other mode resolves once, when a target or the contrast check first asks for it. A target passes back the
