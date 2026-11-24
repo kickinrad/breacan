@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.27.0](https://github.com/kickinrad/breacan/compare/v0.26.0...v0.27.0) (2026-11-24)
+
+
+### Features
+
+* **android:** ✨ add the Material language for Android (task 17A) ([#125](https://github.com/kickinrad/breacan/issues/125)) ([bd0cdc1](https://github.com/kickinrad/breacan/commit/bd0cdc12f9d12e4e35222e48ba1d4d1a159aa579))
+
 ## [0.26.0](https://github.com/kickinrad/breacan/compare/v0.25.0...v0.26.0) (2026-11-24)
 
 
