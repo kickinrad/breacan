@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "dependencies": {
+    "expo": "latest",
+    "react-native": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}

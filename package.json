@@ -21,6 +21,9 @@
   "devDependencies": {
     "@google/design.md": "latest",
     "@unpunnyfuns/swatchbook-core": "latest",
-    "happy-dom": "latest"
+    "expo": "latest",
+    "happy-dom": "latest",
+    "react-native": "latest",
+    "typescript": "latest"
   }
 }
