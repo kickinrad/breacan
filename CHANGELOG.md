@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.30.0](https://github.com/kickinrad/breacan/compare/v0.29.0...v0.30.0) (2026-11-24)
+
+
+### Features
+
+* **sources:** ✨ iTerm2 schemes in the scheme source (task 19) ([#135](https://github.com/kickinrad/breacan/issues/135)) ([b19b5ca](https://github.com/kickinrad/breacan/commit/b19b5ca44b4ef8ed30c78e077ec3bbd46537f307))
+* **sources:** ✨ read iTerm2 schemes in scheme (task 19) ([b19b5ca](https://github.com/kickinrad/breacan/commit/b19b5ca44b4ef8ed30c78e077ec3bbd46537f307))
+
 ## [0.29.0](https://github.com/kickinrad/breacan/compare/v0.28.0...v0.29.0) (2026-11-24)
 
 
