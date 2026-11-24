@@ -21,6 +21,12 @@
       "source": "./plugins/breacan-material",
       "description": "Material 3, Breacán's Android language: answer from Material's own tokens and guidance.",
       "category": "design"
+    },
+    {
+      "name": "breacan-apple",
+      "source": "./plugins/breacan-apple",
+      "description": "Apple's iOS language: answer from Apple's Human Interface Guidelines and Breacán's foundation tokens.",
+      "category": "design"
     }
   ]
 }

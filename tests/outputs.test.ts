@@ -143,7 +143,7 @@ test("an output without a declared kit fails, saying so", () => {
   expect(result.stderr.toString()).toContain("needs a declared kit");
 });
 
-test("the engine holds no kit: src/ names no house, and carries no palette hex", () => {
+test("the engine holds no kit: only platform languages carry their system swatches", () => {
   const sources = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
     entry.isDirectory() ? sources(join(dir, entry.name)) : [join(dir, entry.name)]);
   const house = /tokyo/i;
@@ -151,7 +151,8 @@ test("the engine holds no kit: src/ names no house, and carries no palette hex",
   for (const file of sources(join(root, "src"))) {
     const text = readFileSync(file, "utf8");
     expect(text, file).not.toMatch(house);
-    expect(text, file).not.toMatch(hex);
+    // Apple's HIG publishes reference swatches for its language; the neutral engine has no palette.
+    if (!file.includes("/src/languages/")) expect(text, file).not.toMatch(hex);
   }
 });
 
