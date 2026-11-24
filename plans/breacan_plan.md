@@ -168,8 +168,8 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 
 13. [x] **Dial on one foundation.** The platform layer and resolve rule for type only, end to end, with a fixture Apple stub. Route: implementation-hard. Demo: type differs by level on fixture kit D. Blocked by: 12.
 14. [x] **Dial for every foundation.** Levels, per-foundation overrides and the chrome rule across all foundations and component tokens. Route: implementation-hard. Demo: acceptance 5. Blocked by: 13.
-15. [ ] **breacan-apple.** Foundations-only Apple language plugin with HIG links. Route: implementation. Demo: walkthrough A on iOS. Blocked by: 14.
-16. [ ] **Expo output.** The typed Expo theme from the react-native code, per platform. Route: implementation. Demo: a fixture Expo project typechecks. Blocked by: 14.
+15. [x] **breacan-apple.** Foundations-only Apple language plugin with HIG links. Route: implementation. Demo: walkthrough A on iOS. Blocked by: 14.
+16. [x] **Expo output.** The typed Expo theme from the react-native code, per platform. Route: implementation. Demo: a fixture Expo project typechecks. Blocked by: 14.
 17. [ ] **Boombox moves.** boombox-design becomes the Boombox theme repo with web, iOS and Android kits at their levels. The Swatchbook Storybook config replaces the storybook output, which is then deleted. Route: implementation. Demo: acceptance 7; walkthrough D. Blocked by: 15, 16.
 18. [ ] **Playground columns.** Base, Theme, Platform and Kit side by side. Route: implementation. Demo: the owner reviews Tokyo and Boombox in the playground. Blocked by: 17.
 
@@ -266,6 +266,16 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Per-foundation overrides: `dial: { level, <foundation>: "theme" | "platform" }`. Chrome rule: below Signature a language's `chrome` tree (under `breacan.comp`) stays native, tinted with the theme's primary through `breacan.sys.tint`. Shortcut in the README: overrides do not reach chrome yet.
   - Acceptance 5: `tests/dial.test.ts` builds kit D at each level against its golden, and a `motion: "theme"` override changes only motion tokens.
   - Shipped: PR #114 merged and released as 0.24.0.
+- Task 16, Expo output (implementation, built by a Codex worker; Demo passed first try; merged).
+  - The `react-native` output also exports `themes[platform][mode]`, `ThemePlatform` and `Theme` when a kit lists platforms; a kit without them is byte-identical. Platforms now resolve in every mode (`media[mode]`), not just the base.
+  - `tests/expo.test.ts` builds kit D for iOS and Android and runs `tsc --noEmit` on a fixture Expo app, with `@ts-expect-error` lines proving an unlisted platform or mode fails. expo, react-native and typescript joined the dev dependencies for it.
+  - Shipped: PR #118, released as 0.25.0.
+  - Audit (owner's call after finding the route went to Codex): a Claude reviewer passed it with one Should, a dead `tests/expo/package.json`, removed in #121.
+- Task 15, breacan-apple (implementation; Codex first version, Claude trim merged).
+  - The Codex version (#120) was stopped and closed. A Claude audit found dark mode taking light colours and invented corner, motion, elevation and component scales with no Apple source.
+  - Merged version (#122, Claude): `language: "apple"` is a built-in iOS language with only HIG-published values: colour swatches for light and dark, SF Pro at Dynamic Type's default Large sizes (React Native scales them at runtime, owner's call), the 44 pt hit region, SF Symbols, and chrome. A language now gets `run({ platform, mode, scheme })`, the scheme read from each mode's `prefers-color-scheme` query, so kits naming modes night and day work. The `breacan-apple` plugin carries the `apple-reference` skill.
+  - Demo: walkthrough A on iOS at Native and Tinted, through the binary (`tests/apple.test.ts`); review round 1 caught the mode-name bug, fixed with a night and day test. Released as 0.26.0.
+  - Routing: `implementation` now routes to Claude Sonnet (chezmoi e78a8fe).
 
 ## Related
 
