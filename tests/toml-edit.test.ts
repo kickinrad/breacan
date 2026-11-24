@@ -1,4 +1,4 @@
-// theme.toml edits change the edited value's line and nothing else (kumiko dev's save).
+// theme.toml edits change the edited value's line and nothing else (breacan edit's save).
 import { expect, test } from "bun:test";
 import { setValue } from "../src/toml-edit.mjs";
 

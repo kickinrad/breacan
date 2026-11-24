@@ -215,22 +215,21 @@ The plugin guides an agent, and its rules file lets the agent's lint enforce the
 
 `"template"` writes a kit's own files for apps the engine has no output for, such as terminal and editor themes, for a declared kit: `template: { from: "templates", to: "ports" }`. Every file under `from` is written to the same path under `to`. In each file, `{{<mode>.<colour>}}` becomes that mode's palette colour as `#rrggbb` (so `{{night.blue}}80` adds an alpha), and `{{name}}` becomes the kit's name; every other byte stays as written. A slot the theme lacks fails the build, naming the file. CSS, JS, Kotlin, Markdown and HTML files get the generated header; other formats are written as the template has them.
 
-## Live editing: `breacan dev`
+## Local editor: `breacan edit`
 
-`breacan dev [--port <n>]` (port 4400 by default) builds every output, then serves the project on `http://localhost:<port>/` (the playground, when the config has one) and edits the kit's `theme.toml` live, for a declared kit with a `css` output. Edits are built in memory exactly as `breacan` builds them, derived roles and contrast included, and nothing is written until a save. A change to the kit's folder or `tokens/` on disk rebuilds every output.
+`breacan edit [--port <n>]` (port 4400 by default) builds every output, then serves the project on `http://localhost:<port>/` (the playground, when the config has one) and the Kit panel, and saves edits straight into the kit's token files: `theme.toml` when the kit has one, else the colours in `tokens/*.tokens.json`. Edits are built in memory exactly as `breacan` builds them, derived roles and contrast included, and nothing is written until a save. A save changes only the edited values, each on its own line, so `git diff` shows them alone. A change to the kit's folder or `tokens/` on disk rebuilds every output. `breacan dev` still runs it, until the contract task removes aliases.
 
 | Endpoint | Does |
 | --- | --- |
-| `POST /_kumiko/edit` | takes `{ "<theme.toml path>": value }` (`"palette.night.primary": "#fd5416"`, `"faces.brand": ["Archivo", "sans-serif"]`, `"tokens.acme.layout.gap": "12px"`; `null` drops an edit), builds the draft and answers with the pairs under their floors |
-| `POST /_kumiko/save` | writes the edits into `theme.toml` and rebuilds; each edited value changes on its own line, keeping its key, comment and `why`, and a new key joins its table. A draft with a pair under its floor is not saved |
+| `POST /_kumiko/edit` | takes `{ "<path>": value }`, builds the draft and answers with the pairs under their floors; `null` drops an edit. A path is a `theme.toml` path (`"palette.night.primary": "#fd5416"`, `"faces.brand": ["Archivo", "sans-serif"]`, `"tokens.acme.layout.gap": "12px"`), or, in a kit with no `theme.toml`, a colour token's path (`"color.brand": "#fd5416"`) |
+| `POST /_kumiko/save` | writes the edits into the token files and rebuilds; in `theme.toml` each edited value keeps its key, comment and `why` and a new key joins its table, in a tokens file only the token's `$value` changes. A draft with a pair under its floor is not saved |
 | `GET /_kumiko/live` | the current draft: the `css` output's text, its faces' stylesheets, and the kit's tokens per mode |
 | `GET /_kumiko/events` | server-sent events: `live` after every edit, `reload` after a rebuild from disk |
-| `GET /_kumiko/bridge.js` | the bridge, below |
-| `GET /_kumiko/panel` | the Kit panel: every palette colour of a mode (with the pairs the kit is held to, their live ratios and whether they pass), the faces by the type roles that read them, and the kit's own lengths and times in `[tokens]` as sliders with their units, grouped as Spacing, Radius, Size and Duration; each with its reset, then Save. It wears the kit's own variables. |
+| `GET /_kumiko/panel` | the Kit panel: every colour (with the pairs the kit is held to, their live ratios and whether they pass), the faces by the type roles that read them, and the kit's own lengths and times in `[tokens]` as sliders with their units; each with its reset, then Save. It wears the kit's own variables. |
 
 The server listens on `127.0.0.1` and answers only to the names `localhost` and `127.0.0.1` with its port; any other host name, such as a LAN name or a DNS-rebinding page's, gets a 403. Only a page the server itself serves can edit or save: a request from another origin is refused.
 
-The bridge is how another app follows the edits: load `http://localhost:<port>/_kumiko/bridge.js` as a classic script, in development only. It adds the draft's CSS in a `<style id="kumiko-live">` (the `css` output's variables on `:root`), loads its faces, and replaces both on every edit, without a reload; each update also fires a `kumiko:live` event on `window` whose `detail` is the kit's tokens per mode (kept as `window.kumikoLive` too), for code that reads tokens in JavaScript. The app's own styles follow when they read the kit's variables, for example `var(--md-sys-color-primary, <its own value>)`, so the page looks as before when the server is stopped. Pin the kit's mode on the root (`data-theme`) when the app has one scheme. A parent page that frames the app switches its mode with `postMessage({ kumiko: "theme", scheme: "light" | "dark" })`, which the bridge sets as `data-theme`.
+Shortcuts: a kit with no `theme.toml` edits literal colours only (not aliases, other types or colour objects), shows contrast only where the kit declares its pairs or sets Material's roles, and edits nothing when a resolver governs `tokens/`.
 
 ## Rendered check: `breacan audit`
 

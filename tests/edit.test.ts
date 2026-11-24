@@ -1,19 +1,19 @@
-// kumiko dev: an edit is built in memory and sent live; only its own pages may edit or save; save writes exactly the
+// breacan edit: an edit is built in memory and sent live; only its own pages may edit or save; save writes exactly the
 // edited values into theme.toml, and the outputs pass --check after (tests/playground/ is the kit).
 import { afterAll, expect, test } from "bun:test";
-import { cpSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { connect } from "node:net";
 import { join } from "node:path";
-import { watchSources } from "../src/dev.mjs";
+import { watchSources } from "../src/edit.mjs";
 import { command, root, run, scratch } from "./helpers";
 
-const dir = scratch("kumiko-dev-");
+const dir = scratch("breacan-edit-");
 for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
 const port = 4800 + Math.floor(Math.random() * 1000);
-const server = Bun.spawn([...command, "dev", "--port", String(port)], { cwd: dir, stdout: "pipe", stderr: "pipe" });
+const server = Bun.spawn([...command, "edit", "--port", String(port)], { cwd: dir, stdout: "pipe", stderr: "pipe" });
 afterAll(() => server.kill());
 const origin = `http://localhost:${port}`;
-const ready = (async () => { for (const _ of Array(100)) { try { if ((await fetch(`${origin}/_kumiko/live`)).ok) return; } catch {} await Bun.sleep(100); } throw new Error("kumiko dev did not start"); })();
+const ready = (async () => { for (const _ of Array(100)) { try { if ((await fetch(`${origin}/_kumiko/live`)).ok) return; } catch {} await Bun.sleep(100); } throw new Error("breacan edit did not start"); })();
 const post = (path: string, body: object, from = origin) => fetch(`${origin}${path}`, { method: "POST", headers: { Origin: from, "Content-Type": "application/json" }, body: JSON.stringify(body) });
 const live = async () => (await fetch(`${origin}/_kumiko/live`)).json();
 const theme = readFileSync(join(dir, "design/theme.toml"), "utf8");
@@ -27,7 +27,6 @@ test("an edit reaches the live CSS and the kit's tokens without touching theme.t
   expect(now.css).toContain("--md-sys-color-primary: light-dark(#2e7de9, #ff0000);");
   expect(now.kit.modes.night.find((token: { path: string }) => token.path === "md.sys.color.primary").value).toBe("#ff0000");
   expect(readFileSync(join(dir, "design/theme.toml"), "utf8")).toBe(theme);
-  expect(await (await fetch(`${origin}/_kumiko/bridge.js`)).text()).toContain("kumiko:live");
 });
 
 test("a page elsewhere cannot edit or save", async () => {
@@ -57,7 +56,7 @@ test("a page on a rebound name cannot read the kit or the project's files", asyn
   await ready;
   // The server listens on 127.0.0.1 alone, so it answers to no IPv6 name either.
   expect(await raw("/VERSION", `[::1]:${port}`)).toBe(403);
-  for (const path of ["/VERSION", "/_kumiko/live", "/_kumiko/panel", "/_kumiko/bridge.js"]) {
+  for (const path of ["/VERSION", "/_kumiko/live", "/_kumiko/panel"]) {
     expect(await raw(path, `rebind.example:${port}`)).toBe(403);
     expect(await raw(path, `localhost:${port}`)).toBe(200);
   }
@@ -136,3 +135,32 @@ test("the event stream stays open past Bun's idle timeout", async () => {
   expect(ended).toBe(false);
   await reader.cancel();
 }, 20_000);
+
+// Acceptance 12: a colour changed through the editor's HTTP API is in the token file, alone, and in the playground.
+const themeKit = scratch("breacan-edit-theme-");
+for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(themeKit, entry), { recursive: true });
+const plain = scratch("breacan-edit-plain-");
+mkdirSync(join(plain, "tokens"));
+writeFileSync(join(plain, "VERSION"), "1.0.0\n");
+writeFileSync(join(plain, "breacan.config.mjs"), 'export default { targets: ["css", "playground"], kit: { name: "plain" }, css: { path: "out/kit.css" }, playground: { path: "docs/play" } };\n');
+writeFileSync(join(plain, "tokens/colors.tokens.json"), '{\n  "color": {\n    "$type": "color",\n    "brand": { "$value": "#2e7de9" },\n    "accent":   {"$value":"#ff9e64", "$description": "kept"}\n  }\n}\n');
+
+// `dev` is the hidden alias of `edit`: the theme kit runs through it.
+test.each([
+  ["a theme.toml kit", themeKit, "dev", "design/theme.toml", "palette.night.blue"],
+  ["a plain DTCG kit", plain, "edit", "tokens/colors.tokens.json", "color.brand"],
+])("%s: one colour edit changes one value in its token file, and the playground carries it", async (_, cwd, verb, file, path) => {
+  const at = 5800 + Math.floor(Math.random() * 1000);
+  const child = Bun.spawn([...command, verb, "--port", String(at)], { cwd, stdout: "pipe", stderr: "pipe" });
+  try {
+    for (const _ of Array(100)) { try { if ((await fetch(`http://localhost:${at}/_kumiko/live`)).ok) break; } catch {} await Bun.sleep(100); }
+    const send = (route: string) => fetch(`http://localhost:${at}/_kumiko/${route}`, { method: "POST", headers: { Origin: `http://localhost:${at}`, "Content-Type": "application/json" }, body: JSON.stringify(route === "edit" ? { [path]: "#12ab34" } : {}) });
+    const before = readFileSync(join(cwd, file), "utf8").split("\n");
+    expect((await send("edit")).status).toBe(200);
+    expect((await send("save")).status).toBe(200);
+    const after = readFileSync(join(cwd, file), "utf8").split("\n");
+    expect(after).toHaveLength(before.length);
+    expect(after.filter((line, i) => line !== before[i])).toEqual([expect.stringContaining("#12ab34")]);
+    expect(readFileSync(join(cwd, "docs/play/index.html"), "utf8")).toContain("#12ab34");
+  } finally { child.kill(); }
+});

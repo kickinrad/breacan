@@ -1,12 +1,12 @@
-// The Tune panel's page, served by kumiko dev at /_kumiko/panel. It reads the
-// kit from the server, sends every edit to it, and the server builds the edit and sends the result here and to every
-// page that loads its bridge. Inputs stay put while the rest redraws, so an open colour picker stays open.
+// The Tune panel's page, served by breacan edit at /_kumiko/panel. It reads the kit from the server, sends every edit to
+// it, and the server builds the edit and sends the result here. Inputs stay put while the rest redraws, so an open colour picker stays open.
 import { controls, tuneView, valueOf } from "./tune.js";
 import { contrast } from "../color.mjs";
 
 // A mode's colour scheme by its surface, nearer black or white (as the playground decides it).
 const scheme = (tokens) => {
-  const surface = tokens.find((token) => token.path === "md.sys.color.surface").value;
+  const surface = tokens.find((token) => token.path === "md.sys.color.surface")?.value;
+  if (!surface) return "light"; // a kit with no Material roles
   return contrast(surface, "#000000") > contrast(surface, "#ffffff") ? "light" : "dark"; // lint: own black and white, the ends a scheme is measured against
 };
 
