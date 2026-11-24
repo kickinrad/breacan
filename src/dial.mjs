@@ -4,6 +4,9 @@
 // its level. The dial says, foundation by foundation, whether the platform keeps the theme's values or takes its
 // language's; the rule runs during resolution, as the language layers that join the stack.
 import apple from "./languages/apple.mjs";
+import material from "./languages/material.mjs";
+
+const BUILT_IN = { apple, material };
 
 // Each foundation and the token groups it owns. A language's tree for a foundation sets tokens in its groups only, so
 // a foundation's dial setting moves that foundation's tokens and nothing else.
@@ -50,7 +53,7 @@ const readDial = (platform, dial) => {
 // `tint` is the theme's primary colour, the brand tint on system chrome.
 export const platformLayers = (platforms = {}, { tint } = {}) => Promise.all(Object.entries(platforms).map(async ([platform, { language, dial } = {}]) => {
   const { level, takes } = readDial(platform, dial);
-  if (language === "apple") language = apple;
+  if (typeof language === "string") language = BUILT_IN[language] ?? language;
   if (language?.slot !== "language" || typeof language.run !== "function") {
     throw new Error(`platforms.${platform}.language must be a language module ({ slot: "language", name, run })`);
   }
