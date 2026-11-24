@@ -170,7 +170,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 14. [x] **Dial for every foundation.** Levels, per-foundation overrides and the chrome rule across all foundations and component tokens. Route: implementation-hard. Demo: acceptance 5. Blocked by: 13.
 15. [x] **breacan-apple.** Foundations-only Apple language plugin with HIG links. Route: implementation. Demo: walkthrough A on iOS. Blocked by: 14.
 16. [x] **Expo output.** The typed Expo theme from the react-native code, per platform. Route: implementation. Demo: a fixture Expo project typechecks. Blocked by: 14.
-17. [ ] **Boombox moves.** boombox-design becomes the Boombox theme repo with web, iOS and Android kits at their levels. The Swatchbook Storybook config replaces the storybook output, which is then deleted. Route: implementation. Demo: acceptance 7; walkthrough D. Blocked by: 15, 16.
+17. [x] **Boombox moves.** boombox-design becomes the Boombox theme repo with web, iOS and Android kits at their levels. The Swatchbook Storybook config replaces the storybook output, which is then deleted. Route: implementation. Demo: acceptance 7; walkthrough D. Blocked by: 15, 16.
 18. [ ] **Playground columns.** Base, Theme, Platform and Kit side by side. Route: implementation. Demo: the owner reviews Tokyo and Boombox in the playground. Blocked by: 17.
 
 ### Phase 3: inputs, editing and public-ready
@@ -276,6 +276,12 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Merged version (#122, Claude): `language: "apple"` is a built-in iOS language with only HIG-published values: colour swatches for light and dark, SF Pro at Dynamic Type's default Large sizes (React Native scales them at runtime, owner's call), the 44 pt hit region, SF Symbols, and chrome. A language now gets `run({ platform, mode, scheme })`, the scheme read from each mode's `prefers-color-scheme` query, so kits naming modes night and day work. The `breacan-apple` plugin carries the `apple-reference` skill.
   - Demo: walkthrough A on iOS at Native and Tinted, through the binary (`tests/apple.test.ts`); review round 1 caught the mode-name bug, fixed with a night and day test. Released as 0.26.0.
   - Routing: `implementation` now routes to Claude Sonnet (chezmoi e78a8fe).
+- Task 17, Boombox moves (implementation, Claude; three parts; done).
+  - A: `language: "material"` is a built-in Android language from the vendored Material tokens, beside `"apple"`; one hand-typed table maps light roles to palette tones, since `material/` holds only the dark scheme. PR #125, released as 0.27.0. Demo passed first try.
+  - B: boombox-design #13 (merged 3ad3ba1, owner's approval) moves the kit to Breacán: `breacan.config.mjs`, the receipt, mise on `github:kickinrad/breacan`, and `pre-breacan` tagged. iOS (`apple`) and Android (`material`) at Branded, the web at Signature as the base (owner's call). The web CSS and Beer outputs are byte-identical, and `tokens` and `textStyles` in `ports/react-native/tokens.ts` are unchanged; `themes[platform][mode]` is added. A Swatchbook config replaces the storybook output; its own toolbar doesn't show on HTML stories, and the generated Site and Live stories and Kit panel are gone (owner accepted).
+  - Acceptance 7: `tsc --noEmit` passes in the Boombox Expo app against the generated theme, checked in place and removed; nothing was committed to the app.
+  - Walkthrough D: the phones keep Boombox's colour, type and shape, and take each platform's touch target, icons and, on iOS, system bars and sheets. Their motion and elevation equal the web's: Apple publishes none, and Material's baseline is what the kit already inherits.
+  - C: the storybook output is deleted (#127, breaking, released as 0.28.0). A config still listing it fails naming Swatchbook. The Boombox golden loses its `.storybook` entries only, checked against the `pre-breacan` checkout.
 
 ## Related
 
