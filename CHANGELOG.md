@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.24.0](https://github.com/kickinrad/breacan/compare/v0.23.0...v0.24.0) (2026-11-24)
+
+
+### Features
+
+* **dial:** ✨ extend the dial to every foundation ([f941c0c](https://github.com/kickinrad/breacan/commit/f941c0cd7c02c680c2a061ef5a7d52964d506fd8))
+* **dial:** ✨ task 14, the dial for every foundation ([#114](https://github.com/kickinrad/breacan/issues/114)) ([f941c0c](https://github.com/kickinrad/breacan/commit/f941c0cd7c02c680c2a061ef5a7d52964d506fd8))
+
 ## [0.23.0](https://github.com/kickinrad/breacan/compare/v0.22.1...v0.23.0) (2026-11-24)
 
 
