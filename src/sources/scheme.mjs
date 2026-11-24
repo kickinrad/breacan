@@ -2,17 +2,43 @@
 // accents fill Material's accent roles, and the sixteen ANSI colours map as tinted-theming's shell templates map
 // them. A scheme gives its own variant (light or dark); the other scheme stays the base's unless a second file
 // gives it. Everything else comes from the base.
+// An iTerm2 `.itermcolors` file is read too: ANSI 0 to 15 are the ANSI colours, ANSI 1 to 6 the accents, the background and
+// foreground base00 and base05, the selection base02, and the steps between them are mixed (iTerm2 has no ramp).
 // Options: files (one or two scheme paths, at most one per variant).
 import { readFileSync } from "node:fs";
 import YAML from "yaml";
-import { bestOn, mix, textSafe } from "../color.mjs";
+import { bestOn, luminance, mix, textSafe } from "../color.mjs";
 
 const HEX = /^#?[0-9a-fA-F]{6}$/;
 // tinted-theming's base16-shell order; Base24 has its own bright colours.
 const ANSI16 = ["00", "08", "0B", "0A", "0D", "0E", "0C", "05", "03", "08", "0B", "0A", "0D", "0E", "0C", "07"];
 const ANSI24 = { 9: "12", 10: "14", 11: "13", 12: "16", 13: "17", 14: "15" };
 
+// A `.itermcolors` plist as a scheme: its colours are dicts of 0 to 1 sRGB components keyed by name.
+// shortcut: the cursor colour and a colour space other than sRGB are ignored, until a role needs the cursor.
+const readIterm = (file) => {
+  let text;
+  try { text = readFileSync(file, "utf8"); } catch (error) { throw new Error(`scheme: cannot read ${file} (${error.message})`); }
+  const colours = {};
+  for (const [, name, body] of text.matchAll(/<key>([^<]+) Color<\/key>\s*<dict>([\s\S]*?)<\/dict>/g)) {
+    const parts = Object.fromEntries([...body.matchAll(/<key>(Red|Green|Blue) Component<\/key>\s*<real>([^<]+)<\/real>/g)].map(([, c, v]) => [c, Number(v)]));
+    if (!["Red", "Green", "Blue"].every((c) => Number.isFinite(parts[c]))) throw new Error(`scheme: ${file} has an unreadable colour for ${name}`);
+    colours[name] = `#${["Red", "Green", "Blue"].map((c) => Math.round(parts[c] * 255).toString(16).padStart(2, "0")).join("")}`;
+  }
+  for (const name of ["Background", "Foreground", "Selection", ...Array.from({ length: 16 }, (_, i) => `Ansi ${i}`)]) {
+    if (!colours[name]) throw new Error(`scheme: ${file} has no colour for ${name}`);
+  }
+  const [bg, fg] = [colours.Background, colours.Foreground];
+  const ansi = Array.from({ length: 16 }, (_, i) => colours[`Ansi ${i}`]);
+  const hex = {
+    "00": bg, "01": mix(bg, fg, 8), "02": colours.Selection, "03": mix(bg, fg, 40), "04": mix(bg, fg, 65), "05": fg,
+    "06": mix(bg, fg, 85), "07": mix(bg, fg, 95), "08": ansi[1], "0B": ansi[2], "0A": ansi[3], "0D": ansi[4], "0E": ansi[5], "0C": ansi[6],
+  };
+  return { variant: luminance(bg) > 0.18 ? "light" : "dark", system: "base16", hex, ansi, name: file };
+};
+
 const read = (file) => {
+  if (file.endsWith(".itermcolors")) return readIterm(file);
   let scheme;
   try { scheme = YAML.parse(readFileSync(file, "utf8")); } catch (error) { throw new Error(`scheme: cannot read ${file} (${error.message})`); }
   const system = scheme?.system ?? "base16";
@@ -31,7 +57,7 @@ const read = (file) => {
 };
 
 // One scheme's colour roles and its palette and ANSI tokens, as a token tree.
-const tree = ({ system, hex }) => {
+const tree = ({ system, hex, ansi: given }) => {
   const b = (slot) => hex[slot];
   const surface = b("00");
   const text = b("05");
@@ -52,7 +78,7 @@ const tree = ({ system, hex }) => {
   }
   roles["surface-tint"] = roles.primary;
   const colour = (value) => ({ $type: "color", $value: value });
-  const ansi = Object.fromEntries(ANSI16.map((slot, i) => [String(i), colour(b(system === "base24" && ANSI24[i] ? ANSI24[i] : slot))]));
+  const ansi = Object.fromEntries(ANSI16.map((slot, i) => [String(i), colour(given?.[i] ?? b(system === "base24" && ANSI24[i] ? ANSI24[i] : slot))]));
   return {
     md: { sys: { color: Object.fromEntries(Object.entries(roles).map(([role, value]) => [role, colour(value)])) } },
     scheme: { palette: Object.fromEntries(Object.entries(hex).map(([slot, value]) => [`base${slot}`, colour(value)])), ansi },
