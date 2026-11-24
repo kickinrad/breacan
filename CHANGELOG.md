@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.31.0](https://github.com/kickinrad/breacan/compare/v0.30.0...v0.31.0) (2026-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **edit:** /_kumiko/bridge.js is gone.
+
+### Features
+
+* **edit:** breacan edit saves to theme.toml or DTCG files (task 21) ([#136](https://github.com/kickinrad/breacan/issues/136)) ([f2fade4](https://github.com/kickinrad/breacan/commit/f2fade460dc13f5f0fb23b8ff8bac681d1b39f37))
+
 ## [0.30.0](https://github.com/kickinrad/breacan/compare/v0.29.0...v0.30.0) (2026-11-24)
 
 
