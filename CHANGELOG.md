@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.25.0](https://github.com/kickinrad/breacan/compare/v0.24.0...v0.25.0) (2026-11-24)
+
+
+### Features
+
+* **expo:** ✨ emit typed platform themes ([73f7a6b](https://github.com/kickinrad/breacan/commit/73f7a6b73dead0cf0c284a1a6518bbf8af65ab9c))
+* **expo:** ✨ emit typed platform themes (task 16) ([#118](https://github.com/kickinrad/breacan/issues/118)) ([73f7a6b](https://github.com/kickinrad/breacan/commit/73f7a6b73dead0cf0c284a1a6518bbf8af65ab9c))
+
 ## [0.24.0](https://github.com/kickinrad/breacan/compare/v0.23.0...v0.24.0) (2026-11-24)
 
 
