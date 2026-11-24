@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.28.0](https://github.com/kickinrad/breacan/compare/v0.27.0...v0.28.0) (2026-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **outputs:** 🔥 delete the storybook output (task 17C) ([#127](https://github.com/kickinrad/breacan/issues/127))
+
+### Features
+
+* **outputs:** 🔥 delete the storybook output (task 17C) ([#127](https://github.com/kickinrad/breacan/issues/127)) ([0edf92e](https://github.com/kickinrad/breacan/commit/0edf92e0155421dc65cdd98b460a4c928a97f41d))
+
 ## [0.27.0](https://github.com/kickinrad/breacan/compare/v0.26.0...v0.27.0) (2026-11-24)
 
 
