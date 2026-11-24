@@ -151,15 +151,25 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const tokens = resolved.map(entry).map(mark);
   // Resolve each platform after each mode's theme layers, so the dial's selected language values win in both modes.
   const platforms = {};
+  // A language is told each mode's colour scheme: the kit names its modes, but a mode's media query says light or dark,
+  // and the base mode takes the opposite of the scheme query's.
+  const schemeOf = (query, name) => {
+    const scheme = /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1];
+    if (!scheme) throw new Error(`platforms need each mode's colour scheme, and the mode ${name} has no prefers-color-scheme media query`);
+    return scheme;
+  };
+  const schemes = config.platforms ? Object.fromEntries(Object.keys(media).map((query) => [query, schemeOf(query, modes?.media?.[query] ?? query)])) : {};
+  const [otherScheme] = Object.values(schemes);
+  if (config.platforms && !otherScheme) throw new Error(`platforms need each mode's colour scheme, and the base mode ${modes?.base ?? "base"} has no other mode to tell it from`);
   const tint = tokens.find((token) => token.path === "md.sys.color.primary")?.value;
   for (const { platform, level, layersFor } of await platformLayers(config.platforms, { tint })) {
     const ownHere = new Set(own);
-    const baseLayers = await layersFor(modes?.base);
+    const baseLayers = await layersFor({ mode: modes?.base, scheme: otherScheme === "dark" ? "light" : "dark" });
     for (const layer of baseLayers) collect(layer.tree, [], ownHere);
     const markHere = (token) => ownHere.has(token.path) ? token : { ...token, builtin: true };
     const platformModes = {};
     for (const [query] of Object.entries(media)) {
-      const layers = await layersFor(modes?.media?.[query]);
+      const layers = await layersFor({ mode: modes?.media?.[query], scheme: schemes[query] });
       for (const layer of layers) collect(layer.tree, [], ownHere);
       platformModes[modes?.media?.[query] ?? query] = (await resolveLayers([...modeLayers(query), ...layers])).map(entry).map(markHere);
     }

@@ -46,9 +46,9 @@ const SWATCHES = {
 export default {
   slot: "language",
   name: "apple",
-  run: ({ mode } = {}) => ({
+  run: ({ scheme } = {}) => ({
     colour: tree("md.sys.color", Object.fromEntries(Object.entries(SWATCHES)
-      .map(([role, hexes]) => [role, colour(hexes[mode === "dark" ? 1 : 0])]))),
+      .map(([role, hexes]) => [role, colour(hexes[scheme === "dark" ? 1 : 0])]))),
     type: {
       md: {
         ref: { typeface: { brand: font, plain: font } },
