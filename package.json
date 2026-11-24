@@ -1,6 +1,6 @@
 {
   "name": "breacan",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "description": "Build one look into each platform's native theme files from DTCG 2025.10 design tokens, as one binary named breacan.",
   "type": "module",
   "bin": {
