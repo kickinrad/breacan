@@ -1,5 +1,5 @@
 {
-  "$description": "Kit D's brand guide: its colours, its type and its icons.",
+  "$description": "Kit D's brand guide: its colours, its type, its corners, its icons and its button height.",
   "md": {
     "ref": {
       "typeface": {
@@ -12,9 +12,20 @@
         "primary": { "$type": "color", "$value": "#8a2be2" },
         "on-primary": { "$type": "color", "$value": "#ffffff" }
       },
+      "shape": {
+        "corner": {
+          "small": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } },
+          "medium": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }
+        }
+      },
       "typescale": {
         "display-large": { "size": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } } },
         "body-large": { "size": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } } }
+      }
+    },
+    "comp": {
+      "button-medium": {
+        "container-height": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } }
       }
     }
   },
