@@ -240,7 +240,12 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Review round 4 (FAIL, 2 Must): that scanner read JSON and typed TypeScript as plain JavaScript and failed the build. It now picks the language by extension, treats data files as plain inputs, and names an import it cannot resolve; tests cover JSON and typed TypeScript.
   - Shipped: PR #99 merged and released as 0.21.0; 0.21.1 (#101) fixed a kit with no receipt failing its check on the files Breacán adds, which broke tokyo-material's CI on 0.21.0. Review went four FAIL rounds, all on the receipt's config-import tracking; the owner chose to merge after round 4's fix.
   - Acceptance 1: `mise use github:kickinrad/breacan` installs 0.21.0 and `breacan --version` prints it; `github:kickinrad/kumiko` still installs and runs as `kumiko`. tokyo-mono and tokyo-material CI pass on 0.21.1.
-  - Market installed in Claude Code and Codex (`claude plugin install`, `codex plugin add`; chezmoi d5a0e9e holds it). domains #33 and workflows #153 merged; design-system uninstalled from both runtimes. The make-kit and plugin descriptions now say "design tokens", so `dispatch list design tokens` finds Breacán.
+  - Market installed in Claude Code and Codex (`claude plugin install`, `codex plugin add`; chezmoi d5a0e9e holds it). domains #33 and workflows #153 merged; design-system uninstalled from both runtimes. The make-kit and plugin descriptions now say "design tokens", so `dispatch list design tokens` finds Breacán. `~/projects/markets/breacan` links to this checkout, so dispatch ranks it with the other markets: `make-kit` is first.
+- Task 10, Tokyo merge (implementation; in progress, waiting on the owner's look).
+  - The owner kept the name: kickinrad/tokyo-mono takes Tokyo Material into `material/` with its history ([PR #124](https://github.com/kickinrad/tokyo-mono/pull/124)), extending the root palette directly. Both repos are tagged `pre-breacan`. One market lists both plugins; CI checks both kits and releases the kit as `material-v<VERSION>`.
+  - New ports: Base24 schemes and a Ghostty theme with the Windows Terminal colours. `scripts/check-ports.sh` validates Windows Terminal against Microsoft's schema and renders tinted-terminal's templates from the Base24 schemes (acceptance 9, first two parts); Ghostty's own validation runs where Ghostty is installed, and its CI install route waits on the owner.
+  - The swapped Day contrast notes are fixed (secondary 4.41, tertiary 4.31). Every existing port and kit output is byte-identical.
+  - Walkthrough C: the `scheme` source (this repo, `src/sources/scheme.mjs`) builds a whole kit from Tokyo's Base24 schemes (`tests/scheme.test.ts`).
 
 ## Related
 
