@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.23.0](https://github.com/kickinrad/breacan/compare/v0.22.1...v0.23.0) (2026-11-24)
+
+
+### Features
+
+* **dial:** ✨ add the platform layer and the dial for type ([cea1236](https://github.com/kickinrad/breacan/commit/cea1236365b73c6801b294db8a233a0d972676c0))
+* **dial:** ✨ task 13, the dial on one foundation (type) ([#111](https://github.com/kickinrad/breacan/issues/111)) ([cea1236](https://github.com/kickinrad/breacan/commit/cea1236365b73c6801b294db8a233a0d972676c0))
+
 ## [0.22.1](https://github.com/kickinrad/breacan/compare/v0.22.0...v0.22.1) (2026-11-24)
 
 
