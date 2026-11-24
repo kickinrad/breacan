@@ -13,7 +13,8 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
 import tailwind from "../web/tailwind.html" with { type: "text" };
 import { need } from "../system.mjs";
-import { iconLink } from "../web/foundations.js";
+import { fontLinks, iconLink } from "../web/foundations.js";
+import cssOutput from "./css.mjs";
 
 // Beer's stylesheet, installed with the engine (the binary carries Beer's dist/cdn folder as assets). Its shapes are
 // SVG files beside it, which the page carries as data; its font faces point at icon fonts beside it too, which the
@@ -44,7 +45,7 @@ export const bundle = async (client, color, entry = "playground.js") => {
   }
 };
 // The client's modules; each imports the colour maths from "../color.mjs" in the source and "./color.mjs" beside the page.
-const CLIENT = ["playground.js", "examples.js", "foundations.js", "components.js", "cards.js", "pages.js"];
+const CLIENT = ["playground.js", "examples.js", "foundations.js", "components.js", "cards.js", "pages.js", "columns.js"];
 // A source file as text. The engine imports some of them as modules too (color.mjs, and the specimens the
 // claude-design output reads), and the bundler cannot embed a module as text beside importing it, so the binary
 // carries them as assets (mise.toml: --asset); from source each is the file.
@@ -67,7 +68,7 @@ export default {
   reads: ["tokens", "media", "kit"],
   writes: { path: null },
   async run(ctx) {
-    const { tokens, media, mediaTokens, options, config, readExisting, built, root, name, version, theme, modes = { base: "base", media: {} } } = ctx;
+    const { tokens, media, mediaTokens, columns, platforms, options, config, readExisting, built, root, name, version, theme, modes = { base: "base", media: {} } } = ctx;
     const dir = options.path;
     // A sibling output's file, as its own options name it.
     const sibling = (target) => config.targets.includes(target) ? need(config[target] ?? {}, target, "path") : undefined;
@@ -105,6 +106,19 @@ export default {
     const byMode = [[modes.base, tokens.filter((token) => carried.has(token.path))]];
     for (const [query, files] of Object.entries(media)) byMode.push([modes.media[query] ?? query, (await mediaTokens(files)).filter((token) => carried.has(token.path))]);
 
+    // The columns view, where the build made the base's tokens: each column's variables per mode, as the css output
+    // writes them for that column's tokens; and the faces the platforms' type names.
+    const variables = async (set) => Object.fromEntries(await Promise.all([[modes.base, set.tokens], ...Object.entries(set.media)].map(async ([mode, each]) =>
+      [mode, (await cssOutput.run({ tokens: each, media: {}, options: { path: "-" } }))[0].content.match(/^:root \{\n([\s\S]*)\n\}/)[1].split("\n").map((line) => line.trim())])));
+    const sets = columns && { base: columns.base, theme: { tokens: byMode[0][1], media: Object.fromEntries(byMode.slice(1)) }, ...Object.fromEntries(Object.entries(platforms ?? {}).flatMap(([platform, each]) => [[`${platform}:native`, each.native], [`${platform}:kit`, each]])) };
+    const shown = sets && Object.fromEntries(await Promise.all(Object.entries(sets).map(async ([id, set]) => [id, await variables(set)])));
+    const fonts = sets && [...new Set(Object.values(sets).flatMap((set) => [set.tokens, ...Object.values(set.media)]).flatMap(fontLinks))];
+    // Beer's variables map from the kit's on :root, where a column's own would not reach them: each column sets them again.
+    const mapping = beer.match(/^:root, body\.light, body\.dark \{\n([\s\S]*?)\n\}/m)?.[1];
+    if (sets && !mapping) throw new Error("playground: the beer output has no :root block that maps Beer's variables");
+    const columnData = sets && { beer: mapping.split("\n").map((line) => line.trim()), base: shown.base, theme: shown.theme, fonts,
+      platforms: Object.fromEntries(Object.entries(platforms ?? {}).map(([platform, each]) => [platform, { level: each.level, native: shown[`${platform}:native`], kit: shown[`${platform}:kit`] }])) };
+
     const color = await source("../color.mjs");
     const client = await Promise.all(CLIENT.map(async (file) => [file, await source(`../web/${file}`)]));
     const fields = [
@@ -114,6 +128,7 @@ export default {
       `"modes": {\n${byMode.map(([mode, each]) => `    ${JSON.stringify(mode)}: ${lines(each)}`).join(",\n")}\n  }`,
       ...(icon === undefined ? [] : [`"icon": ${JSON.stringify(icon)}`]),
       ...(output === undefined ? [] : [`"tailwind": "tailwind.html"`]),
+      ...(columnData ? [`"columns": ${JSON.stringify(columnData, null, 2).replaceAll("\n", "\n  ")}`] : []),
       ...(notes === undefined ? [] : [`"notes": ${JSON.stringify(notesHtml(notes))}`]),
       ...(entries.length ? [`"examples": ${JSON.stringify(entries)}`] : []),
     ];

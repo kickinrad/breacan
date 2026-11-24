@@ -170,6 +170,7 @@ playground: { path: "docs/playground", examples: ["preview/example.json"] }
 - `path`: the directory it writes.
 - `examples` (optional): the project's own entry files, read at build and carried in the page. An entry is `{ name, surface, output, preview?, captures?, devices? }`: `preview` a live web page, `captures` `[{ src, label, build? }]` for a surface a page cannot embed, `devices` `[{ name, width, height }]`, each path relative to the entry. A missing entry fails the build; a missing preview or capture fails `breacan audit`.
 - theme.toml's `icon` (a Material Symbol) is the kit's mark in the top app bar on small screens (`style` otherwise).
+- The **Columns** destination shows one specimen screen four times: **Base** (the Breacán-neutral base alone), **Theme** (the kit's own look), **Platform** (the platform's language alone, at Native) and **Kit** (what the dial resolves for that platform at the kit's level). A kit with `platforms` gets Platform and Kit, with a picker when it lists more than one; without, Base and Theme only. The mode switch moves every column. Each column is the same markup under its own CSS variables, written by the `css` output's own code; the columns stack on a phone.
 
 It writes:
 

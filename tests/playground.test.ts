@@ -67,7 +67,7 @@ test("the page opens from disk: it carries the kit's data and the client as one 
 
 test("the page's data holds the kit's name, version, both modes' tokens and the notes", () => {
   const data = tokensOf(built());
-  expect(Object.keys(data)).toEqual(["name", "version", "title", "modes", "notes"]);
+  expect(Object.keys(data)).toEqual(["name", "version", "title", "modes", "columns", "notes"]);
   expect(data.name).toBe("acme");
   expect(data.title).toBe("acme");
   expect(data.version).toBe("1.2.3");
@@ -374,7 +374,7 @@ test("tailwind: without the output the item says the kit has none and writes no 
 
   const dir = built(withTailwind());
   const withData = tokensOf(dir);
-  expect(Object.keys(withData)).toEqual(["name", "version", "title", "modes", "tailwind", "notes"]);
+  expect(Object.keys(withData)).toEqual(["name", "version", "title", "modes", "tailwind", "columns", "notes"]);
   expect(withData.tailwind).toBe("tailwind.html");
   const html: string = tailwind(withData, withData.modes.night);
   expect(html).toContain('<iframe data-frame="tailwind.html"');
@@ -590,6 +590,7 @@ test("the Examples destination sits before Rules with an entry, and is absent wi
   const { tabs } = await client();
   const ids = (data: object) => tabs(data).map((tab: { id: string }) => tab.id);
   expect(ids({})).toEqual(["foundations", "components", "cards", "pages", "rules"]);
+  expect(ids({ columns: {} })).toEqual(["foundations", "components", "cards", "pages", "columns", "rules"]);
   const both = tabs({ examples: [{ base: "./", entry: { name: "Home" } }] });
   expect(both.map((tab: { id: string }) => tab.id)).toEqual(["foundations", "components", "cards", "pages", "examples", "rules"]);
   expect(both[4].items.map((item: { name: string }) => item.name)).toEqual(["Home"]);
@@ -615,4 +616,51 @@ test("the page carries no CSS of its own: its styles are Beer's and the kit's ou
   const styles = [...read(dir, "docs/play/index.html").matchAll(/<style>([\s\S]*?)<\/style>/g)].map((match) => match[1].trim());
   expect(styles).toHaveLength(3);
   expect(styles.slice(1)).toEqual([read(dir, "ports/css/kit.css").trim(), read(dir, "ports/css/kit-beer.css").trim()]);
+});
+
+test("Columns: Base, Theme, Platform and Kit carry their own variables in both modes; a kit with no platforms shows two", async () => {
+  const { view } = await client();
+  const none = tokensOf(built());
+  expect(Object.keys(none.columns.platforms)).toEqual([]);
+  const columnsOf = (data: object, platform?: string) => [...view(data, { tab: "columns", mode: "night", platform }).matchAll(/<div class="surface border"([^>]*?) style="([^"]*)"/g)];
+  expect(columnsOf(none)).toHaveLength(2);
+
+  const dir = edited('c.platforms = { ios: { language: "apple", dial: "branded" }, android: { language: "material", dial: "native" } };');
+  built(dir);
+  const { columns, modes } = tokensOf(dir);
+  const get = (lines: string[], name: string) => lines.find((line: string) => line.startsWith(`--${name}:`));
+  const [ios, android] = [columns.platforms.ios, columns.platforms.android];
+  // The theme is the kit's own face; the base alone is neither it nor the platform's; Platform takes the language's face
+  // and Kit keeps the theme's (Branded keeps type), so Kit differs from Platform where the dial says.
+  expect(get(columns.theme.night, "md-ref-typeface-plain")).toContain("Fixture Sans");
+  expect(get(columns.base.night, "md-ref-typeface-plain")).not.toContain("Fixture Sans");
+  expect(get(ios.native.night, "md-ref-typeface-plain")).toContain("SF Pro");
+  expect(get(ios.kit.night, "md-ref-typeface-plain")).toContain("Fixture Sans");
+  expect(get(android.native.night, "md-ref-typeface-plain")).toContain("Roboto");
+  expect(ios.level).toBe("branded");
+  expect(android.level).toBe("native");
+  // Colour: Branded keeps the theme's primary; Native takes the platform's, and the base has its own.
+  const primary = (lines: string[]) => get(lines, "md-sys-color-primary");
+  expect(primary(columns.theme.night)).toContain("#7aa2f7");
+  expect(primary(ios.kit.night)).toBe(primary(columns.theme.night));
+  expect(primary(ios.native.night)).not.toBe(primary(columns.theme.night));
+  expect(primary(columns.base.night)).not.toBe(primary(columns.theme.night));
+  // Each mode has its own set: the modes differ in every column.
+  for (const set of [columns.base, columns.theme, ios.native, ios.kit]) expect(primary(set.night)).not.toBe(primary(set.day));
+  expect(Object.keys(columns.theme)).toEqual(Object.keys(modes));
+
+  // The view draws the same specimen four times, each under its own variables, and the picker moves the platform.
+  const data = tokensOf(dir);
+  const [first, second] = [columnsOf(data), columnsOf(data, "android")];
+  expect(first).toHaveLength(4);
+  expect(first.map((match) => match[1] !== "")).toEqual([true, false, true, true]);
+  expect(first[2][2]).toContain("SF Pro");
+  expect(second[2][2]).toContain("Roboto");
+  expect(first[1][2]).toBe(second[1][2]);
+  expect(view(data, { tab: "columns", mode: "night" })).toContain('data-platform="android"');
+  // The view is reached from the top app bar; the rail and the phone's bottom bar keep their five destinations.
+  const page = view(data, { tab: "foundations", mode: "night" });
+  expect(page.match(/<nav class="top">[^]*?<\/nav>/)![0]).toContain('href="#columns"');
+  expect(page.match(/href="#columns"/g)).toHaveLength(1);
+  expect(view(tokensOf(built(edited('c.platforms = { ios: { language: "apple", dial: "branded" } };'))), { tab: "columns", mode: "night" })).not.toContain("data-platform");
 });

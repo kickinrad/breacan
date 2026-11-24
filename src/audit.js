@@ -25,9 +25,10 @@ export const audit = (doc, { faces }) => {
   const visible = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && style(el).visibility === "visible" && el.checkVisibility?.() !== false; };
   const name = (el) => `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? `.${el.className.trim().split(/\s+/).join(".")}` : ""} "${el.textContent.trim().slice(0, 30)}"`;
   // Text an element sets itself, not only its children's; a disabled specimen (Material's 38%) is meant to be faint,
-  // and a contrast pair the page marks failing (`data-fail`) is shown failing on purpose.
+  // a contrast pair the page marks failing (`data-fail`) is shown failing on purpose, and a column of the Columns view
+  // that shows another token set than the kit's (`data-other-set`) is that set's, not the kit's to answer for.
   const texts = [...doc.body.querySelectorAll("*")].filter((el) => [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())
-    && visible(el) && !el.closest("[disabled], [aria-disabled='true'], :disabled, .disabled, [data-fail], iframe, script, style") && opacity(el) > 0.9);
+    && visible(el) && !el.closest("[disabled], [aria-disabled='true'], :disabled, .disabled, [data-fail], [data-other-set], iframe, script, style") && opacity(el) > 0.9);
 
   for (const el of texts) {
     const s = style(el);
