@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.29.0](https://github.com/kickinrad/breacan/compare/v0.28.0...v0.29.0) (2026-11-24)
+
+
+### Features
+
+* **playground:** ✨ add the columns view (task 18) ([#130](https://github.com/kickinrad/breacan/issues/130)) ([26f5094](https://github.com/kickinrad/breacan/commit/26f5094cb55a300883a7137f96fbf6bcf740f285))
+
 ## [0.28.0](https://github.com/kickinrad/breacan/compare/v0.27.0...v0.28.0) (2026-11-24)
 
 
