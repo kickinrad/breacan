@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.22.1](https://github.com/kickinrad/breacan/compare/v0.22.0...v0.22.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **receipt:** 🐛 list files as path and sha256 so scanners don't flag it ([#107](https://github.com/kickinrad/breacan/issues/107)) ([3cbe8c9](https://github.com/kickinrad/breacan/commit/3cbe8c9b4207f65354456a6a70319aa04579b304))
+
 ## [0.22.0](https://github.com/kickinrad/breacan/compare/v0.21.1...v0.22.0) (2026-11-24)
 
 
