@@ -6,6 +6,7 @@ import { contrast } from "../color.mjs";
 import cards from "./cards.js";
 import { examples } from "./examples.js";
 import components from "./components.js";
+import { columns } from "./columns.js";
 import foundations, { fontLinks, replay } from "./foundations.js";
 import pages from "./pages.js";
 
@@ -43,21 +44,26 @@ export const exceptions = (tokens) => {
 // beneath it from medium up and its bottom bar on small; the list and the detail are Material's two panes
 // (layout.css): side by side from expanded, and below that only the list (a tab named) or the open item (an item
 // named, `data-open`, with a back button) shows. A destination with one item has no list: its item is the page.
-// Without example entries, no Examples.
-export const tabs = (data, device) => data.examples?.length
-  ? [...TABS.slice(0, -1), { id: "examples", name: "Examples", icon: "apps", items: examples(data.examples, device) }, TABS.at(-1)]
-  : TABS;
+// Without example entries, no Examples, and without the build's columns, no Columns. Columns is reached from the top
+// app bar, not the rail or bar (`aside`): a sixth destination does not fit a phone's bottom bar.
+export const tabs = (data, device) => [
+  ...TABS.slice(0, -1),
+  ...(data.columns ? [{ id: "columns", name: "Columns", icon: "view_column", aside: true, items: [{ id: "columns", name: "Columns", wide: true, body: (each, tokens, state) => columns(each, state.mode, state.platform) }] }] : []),
+  ...(data.examples?.length ? [{ id: "examples", name: "Examples", icon: "apps", items: examples(data.examples, device) }] : []),
+  TABS.at(-1),
+];
 
-export const view = (data, { tab: tabId, item: itemId, mode = Object.keys(data.modes)[0], expanded = false, device = 0 }) => {
+export const view = (data, { tab: tabId, item: itemId, mode = Object.keys(data.modes)[0], expanded = false, device = 0, platform }) => {
   const TABS = tabs(data, device);
   const tab = TABS.find((each) => each.id === tabId) ?? TABS[0];
   const item = tab.items.find((each) => each.id === itemId) ?? tab.items[0];
   const open = tab.id === tabId && item.id === itemId;
-  const destinations = TABS.map((each) => `<a href="#${each.id}"${each === tab ? ' class="active"' : ""}><i>${each.icon}</i><div>${each.name}</div></a>`).join("");
+  const destinations = TABS.filter((each) => !each.aside).map((each) => `<a href="#${each.id}"${each === tab ? ' class="active"' : ""}><i>${each.icon}</i><div>${each.name}</div></a>`).join("");
   // One icon button steps to the next mode; its icon is that mode's scheme.
   const names = Object.keys(data.modes);
   const next = names[(names.indexOf(mode) + 1) % names.length];
   const switcher = `<button class="circle transparent" data-mode="${esc(next)}" aria-label="${esc(next[0].toUpperCase() + next.slice(1))} mode"><i>${scheme(data.modes[next]) === "light" ? "light_mode" : "dark_mode"}</i></button>`;
+  const columnsLink = data.columns ? `<a class="button circle transparent${tab.id === "columns" ? " fill" : ""}" href="#${tab.id === "columns" ? TABS[0].id : "columns"}" aria-label="Columns"><i>view_column</i></a>` : "";
   const items = tab.items.map((each) => `<li><a class="wave${each === item ? " active" : ""}" href="#${tab.id}/${each.id}"><span class="max">${each.name}</span></a></li>`).join("");
   const list = tab.items.length > 1 ? `<div><ul class="list">${items}</ul></div>\n` : "";
   // The top app bar spans the window: the menu button over the rail's column (it expands the rail; on small, where
@@ -67,9 +73,9 @@ export const view = (data, { tab: tabId, item: itemId, mode = Object.keys(data.m
   const mark = `<i class="s">${esc(data.icon ?? "style")}</i>`;
   const back = open && list ? `<a class="button circle transparent" data-back href="#${tab.id}" aria-label="Back"><i>arrow_back</i></a>` : "";
   return `<nav class="left m l${expanded ? " max" : ""}">${destinations}</nav>
-<nav class="top">${menu}${mark}${back}<h6 class="max">${esc(data.title ?? data.name)}</h6>${switcher}</nav>
+<nav class="top">${menu}${mark}${back}<h6 class="max">${esc(data.title ?? data.name)}</h6>${columnsLink}${switcher}</nav>
 <main><div class="panes"${open ? " data-open" : ""}>
-${list}<div><h1>${item.name}</h1>${item.body(data, data.modes[mode])}</div>
+${list}<div${item.wide ? ' style="display: block; max-inline-size: none"' : ""}><h1>${item.name}</h1>${item.body(data, data.modes[mode], { mode, platform })}</div>
 </div></main>
 <nav class="bottom s">${destinations}</nav>`;
 };
@@ -78,6 +84,7 @@ const boot = () => {
   // The kit's data, examples included, travels in the page, so it opens from disk.
   const data = JSON.parse(document.getElementById("kit").textContent);
   let device = 0;
+  let platform;
   const modes = Object.keys(data.modes);
   const schemes = Object.fromEntries(modes.map((mode) => [mode, scheme(data.modes[mode])]));
   const root = document.documentElement;
@@ -92,16 +99,18 @@ const boot = () => {
   try { expanded = localStorage.getItem("rail") === "expanded"; } catch {}
   document.title = `${data.title ?? data.name} playground`;
   // The kit's faces, one stylesheet each, so a family Google Fonts lacks fails alone.
-  for (const href of new Set(modes.flatMap((each) => fontLinks(data.modes[each])))) document.head.append(Object.assign(document.createElement("link"), { rel: "stylesheet", href }));
+  for (const href of new Set([...modes.flatMap((each) => fontLinks(data.modes[each])), ...(data.columns?.fonts ?? [])])) document.head.append(Object.assign(document.createElement("link"), { rel: "stylesheet", href }));
   const draw = () => {
     const [tab, item] = location.hash.slice(1).split("/");
-    document.getElementById("app").innerHTML = view(data, { tab, item, mode, expanded, device });
+    document.getElementById("app").innerHTML = view(data, { tab, item, mode, expanded, device, platform });
     // A frame follows the mode through its address: the hash is the data-theme it sets.
     for (const frame of document.querySelectorAll("[data-frame]")) frame.src = `${frame.dataset.frame}#${schemes[mode]}`;
   };
   window.addEventListener("hashchange", draw);
   document.addEventListener("click", (event) => {
     if (event.target.closest("[data-replay]")) return replay(document);
+    const picked = event.target.closest("[data-platform]");
+    if (picked) { platform = picked.dataset.platform; return draw(); }
     const chosen = event.target.closest("[data-device]");
     if (chosen) { device = Number(chosen.dataset.device); return draw(); }
     // A layout's panes in a frame: a row opens its pane on a small screen, and the pane's back button closes it.

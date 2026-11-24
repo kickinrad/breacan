@@ -162,7 +162,25 @@ export const build = async (config = {}, { check = false, preview = false, theme
   const [otherScheme] = Object.values(schemes);
   if (config.platforms && !otherScheme) throw new Error(`platforms need each mode's colour scheme, and the base mode ${modes?.base ?? "base"} has no other mode to tell it from`);
   const tint = tokens.find((token) => token.path === "md.sys.color.primary")?.value;
-  for (const { platform, level, layersFor } of await platformLayers(config.platforms, { tint })) {
+  // The playground's columns: the Breacán-neutral base alone (Material's spec, the shared scales and one scheme's colours,
+  // and the colour engine when the kit has one), and with a platform's language over it at Native, resolved in each mode
+  // as a platform is (`columns.base`, and `native` on each platform).
+  const neutral = (scheme) => [{ tree: material.tokens(), file: material.name }, { tree: shared(), file: "builtin:base" }, { tree: colours(scheme), file: "builtin:base" },
+    ...engines.map((engine, i) => ({ tree: engine[scheme], file: foundations[i].name }))];
+  const schemeIn = (query) => /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1] ?? baseScheme;
+  const column = async (layersFor) => {
+    const mine = new Set();
+    const at = async (mode, scheme) => {
+      const extra = layersFor ? await layersFor({ mode, scheme }) : [];
+      for (const layer of extra) collect(layer.tree, [], mine);
+      return (await resolveLayers([...neutral(scheme), ...extra])).map(entry).map((token) => mine.has(token.path) ? token : { ...token, builtin: true });
+    };
+    const result = { tokens: await at(modes?.base, baseScheme), media: {} };
+    for (const query of Object.keys(media)) result.media[modes?.media?.[query] ?? query] = await at(modes?.media?.[query], schemeIn(query));
+    return result;
+  };
+  const columns = modules.some((module) => module.name === "playground") ? { base: await column() } : undefined;
+  for (const { platform, level, layersFor, nativeFor } of await platformLayers(config.platforms, { tint })) {
     const ownHere = new Set(own);
     const baseLayers = await layersFor({ mode: modes?.base, scheme: otherScheme === "dark" ? "light" : "dark" });
     for (const layer of baseLayers) collect(layer.tree, [], ownHere);
@@ -173,7 +191,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
       for (const layer of layers) collect(layer.tree, [], ownHere);
       platformModes[modes?.media?.[query] ?? query] = (await resolveLayers([...modeLayers(query), ...layers])).map(entry).map(markHere);
     }
-    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...baseLayers])).map(entry).map(markHere), media: platformModes };
+    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...baseLayers])).map(entry).map(markHere), media: platformModes, ...(columns && { native: await column(nativeFor) }) };
   }
 
   // Each other mode resolves once, when a target or the contrast check first asks for it. A target passes back the
@@ -227,7 +245,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
     ...Object.fromEntries(modules.map((module) => [module.name, withDefaults(module, config[module.name])])) };
   for (const module of modules.filter((each) => each.slot === "output")) {
     const base = { tokens, media, mediaTokens, config: moduleConfig, readExisting, list, built, ...kit,
-      ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }), ...(config.platforms && { platforms }) };
+      ...(kit.name && { title: theme.title ?? kit.name }), ...(modes && { modes }), ...(theme.modes && { theme }), ...(config.platforms && { platforms }), ...(columns && { columns }) };
     const files = await module.run({ ...base, render: (name) => render(name, base), options: optionsFor(module, base, config[module.name]) });
     outputs.push(...(kit.name ? stamp(files, kit, module.name) : files));
   }

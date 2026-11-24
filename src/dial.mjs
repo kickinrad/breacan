@@ -48,16 +48,18 @@ const readDial = (platform, dial) => {
   return { level, takes };
 };
 
-// Each platform's level and its language's layers over the theme: [{ platform, level, layersFor }], where
-// `layersFor({ mode, scheme })` runs the language for a mode (the kit's own name for it) and its colour scheme, "light" or "dark".
+// Each platform's level and its language's layers over the theme: [{ platform, level, layersFor, nativeFor }], where
+// `layersFor({ mode, scheme })` runs the language for a mode (the kit's own name for it) and its colour scheme, "light" or "dark",
+// at the kit's dial, and `nativeFor` the same at Native, the language alone (the playground's Platform column).
 // `tint` is the theme's primary colour, the brand tint on system chrome.
 export const platformLayers = (platforms = {}, { tint } = {}) => Promise.all(Object.entries(platforms).map(async ([platform, { language, dial } = {}]) => {
-  const { level, takes } = readDial(platform, dial);
+  const { level } = readDial(platform, dial);
   if (typeof language === "string") language = BUILT_IN[language] ?? language;
   if (language?.slot !== "language" || typeof language.run !== "function") {
     throw new Error(`platforms.${platform}.language must be a language module ({ slot: "language", name, run })`);
   }
-  const layersFor = async ({ mode, scheme }) => {
+  const layersAt = (dial) => async ({ mode, scheme }) => {
+    const { level, takes } = readDial(platform, dial);
     const trees = await language.run({ platform, mode, scheme }) ?? {};
     const groups = { ...FOUNDATIONS, chrome: CHROME };
     for (const [part, tree] of Object.entries(trees)) {
@@ -74,5 +76,5 @@ export const platformLayers = (platforms = {}, { tint } = {}) => Promise.all(Obj
     }
     return layers;
   };
-  return { platform, level, layersFor };
+  return { platform, level, layersFor: layersAt(dial), nativeFor: layersAt("native") };
 }));
