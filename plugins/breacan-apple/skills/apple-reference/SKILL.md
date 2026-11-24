@@ -13,11 +13,10 @@ Answer Apple design questions from Apple's current guidance. Breacán's built-in
 2. Check [Color](https://developer.apple.com/design/human-interface-guidelines/color) for system colours and their dynamic API names.
 3. Check [Typography](https://developer.apple.com/design/human-interface-guidelines/typography) for SF Pro and Dynamic Type sizes.
 4. Check [Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility) for control size and spacing.
-5. Check [Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons), [Layout](https://developer.apple.com/design/human-interface-guidelines/layout), and [SF Symbols](https://developer.apple.com/design/human-interface-guidelines/sf-symbols) for shape, layout, and icons.
-6. Check [Motion](https://developer.apple.com/design/human-interface-guidelines/motion) and [Materials](https://developer.apple.com/design/human-interface-guidelines/materials) for animation and depth.
-7. Check [Toolbars](https://developer.apple.com/design/human-interface-guidelines/toolbars), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars), and [Sheets](https://developer.apple.com/design/human-interface-guidelines/sheets) for system chrome.
+5. Check [SF Symbols](https://developer.apple.com/design/human-interface-guidelines/sf-symbols) for icons and [Materials](https://developer.apple.com/design/human-interface-guidelines/materials) for depth.
+6. Check [Toolbars](https://developer.apple.com/design/human-interface-guidelines/toolbars), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars), and [Sheets](https://developer.apple.com/design/human-interface-guidelines/sheets) for system chrome.
 
-Apple publishes no fixed corner, duration, or elevation token scale. Label Breacán's numeric scales as its design choices. For native controls, prefer the platform API over the static design token.
+Apple publishes no fixed corner, duration, or elevation scale, so the Breacán language gives none. Its text sizes are Dynamic Type's default (Large); React Native scales text with the user's setting at runtime. For native controls, prefer the platform API over the static design token.
 
 ## Done when
 

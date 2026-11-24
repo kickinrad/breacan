@@ -10,9 +10,9 @@ Install the reference skill from the Breacán market with `/plugin install breac
 
 In a kit, set `platforms: { ios: { language: "apple", dial: "tinted" } }`.
 
-The language provides tokens for every foundation and system chrome. It provides no native component code. The dial's platform tokens represent the default light appearance and Dynamic Type Large size. Apple's system colours, fonts, materials, and motion adapt at runtime, so native apps should use Apple's system APIs.
+The language gives colour (Apple's default light and dark swatches), type, the 44 pt `touch-min`, SF Symbols and system chrome. It gives no corner, motion, elevation or component values, because Apple publishes no fixed scale for them; the theme's stay. It provides no native component code.
 
-Shortcut: Breacán chooses illustrative scales for corners, motion durations, and elevation because Apple's HIG gives guidance but no fixed token scale. Revisit them when a native output or a kit requires a measured control design.
+Text sizes are Dynamic Type's default (Large). React Native scales text with the user's setting at runtime, so a native app should still use Apple's system APIs for adaptive type and colour.
 
 ## Contributing
 
