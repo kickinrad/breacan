@@ -11,7 +11,12 @@ const kit = () => {
   expect(run(dir, "build").stderr.toString()).toBe("");
   return dir;
 };
-const receipt = (dir: string) => JSON.parse(read(dir, "breacan.receipt.json"));
+// The receipt as path-keyed maps, as 0.21 wrote it; the engine still reads that form, so tests write it back.
+const receipt = (dir: string) => {
+  const raw = JSON.parse(read(dir, "breacan.receipt.json"));
+  const map = (list: { path: string; sha256: string; header?: boolean }[], value: (entry: any) => unknown) => Object.fromEntries(list.map((entry) => [entry.path, value(entry)]));
+  return { ...raw, inputs: map(raw.inputs, (entry) => entry.sha256), outputs: map(raw.outputs, ({ path, ...entry }) => entry) };
+};
 const sha = (text: string) => createHash("sha256").update(text).digest("hex");
 const failure = (dir: string) => { const result = run(dir, "check"); expect(result.exitCode).toBe(1); return result.stderr.toString(); };
 
@@ -160,4 +165,15 @@ test("with no receipt, a file kumiko never wrote is named, not failed, and an ed
   expect(result.stdout.toString()).toContain("ports/tokens/tokyo-material.resolver.json is new in breacan");
   appendFileSync(join(dir, "docs/playground/tokyo-material.css"), "/* mine */\n");
   expect(failure(dir)).toContain("docs/playground/tokyo-material.css is stale");
+});
+
+test("the receipt lists each file as { path, sha256 }, so a path beside a digest never reads as a secret", () => {
+  const dir = kit();
+  const raw = JSON.parse(read(dir, "breacan.receipt.json"));
+  expect(Array.isArray(raw.inputs) && Array.isArray(raw.outputs)).toBe(true);
+  expect(raw.outputs.find((entry: { path: string }) => entry.path === "ports/bat/tokyo-mono.tmTheme")).toMatchObject({ sha256: expect.stringMatching(/^[0-9a-f]{64}$/) });
+  // No line pairs a quoted path with a digest, the shape gitleaks' generic-api-key rule reads as a key.
+  expect(read(dir, "breacan.receipt.json")).not.toMatch(/"[^"]*[./][^"]*": "[0-9a-f]{64}"/);
+  const gitleaks = Bun.which("gitleaks");
+  if (gitleaks) expect(Bun.spawnSync([gitleaks, "dir", "--no-banner", join(dir, "breacan.receipt.json")]).exitCode).toBe(0);
 });
