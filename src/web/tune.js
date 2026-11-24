@@ -1,5 +1,5 @@
 // Tune: what theme.toml sets that a person changes, as controls. `controls` is the model (plain data, no markup),
-// so any host can draw it; `tuneView` draws it in kumiko dev's panel (/_kumiko/panel). Groups take DTCG 2025.10's type names (color,
+// so any host can draw it; `tuneView` draws it in breacan edit's panel (/_kumiko/panel). Groups take DTCG 2025.10's type names (color,
 // fontFamily, dimension, duration); a control's label is its plain name and its theme.toml path is the detail.
 import { contrast } from "../color.mjs";
 import { fills, pairs } from "./foundations.js";
@@ -53,7 +53,9 @@ export const controls = (data, mode, edits = {}) => {
     const path = `palette.${mode}.${key}`;
     return { path, label: label(key), detail: path, kind: "color", value: edits[path] ?? token.value, saved: token.value, pairs: pairsOf(data, tokens, key) };
   });
-  if (colours.length) groups.push({ group: "Color", items: colours });
+  // A kit with no theme.toml: the colours its tokens files set (data.tune.colors, token paths), edited by token path.
+  const own = (data.tune?.colors ?? []).map((path) => ({ path, label: path, detail: path, kind: "color", value: edits[path] ?? find(tokens, path), saved: find(tokens, path), pairs: [] }));
+  if (colours.length || own.length) groups.push({ group: "Color", items: [...colours, ...own] });
   const faces = Object.entries(data.tune?.faces ?? {}).filter(([face]) => FACES[face]).map(([face, family]) => {
     const path = `faces.${face}`;
     const saved = [family].flat().join(", ");

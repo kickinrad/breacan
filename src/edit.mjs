@@ -1,44 +1,24 @@
-// kumiko dev: serves the project on localhost (/ opens the playground, when the config has one), builds every edit in
-// memory as the engine builds it, and pushes the result live to every page that loads the bridge
-// (/_kumiko/bridge.js) or listens to /_kumiko/events. Save writes the edits into theme.toml and rebuilds; a change to
-// the kit's sources on disk rebuilds every output and sends "reload".
-import { watch } from "node:fs";
-import { readFile, realpath, writeFile } from "node:fs/promises";
-import { extname, join, resolve, sep } from "node:path";
+// breacan edit: serves the project on localhost (/ opens the playground, when the config has one) and the Kit panel,
+// builds every edit in memory as the engine builds it, and pushes the result live to every page that listens to
+// /_kumiko/events. Save writes the edits into the kit's token files (theme.toml, else the colours of tokens/*.tokens.json),
+// one changed value each, and rebuilds; a change to the kit's sources on disk rebuilds every output and sends "reload".
+// `breacan dev` is a hidden alias for it, until the contract task removes aliases.
+import { existsSync, watch } from "node:fs";
+import { readFile, readdir, realpath, writeFile } from "node:fs/promises";
+import { basename, extname, join, resolve, sep } from "node:path";
 import { build } from "./build.mjs";
 import { contrastPairs } from "./checks/contrast.mjs";
 import { setValue } from "./toml-edit.mjs";
+import { colours, setToken } from "./token-edit.mjs";
 import { fontLinks, iconLink } from "./web/foundations.js";
 import { bundle, inline, source } from "./outputs/playground.mjs";
 
 const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2" };
-// Pages elsewhere (a WordPress copy) read the live CSS and its events.
-const OPEN = { "Access-Control-Allow-Origin": "*", "Cache-Control": "no-store" };
-
-// The bridge a consuming page loads in development only: it applies the kit's live CSS and faces, reads only from the
-// server that served it, and announces each update as a "kumiko:live" event (detail: the kit's tokens per mode, also
-// kept as window.kumikoLive) for code that reads tokens in JavaScript.
-const bridge = `// kumiko's live bridge: the kit's CSS from kumiko dev, updated on every edit. Load it in development only.
-(() => {
-  const origin = new URL(document.currentScript.src).origin;
-  const style = Object.assign(document.createElement("style"), { id: "kumiko-live" });
-  document.head.append(style);
-  const apply = ({ css, fonts, kit }) => {
-    style.textContent = css;
-    window.kumikoLive = kit;
-    window.dispatchEvent(new CustomEvent("kumiko:live", { detail: kit }));
-    for (const href of fonts) if (!document.querySelector('link[href="' + CSS.escape(href) + '"]')) document.head.append(Object.assign(document.createElement("link"), { rel: "stylesheet", href }));
-  };
-  fetch(origin + "/_kumiko/live").then((response) => response.json()).then(apply);
-  // A host page (a page framing this one) may switch the mode: { kumiko: "theme", scheme: "light" | "dark" }.
-  window.addEventListener("message", ({ data }) => { if (data?.kumiko === "theme" && ["light", "dark"].includes(data.scheme)) document.documentElement.dataset.theme = data.scheme; });
-  new EventSource(origin + "/_kumiko/events").addEventListener("live", (event) => apply(JSON.parse(event.data)));
-})();
-`;
+const NO_STORE = { "Cache-Control": "no-store" };
 
 // Watches each source folder for changes. An optional folder that is not there is skipped; any other failure to watch
 // is reported, since edits on disk would otherwise go unseen.
-export const watchSources = (sources, changed, report = (dir, error) => console.error(`kumiko dev: not watching ${dir}: ${error.message}`)) => {
+export const watchSources = (sources, changed, report = (dir, error) => console.error(`breacan edit: not watching ${dir}: ${error.message}`)) => {
   for (const { dir, optional } of sources) {
     try {
       watch(dir, changed).on("error", (error) => report(dir, error));
@@ -48,12 +28,13 @@ export const watchSources = (sources, changed, report = (dir, error) => console.
   }
 };
 
-export const dev = async ({ config, port = 4400 }) => {
+export const edit = async ({ config, port = 4400 }) => {
   const root = await realpath(resolve("."));
   const kitRoot = resolve(config.kit?.root ?? "design");
   const themeFile = join(kitRoot, "theme.toml");
   const cssPath = config.css?.path;
-  if (!config.kit || !cssPath) throw new Error("kumiko dev needs a kit and a css output");
+  if (!config.kit || !cssPath) throw new Error("breacan edit needs a kit and a css output");
+  const hasTheme = existsSync(themeFile);
   const output = (outputs, path) => outputs.find((each) => resolve(each.path) === resolve(path))?.content;
 
   let edits = {};
@@ -61,41 +42,58 @@ export const dev = async ({ config, port = 4400 }) => {
   const clients = new Set();
   const send = (event, data) => { for (const client of clients) client.enqueue(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`); };
 
-  // The saved theme with the edits applied, built in memory: the css output and its faces, the kit as a panel reads it
-  // (each mode's tokens, what theme.toml sets that a person tunes, the pairs it is held to), and the pairs that fall
+  // The files the edits reach: theme.toml, else the tokens files that a build reads as they are (none when a resolver
+  // governs tokens/). `draft` is the text of each file an edit changes, with the edits applied.
+  const tokenFiles = async () => {
+    const listed = (await readdir("tokens").catch(() => [])).sort();
+    return listed.some((file) => file.endsWith(".resolver.json")) ? [] : listed.filter((file) => file.endsWith(".tokens.json")).map((file) => `tokens/${file}`);
+  };
+  const draft = async () => {
+    const files = hasTheme ? [themeFile] : await tokenFiles();
+    const saved = Object.fromEntries(await Promise.all(files.map(async (file) => [file, await readFile(file, "utf8")])));
+    const changed = {};
+    for (const [path, value] of Object.entries(edits)) {
+      const file = hasTheme ? themeFile : files.find((each) => colours(JSON.parse(saved[each])).includes(path));
+      if (!file) throw new Error(`${path} is not a colour a tokens file sets`);
+      changed[file] = hasTheme ? setValue(changed[file] ?? saved[file], path, value) : setToken(changed[file] ?? saved[file], path, value);
+    }
+    return { changed, colors: hasTheme ? undefined : files.flatMap((file) => colours(JSON.parse(saved[file]))) };
+  };
+  // The saved kit with the edits applied, built in memory: the css output and its faces, the kit as a panel reads it
+  // (each mode's tokens, what the kit's files set that a person tunes, the pairs it is held to), and the pairs that fall
   // under their floors.
-  const draft = async () => Object.entries(edits).reduce((text, [path, value]) => setValue(text, path, value), await readFile(themeFile, "utf8"));
   const preview = async () => {
-    const text = await draft();
-    const { outputs, contrast, theme, modes } = await build(config, { preview: true, theme: text });
+    const { changed, colors } = await draft();
+    const { outputs, contrast, theme, modes } = await build(config, { preview: true, theme: changed[themeFile], drafts: changed });
     const kit = {
-      name: theme.name,
+      name: theme.name ?? config.kit.name,
       modes: Object.fromEntries(Object.entries(modes).map(([mode, tokens]) => [mode, tokens.map(({ path, value, type }) => ({ path, value, type }))])),
-      tune: { faces: theme.faces, tokens: theme.values.filter(([path, each]) => path.startsWith(`${theme.name}.`) && ["dimension", "duration"].includes(each.$type) && !String(each.$value).startsWith("{")).map(([path]) => path) },
+      tune: { faces: theme.faces, colors, tokens: (theme.values ?? []).filter(([path, each]) => path.startsWith(`${theme.name}.`) && ["dimension", "duration"].includes(each.$type) && !String(each.$value).startsWith("{")).map(([path]) => path) },
       pairs: theme.contrast ? contrastPairs(theme, Object.values(modes)[0]) : undefined,
     };
     live = { css: output(outputs, cssPath), fonts: [...new Set(Object.values(modes).flatMap(fontLinks))], kit, contrast, edits };
     send("live", live);
-    return { text, contrast };
+    return { changed, contrast };
   };
   // Writes every output from the files on disk.
   const rebuild = async () => { await build(config); edits = {}; await preview(); };
 
   await rebuild();
-  // A change on disk (the kit's folder, tokens/) rebuilds and tells every listener to reload. theme.toml as Save last
-  // wrote it is already built, so the server's own write reloads nothing; once theme.toml holds anything else, every
-  // later change rebuilds, a revert to the saved text included.
+  // A change on disk (the kit's folder, tokens/) rebuilds and tells every listener to reload. A file as Save last wrote
+  // it is already built, so the server's own write reloads nothing; once the file holds anything else, every later
+  // change rebuilds, a revert to the saved text included.
   let pending;
-  let wrote;
-  const changed = async (_, file) => {
-    if (file === "theme.toml" && wrote !== undefined) {
-      if ((await readFile(themeFile, "utf8").catch(() => undefined)) === wrote) return;
-      wrote = undefined;
+  const wrote = new Map();
+  const onDisk = async (_, file) => {
+    const own = wrote.get(file);
+    if (own) {
+      if ((await readFile(own.path, "utf8").catch(() => undefined)) === own.text) return;
+      wrote.delete(file);
     }
     clearTimeout(pending);
     pending = setTimeout(() => rebuild().then(() => send("reload", {}), (error) => send("problem", { message: error.message })), 100);
   };
-  watchSources([{ dir: kitRoot }, { dir: resolve("tokens"), optional: true }], changed);
+  watchSources([{ dir: kitRoot, optional: true }, { dir: resolve("tokens"), optional: true }], onDisk);
 
   // The panel's page: the kit's draft css (replaced live), the panel's stylesheet on the kit's variables, its client.
   const panel = async () => {
@@ -119,7 +117,7 @@ export const dev = async ({ config, port = 4400 }) => {
 `;
   };
 
-  const json = (body, status = 200) => Response.json(body, { status, headers: OPEN });
+  const json = (body, status = 200) => Response.json(body, { status, headers: NO_STORE });
   // A write from this page only: the browser sends Origin on a cross-site POST, and a JSON body needs a preflight this
   // server never grants, so no other site can edit or save.
   const ours = (request) => request.headers.get("origin") === `http://${request.headers.get("host")}` && request.headers.get("content-type") === "application/json";
@@ -134,9 +132,8 @@ export const dev = async ({ config, port = 4400 }) => {
       if (!["127.0.0.1", "localhost"].some((name) => host === `${name}:${server.port}`)) return new Response("Unknown host", { status: 403 });
       const url = new URL(request.url);
       if (url.pathname === "/" && config.playground?.path) return Response.redirect(`/${config.playground.path.replace(/^\.?\//, "")}/index.html`, 302);
-      if (url.pathname === "/_kumiko/bridge.js") return new Response(bridge, { headers: { ...OPEN, "Content-Type": "text/javascript" } });
       if (url.pathname === "/_kumiko/live") return json(live);
-      if (url.pathname === "/_kumiko/panel") return new Response(await panel(), { headers: { "Content-Type": "text/html", "Cache-Control": "no-store" } });
+      if (url.pathname === "/_kumiko/panel") return new Response(await panel(), { headers: { ...NO_STORE, "Content-Type": "text/html" } });
       if (url.pathname === "/_kumiko/events") {
         // An event stream stays open while idle; Bun closes idle requests after 10s otherwise.
         server.timeout(request, 0);
@@ -144,7 +141,7 @@ export const dev = async ({ config, port = 4400 }) => {
         return new Response(new ReadableStream({
           start(controller) { client = controller; clients.add(client); controller.enqueue(": kumiko\n\n"); },
           cancel() { clients.delete(client); },
-        }), { headers: { ...OPEN, "Content-Type": "text/event-stream" } });
+        }), { headers: { ...NO_STORE, "Content-Type": "text/event-stream" } });
       }
       if (url.pathname === "/_kumiko/edit" && request.method === "POST") {
         if (!ours(request)) return json({ error: "Edits come from a page this server serves" }, 403);
@@ -161,11 +158,13 @@ export const dev = async ({ config, port = 4400 }) => {
       if (url.pathname === "/_kumiko/save" && request.method === "POST") {
         if (!ours(request)) return json({ error: "Saves come from a page this server serves" }, 403);
         try {
-          const { text, contrast } = await preview();
+          const { changed, contrast } = await preview();
           if (contrast.length) return json({ error: `Not saved: ${contrast.length} pair${contrast.length === 1 ? " is" : "s are"} under its floor`, contrast }, 409);
           const saved = Object.keys(edits);
-          wrote = text;
-          await writeFile(themeFile, text);
+          for (const [path, text] of Object.entries(changed)) {
+            wrote.set(basename(path), { path, text });
+            await writeFile(path, text);
+          }
           await rebuild();
           return json({ saved });
         } catch (error) {

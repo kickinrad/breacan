@@ -56,10 +56,10 @@ const loadKit = async (kit) => {
   return { root: resolve(kit.root ?? "design"), version, name: kit.name };
 };
 
-// `preview` (breacan dev): read theme.toml from `theme` (its text), write nothing, and return contrast failures beside
-// the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
+// `preview` (breacan edit): read theme.toml from `theme` (its text) and a tokens file from `drafts` (path to text), write
+// nothing, and return contrast failures beside the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
 // the one in this directory.
-export const build = async (config = {}, { check = false, preview = false, theme: themeText,
+export const build = async (config = {}, { check = false, preview = false, theme: themeText, drafts = {},
   configFile = ["breacan.config.mjs", "kumiko.config.mjs"].find((file) => existsSync(file)) } = {}) => {
   const modules = resolveModules(config);
   // Sources, then foundations: each gives { light, dark } colour trees over the base.
@@ -113,7 +113,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   include.unshift(...builtins);
   if (theme.tree) include.push({ tree: theme.tree, file: "theme.toml" });
   if (standard) include.push({ tree: standard.tree, file: `tokens/${resolvers[0]}` });
-  const source = baseFiles.map((file) => ({ file, strict: true }));
+  const source = baseFiles.map((file) => ({ file, strict: true, ...(file in drafts && { tree: JSON.parse(drafts[file]) }) }));
   const modeLayers = (query) => [...include, ...source.map(({ file, tree }) => ({ file, tree })), ...media[query]];
 
   // The derived roles come first, from everything else, so the build reads what this run computes.
@@ -250,7 +250,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
     outputs.push(...(kit.name ? stamp(files, kit, module.name) : files));
   }
   if (preview) {
-    // Each mode's tokens by name, the base first, for breacan dev's panel.
+    // Each mode's tokens by name, the base first, for breacan edit's panel.
     const byMode = { [modes?.base ?? "base"]: tokens };
     for (const [query, files] of Object.entries(media)) byMode[modes?.media[query] ?? query] = await mediaTokens(files);
     return { outputs, contrast, theme, modes: byMode };
