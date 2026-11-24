@@ -138,7 +138,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 12. **Editor.** A colour changed in the local editor appears in the token file and in the playground.
 13. **Penpot.** The Breacán Penpot plugin pushes Tokyo's tokens into a Penpot file. It pulls one edited colour back, and `git diff` shows only that token changed.
 14. **One home per thing.**
-    - tokyo-mono and tokyo-material are archived, with tags intact.
+    - tokyo-material is archived, with tags intact; tokyo-mono stays as the one Tokyo repo (owner's call).
     - tokyo-mono-site, the dotfiles, Porchlight, Skylight and the stacks Astro template run Breacán in CI and pass.
     - `rg -i 'kumiko|tokens\.config|tokens (--check|lint)'` across those repos, tokyo, boombox-design and breacan finds only changelogs and Plans.
 15. **Market and routing.** The Breacán market installs in Claude Code and Codex, the design-system plugin is gone from domains, and `dispatch list design tokens` names Breacán.
@@ -161,8 +161,8 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 8. [x] **Agent outputs.** DESIGN.md, the kit plugin output (skill index, rules, lint config) and Claude Design on the module shape. Route: implementation. Demo: acceptance 10. Blocked by: 5, 7.
 9. [x] **Breacán plugin and market.** Skills to make kits and build with them, the breacan-material language plugin from `material-reference`, the design-system plugin removed from domains, and dispatch routing. Route: implementation. Demo: acceptance 15. Blocked by: 8.
 10. [x] **Tokyo merge.** Build `kickinrad/tokyo` with the palette, the Material kit and its kit-plugin market. Ports come from Base24, the terminal set and templates (Obsidian, Mealie, Home Assistant included). Fix the swapped day contrast notes (secondary 4.41, tertiary 4.31) and replace `audit` with the checks in CI. Route: implementation. Demo: acceptance 9; walkthrough C from the Tokyo scheme. Blocked by: 9.
-11. [ ] **Consumers migrate.** Move tokyo-mono-site, the dotfiles through chezmoi, Porchlight (lint and Home Assistant template), Skylight (lint only) and the stacks Astro template. Each moves alone, on green CI. Route: implementation. Demo: each consumer's CI green on Breacán. Blocked by: 10.
-12. [ ] **Vault, phase 1.** Curator writes the Breacán ADR and hub and updates `systems.toml`; forge's `references/system.md` example moves to the new name. Route: here. Demo: acceptance 16. Blocked by: 11.
+11. [x] **Consumers migrate.** Move tokyo-mono-site, the dotfiles through chezmoi, Porchlight (lint and Home Assistant template), Skylight (lint only) and the stacks Astro template. Each moves alone, on green CI. Route: implementation. Demo: each consumer's CI green on Breacán. Blocked by: 10.
+12. [x] **Vault, phase 1.** Curator writes the Breacán ADR and hub and updates `systems.toml`; forge's `references/system.md` example moves to the new name. Route: here. Demo: acceptance 16. Blocked by: 11.
 
 ### Phase 2: dial, Apple and Boombox
 
@@ -248,10 +248,15 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Merged as tokyo-mono #124; CI released the kit as `material-v0.6.0` from tokyo-mono. Both runtimes install `tokyo-material@tokyo-mono`; the tokyo-material market is retired (chezmoi 20ff79c).
   - The swapped Day contrast notes are fixed (secondary 4.41, tertiary 4.31). Every existing port and kit output is byte-identical.
   - Walkthrough C: the `scheme` source (this repo, `src/sources/scheme.mjs`) builds a whole kit from Tokyo's Base24 schemes (`tests/scheme.test.ts`).
-- Task 11, consumers (implementation; in progress).
+- Task 11, consumers (implementation, Demo passed; done).
   - Moved, each on green CI: Skylight lint (#43), Porchlight lint (#25), the dotfiles' mise install (chezmoi 2991971), and the stacks template (#28, released 0.10.0; `migrate_token_config.py` carries `tokens.config.mjs` or `kumiko.config.mjs` to `breacan.config.mjs`). Stacks also fixed two template bugs newer Biome trips. Each repo is tagged `pre-breacan`.
   - Porchlight's Home Assistant theme stays pinned at tokyo-mono v4.0.0, which `material-you` wrote before it was deleted; the owner chose to leave it, in [porchlight#26](https://github.com/kickinrad/porchlight/issues/26).
-  - Left: tokyo-mono-site. Its sync reads the old tokyo-material repo at v0.5.0, it has no CI, and `breacan lint src` finds 22 hand-typed values in its own CSS.
+  - tokyo-mono-site moved to Tokyo Material 0.6.0 at the owner's call (#15, reviewed on its preview): breacan builds its CSS and Tailwind theme from the release's token files, and new CI runs `breacan check`, `breacan lint src`, eslint, prettier and the build. Its own CSS takes the kit's durations where they match; deliberate values carry `lint: own` reasons.
+  - Found on the way: the receipt's path-to-digest map tripped gitleaks in the site's hooks; 0.22.1 writes lists of `{ path, sha256 }` (breacan #107). Later trimmed (#109): the receipt no longer traces the config's imports, a README shortcut instead.
+- Task 12, vault (here, Demo passed).
+  - Curator wrote ADR-026 (`026-kumiko-becomes-breacan-a-small-engine-and-modules-on-dtcg`), superseding ADR-021 and ADR-023 where they conflict, and the hub `Agent Ecosystem/Systems/Breacan`, which replaces the deleted Kumiko hub. It fixed the current-state notes the move made wrong: Tokyo Mono, Tokyo Mono Kit, Component Architecture, the Astro and Base stack notes, and Using mise.
+  - `systems.toml` names Breacan (core #131), forge's card example uses Breacán, and `vault-cards check` reports 10 cards current.
+  - Phase 1 is done. Phase 2 (the dial, Apple, Expo, Boombox, playground columns) starts at task 13.
 
 ## Related
 
