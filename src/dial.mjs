@@ -3,6 +3,7 @@
 // native values) and a dial: a level, or { level, <foundation>: "theme" | "platform" } to set one foundation against
 // its level. The dial says, foundation by foundation, whether the platform keeps the theme's values or takes its
 // language's; the rule runs during resolution, as the language layers that join the stack.
+import apple from "./languages/apple.mjs";
 
 // Each foundation and the token groups it owns. A language's tree for a foundation sets tokens in its groups only, so
 // a foundation's dial setting moves that foundation's tokens and nothing else.
@@ -44,26 +45,31 @@ const readDial = (platform, dial) => {
   return { level, takes };
 };
 
-// Each platform's level and the layers its language adds over the theme: [{ platform, level, layers }]. `tint` is the
-// theme's primary colour, the brand tint on system chrome.
+// Each platform's level and its language's layers over the theme: [{ platform, level, layersFor }], where
+// `layersFor({ mode, scheme })` runs the language for a mode (the kit's own name for it) and its colour scheme, "light" or "dark".
+// `tint` is the theme's primary colour, the brand tint on system chrome.
 export const platformLayers = (platforms = {}, { tint } = {}) => Promise.all(Object.entries(platforms).map(async ([platform, { language, dial } = {}]) => {
   const { level, takes } = readDial(platform, dial);
+  if (language === "apple") language = apple;
   if (language?.slot !== "language" || typeof language.run !== "function") {
     throw new Error(`platforms.${platform}.language must be a language module ({ slot: "language", name, run })`);
   }
-  const trees = await language.run({ platform }) ?? {};
-  const groups = { ...FOUNDATIONS, chrome: CHROME };
-  for (const [part, tree] of Object.entries(trees)) {
-    if (!groups[part]) throw new Error(`Language ${language.name} sets ${part}; it may set ${Object.keys(groups).join(", ")}`);
-    const stray = leaves(tree).filter((path) => !within(groups[part])(path));
-    if (stray.length) throw new Error(`Language ${language.name}'s ${part} sets ${stray.join(", ")}, outside ${groups[part].join(", ")}`);
-  }
-  const layers = Object.keys(FOUNDATIONS).filter((foundation) => trees[foundation] && takes[foundation])
-    .map((foundation) => ({ tree: trees[foundation], file: `${language.name} (${foundation})` }));
-  if (trees.chrome && level !== "signature") {
-    if (!tint) throw new Error(`platforms.${platform}: system chrome takes the theme's md.sys.color.primary as its tint, and no layer sets it`);
-    layers.push({ tree: { breacan: { sys: { tint: { $type: "color", $value: tint } } } }, file: "the dial (chrome tint)" },
-      { tree: trees.chrome, file: `${language.name} (chrome)` });
-  }
-  return { platform, level, layers };
+  const layersFor = async ({ mode, scheme }) => {
+    const trees = await language.run({ platform, mode, scheme }) ?? {};
+    const groups = { ...FOUNDATIONS, chrome: CHROME };
+    for (const [part, tree] of Object.entries(trees)) {
+      if (!groups[part]) throw new Error(`Language ${language.name} sets ${part}; it may set ${Object.keys(groups).join(", ")}`);
+      const stray = leaves(tree).filter((path) => !within(groups[part])(path));
+      if (stray.length) throw new Error(`Language ${language.name}'s ${part} sets ${stray.join(", ")}, outside ${groups[part].join(", ")}`);
+    }
+    const layers = Object.keys(FOUNDATIONS).filter((foundation) => trees[foundation] && takes[foundation])
+      .map((foundation) => ({ tree: trees[foundation], file: `${language.name} (${foundation})` }));
+    if (trees.chrome && level !== "signature") {
+      if (!tint) throw new Error(`platforms.${platform}: system chrome takes the theme's md.sys.color.primary as its tint, and no layer sets it`);
+      layers.push({ tree: { breacan: { sys: { tint: { $type: "color", $value: tint } } } }, file: "the dial (chrome tint)" },
+        { tree: trees.chrome, file: `${language.name} (chrome)` });
+    }
+    return layers;
+  };
+  return { platform, level, layersFor };
 }));

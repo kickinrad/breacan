@@ -15,6 +15,12 @@
       "source": {"source": "local", "path": "./plugins/breacan-material"},
       "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
       "category": "Productivity"
+    },
+    {
+      "name": "breacan-apple",
+      "source": {"source": "local", "path": "./plugins/breacan-apple"},
+      "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+      "category": "Productivity"
     }
   ]
 }
