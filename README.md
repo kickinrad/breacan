@@ -1,6 +1,6 @@
 # Breacán
 
-Breacán (said BRAK-awn, Irish for tartan) builds DTCG design tokens → CSS, Beer CSS, Tailwind, React Native, Obsidian, Mealie, `DESIGN.md` and more, as one binary named `breacan`. It still answers to its old name, `kumiko`, with `--check` and `kumiko.config.mjs`, until every project has moved.
+Breacán (said BRAK-awn, Irish for tartan) builds DTCG design tokens → CSS, Beer CSS, Tailwind, React Native, Obsidian, Mealie, `DESIGN.md` and more, as one binary named `breacan`.
 
 ```sh
 mise use github:kickinrad/breacan
@@ -124,7 +124,7 @@ bg = "acme.color.paper"
 min = 4.5
 ```
 
-Every pair is resolved in the base mode and in each other mode, and a pair under its floor, or a path that is not a colour token, fails the build and `--check`, naming the pair, the mode, the ratio and the floor. An exception for a pair the build doesn't check fails.
+Every pair is resolved in the base mode and in each other mode, and a pair under its floor, or a path that is not a colour token, fails the build and `breacan check`, naming the pair, the mode, the ratio and the floor. An exception for a pair the build doesn't check fails.
 
 `src/motion.mjs` (springs as CSS `linear()` easings) and `src/type.mjs` (the fifteen type styles) are libraries, not targets (the `css` target uses the first).
 
@@ -209,7 +209,7 @@ A mode's `data-theme` is the colour scheme its surface is nearer to, so the swit
 | `skills/<name>/references/components.md` | with a `beer` output, each playground component in its Material 3 family with Beer's markup and Material 3's guidance where Material has a page; without one, only the components Material 3 documents, with their guidance |
 | `skills/<name>/references/theme.toml` | the kit's `theme.toml`, under a `#` header line, when it has one |
 
-The plugin guides an agent, and its rules file lets the agent's lint enforce the kit. `--check` holds the files it writes current with `notes.md`, `theme.toml` and the config, like any output's; after `path` changes, the old directory stays until it is removed. Files the output does not write, such as a kit's own evaluations beside the skill, stay the kit's.
+The plugin guides an agent, and its rules file lets the agent's lint enforce the kit. `breacan check` holds the files it writes current with `notes.md`, `theme.toml` and the config, like any output's; after `path` changes, the old directory stays until it is removed. Files the output does not write, such as a kit's own evaluations beside the skill, stay the kit's.
 
 ## The `template` output
 
@@ -217,15 +217,15 @@ The plugin guides an agent, and its rules file lets the agent's lint enforce the
 
 ## Local editor: `breacan edit`
 
-`breacan edit [--port <n>]` (port 4400 by default) builds every output, then serves the project on `http://localhost:<port>/` (the playground, when the config has one) and the Kit panel, and saves edits straight into the kit's token files: `theme.toml` when the kit has one, else the colours in `tokens/*.tokens.json`. Edits are built in memory exactly as `breacan` builds them, derived roles and contrast included, and nothing is written until a save. A save changes only the edited values, each on its own line, so `git diff` shows them alone. A change to the kit's folder or `tokens/` on disk rebuilds every output. `breacan dev` still runs it, until the contract task removes aliases.
+`breacan edit [--port <n>]` (port 4400 by default) builds every output, then serves the project on `http://localhost:<port>/` (the playground, when the config has one) and the Kit panel, and saves edits straight into the kit's token files: `theme.toml` when the kit has one, else the colours in `tokens/*.tokens.json`. Edits are built in memory exactly as `breacan build` builds them, derived roles and contrast included, and nothing is written until a save. A save changes only the edited values, each on its own line, so `git diff` shows them alone. A change to the kit's folder or `tokens/` on disk rebuilds every output.
 
 | Endpoint | Does |
 | --- | --- |
-| `POST /_kumiko/edit` | takes `{ "<path>": value }`, builds the draft and answers with the pairs under their floors; `null` drops an edit. A path is a `theme.toml` path (`"palette.night.primary": "#fd5416"`, `"faces.brand": ["Archivo", "sans-serif"]`, `"tokens.acme.layout.gap": "12px"`), or, in a kit with no `theme.toml`, a colour token's path (`"color.brand": "#fd5416"`) |
-| `POST /_kumiko/save` | writes the edits into the token files and rebuilds; in `theme.toml` each edited value keeps its key, comment and `why` and a new key joins its table, in a tokens file only the token's `$value` changes. A draft with a pair under its floor is not saved |
-| `GET /_kumiko/live` | the current draft: the `css` output's text, its faces' stylesheets, and the kit's tokens per mode |
-| `GET /_kumiko/events` | server-sent events: `live` after every edit, `reload` after a rebuild from disk |
-| `GET /_kumiko/panel` | the Kit panel: every colour (with the pairs the kit is held to, their live ratios and whether they pass), the faces by the type roles that read them, and the kit's own lengths and times in `[tokens]` as sliders with their units; each with its reset, then Save. It wears the kit's own variables. |
+| `POST /_breacan/edit` | takes `{ "<path>": value }`, builds the draft and answers with the pairs under their floors; `null` drops an edit. A path is a `theme.toml` path (`"palette.night.primary": "#fd5416"`, `"faces.brand": ["Archivo", "sans-serif"]`, `"tokens.acme.layout.gap": "12px"`), or, in a kit with no `theme.toml`, a colour token's path (`"color.brand": "#fd5416"`) |
+| `POST /_breacan/save` | writes the edits into the token files and rebuilds; in `theme.toml` each edited value keeps its key, comment and `why` and a new key joins its table, in a tokens file only the token's `$value` changes. A draft with a pair under its floor is not saved |
+| `GET /_breacan/live` | the current draft: the `css` output's text, its faces' stylesheets, and the kit's tokens per mode |
+| `GET /_breacan/events` | server-sent events: `live` after every edit, `reload` after a rebuild from disk |
+| `GET /_breacan/panel` | the Kit panel: every colour (with the pairs the kit is held to, their live ratios and whether they pass), the faces by the type roles that read them, and the kit's own lengths and times in `[tokens]` as sliders with their units; each with its reset, then Save. It wears the kit's own variables. |
 
 The server listens on `127.0.0.1` and answers only to the names `localhost` and `127.0.0.1` with its port; any other host name, such as a LAN name or a DNS-rebinding page's, gets a 403. Only a page the server itself serves can edit or save: a request from another origin is refused.
 
@@ -265,7 +265,7 @@ Five more built-in outputs for a declared kit (they read `ctx.name` and `VERSION
 
 | Output | Writes | Options (required first) |
 | --- | --- | --- |
-| `dtcg` | the kit's resolved tokens as DTCG 2025.10 files any tool reads: `<path>/<name>.tokens.json` for the base mode and `<path>/<name>.<mode>.tokens.json` for each other mode's differences and `<path>/<name>.<platform>.tokens.json` for each platform's, aliases resolved and each colour a 2025.10 colour object, without the Material component tokens the kit leaves alone. A kumiko project lists the first after `builtin:material` in `include` and each other in `media` under its query, then builds its own outputs | `path` (a directory other than `tokens/`, the project's own source); needs a declared kit |
+| `dtcg` | the kit's resolved tokens as DTCG 2025.10 files any tool reads: `<path>/<name>.tokens.json` for the base mode and `<path>/<name>.<mode>.tokens.json` for each other mode's differences and `<path>/<name>.<platform>.tokens.json` for each platform's, aliases resolved and each colour a 2025.10 colour object, without the Material component tokens the kit leaves alone. A project lists the first after `builtin:material` in `include` and each other in `media` under its query, then builds its own outputs | `path` (a directory other than `tokens/`, the project's own source); needs a declared kit |
 | `tailwind` | one Tailwind v4 `@theme inline` file mapping its namespaces onto the kit's runtime CSS variables | `path`, `css` (the runtime CSS file, named in the header) |
 | `obsidian` | a snippet per mode for the Minimal theme, its code colours included: `<out>-<mode>.css` | `out`; the monospace face is the theme's `mono` |
 | `mealie` | `<out>.env` (Mealie's colour slots) and `<out>.css` (a full-look overlay) | `out`; the slots are the theme's `[mealie]` |

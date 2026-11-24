@@ -15,9 +15,9 @@ const skill = (dir: string, at: string) => {
 // acme with the plugin output added, and `edit` applied to the config.
 const acme = (edit = "") => {
   const dir = scratch("tokens-plugin-acme-");
-  for (const entry of ["design", "tokens", "VERSION", "kumiko.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
-  renameSync(join(dir, "kumiko.config.mjs"), join(dir, "base.config.mjs"));
-  writeFileSync(join(dir, "kumiko.config.mjs"), `import base from "./base.config.mjs";\nconst c = structuredClone(base);\nc.targets.push("plugin");\nc.plugin = { path: "plugins/acme", author: { name: "Acme" } };\n${edit}\nexport default c;\n`);
+  for (const entry of ["design", "tokens", "VERSION", "breacan.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
+  renameSync(join(dir, "breacan.config.mjs"), join(dir, "base.config.mjs"));
+  writeFileSync(join(dir, "breacan.config.mjs"), `import base from "./base.config.mjs";\nconst c = structuredClone(base);\nc.targets.push("plugin");\nc.plugin = { path: "plugins/acme", author: { name: "Acme" } };\n${edit}\nexport default c;\n`);
   skill(dir, "plugins/acme/skills/acme");
   return dir;
 };
@@ -28,7 +28,7 @@ const tern = () => {
   return dir;
 };
 const built = (dir: string) => {
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   return dir;
@@ -43,13 +43,13 @@ test("writes the manifest and the skill's references beside the kit's own SKILL.
   for (const file of references) expect(existsSync(join(dir, "agent/tern/skills/tern/references", file))).toBe(true);
   for (const file of ["components.md", "notes.md"]) expect(read(dir, `agent/tern/skills/tern/references/${file}`).split("\n", 10).some((line) => HEADER_LINE.test(line))).toBe(true);
   expect(read(dir, "agent/tern/skills/tern/SKILL.md")).toBe(SKILL);
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
 });
 
 test("a kit without its own SKILL.md gets a starter that points at the references and the lint", () => {
   const dir = tern();
   rmSync(join(dir, "agent/tern/skills/tern/SKILL.md"));
-  expect(run(dir).stderr.toString()).toBe("");
+  expect(run(dir, "build").stderr.toString()).toBe("");
   const skill = read(dir, "agent/tern/skills/tern/SKILL.md");
   expect(skill).toStartWith("---\nname: tern\n");
   expect(skill).toContain("references/index.md");
@@ -85,7 +85,7 @@ test("notes.md and theme.toml beside the skill are the kit's own", () => {
 test("an edited notes.md makes the plugin stale", () => {
   const dir = built(tern());
   writeFileSync(join(dir, "design/notes.md"), `${read(dir, "design/notes.md")}\n- A new rule.\n`);
-  const result = run(dir, "--check");
+  const result = run(dir, "check");
   expect(result.exitCode).not.toBe(0);
   expect(result.stderr.toString()).toContain("design/notes.md changed since the last build");
 });
@@ -93,27 +93,27 @@ test("an edited notes.md makes the plugin stale", () => {
 test("a kit without notes.md builds its plugin without that reference", () => {
   const dir = acme();
   renameSync(join(dir, "design/notes.md"), join(dir, "design/other.md"));
-  expect(run(dir).stderr.toString()).toBe("");
+  expect(run(dir, "build").stderr.toString()).toBe("");
   expect(read(dir, "plugins/acme/skills/acme/references/index.md")).not.toContain("notes.md");
 });
 
 test("the output needs a path and a declared kit", () => {
-  const result = run(acme("delete c.plugin.path;"));
+  const result = run(acme("delete c.plugin.path;"), "build");
   expect(result.stderr.toString()).toContain('plugin option "path" is required');
-  const bare = run(acme("delete c.kit; c.targets = ['plugin'];"));
+  const bare = run(acme("delete c.kit; c.targets = ['plugin'];"), "build");
   expect(bare.stderr.toString()).toContain("plugin needs a declared kit");
 });
 
 test("the manifest's description is the kit's when it names one, and the default otherwise", () => {
   const own = built(acme(`c.plugin.description = "Build, adopt and update UI on Acme.";`));
   expect(JSON.parse(read(own, "plugins/acme/.claude-plugin/plugin.json")).description).toBe("Build, adopt and update UI on Acme.");
-  expect(run(own, "--check").exitCode).toBe(0);
+  expect(run(own, "check").exitCode).toBe(0);
   const plain = built(acme());
   expect(JSON.parse(read(plain, "plugins/acme/.claude-plugin/plugin.json")).description).toMatch(/^Build UI on the .* kit: its rules, components and token names\.$/);
 });
 
 test("an empty description fails, naming it", () => {
-  const result = run(acme(`c.plugin.description = " ";`));
+  const result = run(acme(`c.plugin.description = " ";`), "build");
   expect(result.exitCode).not.toBe(0);
   expect(result.stderr.toString()).toContain("plugin's description must be a non-empty string");
 });

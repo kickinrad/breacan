@@ -22,7 +22,7 @@ export const create = async (args) => {
   seedsOf({ seeds }, "breacan new: --seed");
   const name = basename(resolve(dir)).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   if (!name) throw new Error("breacan new: the folder's name gives no kit name");
-  if (["breacan.config.mjs", "kumiko.config.mjs"].some((file) => existsSync(join(dir, file)))) throw new Error(`breacan new: ${dir} already holds a kit`);
+  if (existsSync(join(dir, "breacan.config.mjs"))) throw new Error(`breacan new: ${dir} already holds a kit`);
   await mkdir(dir, { recursive: true });
   const config = `// The ${name} kit: run \`breacan build\`, then \`breacan check\`. Its look is the seeds; the base fills the rest.
 export default {

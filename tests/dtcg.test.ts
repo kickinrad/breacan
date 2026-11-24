@@ -8,11 +8,11 @@ import { read, root, run, scratch } from "./helpers";
 const kit = () => {
   const dir = scratch("tokens-dtcg-kit-");
   for (const entry of ["design", "tokens", "VERSION"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
-  writeFileSync(join(dir, "kumiko.config.mjs"), `export default {
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default {
   targets: ["css", "dtcg"], include: ["builtin:material"], kit: { name: "acme" },
   css: { path: "out/kit.css", scheme: "dark" }, dtcg: { path: "tokens-out" },
 };\n`);
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   return dir;
@@ -30,7 +30,7 @@ test("writes the base mode and each other mode's differences, aliases resolved, 
   expect(base.md.comp).toBeUndefined();
   expect(day.md.sys.color.primary.$value).not.toEqual(base.md.sys.color.primary.$value);
   expect(day.md.sys.shape).toBeUndefined();
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
 });
 
 test("a consumer that includes the files beneath builtin:material builds the kit's own css", () => {
@@ -38,12 +38,12 @@ test("a consumer that includes the files beneath builtin:material builds the kit
   const app = scratch("tokens-dtcg-app-");
   mkdirSync(join(app, "kit"));
   for (const file of ["acme.tokens.json", "acme.day.tokens.json"]) cpSync(join(dir, "tokens-out", file), join(app, "kit", file));
-  writeFileSync(join(app, "kumiko.config.mjs"), `export default {
+  writeFileSync(join(app, "breacan.config.mjs"), `export default {
   targets: ["css"], include: ["builtin:material", "kit/acme.tokens.json"],
   media: { "(prefers-color-scheme: light)": ["kit/acme.day.tokens.json"] },
   css: { path: "out/app.css", scheme: "dark" },
 };\n`);
-  const result = run(app);
+  const result = run(app, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   expect(declarations(read(app, "out/app.css"))).toEqual(declarations(read(dir, "out/kit.css")));
@@ -52,8 +52,8 @@ test("a consumer that includes the files beneath builtin:material builds the kit
 test("every colour, a derived role's too, is a DTCG 2025.10 colour object", () => {
   const dir = scratch("tokens-dtcg-derived-");
   cpSync(join(root, "tests/derived"), dir, { recursive: true });
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" }, dtcg: { path: "out" } };\n');
-  const result = run(dir);
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" }, dtcg: { path: "out" } };\n');
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   const colours: unknown[] = [];
   const walk = (node: Record<string, unknown>) => {
@@ -67,8 +67,8 @@ test("every colour, a derived role's too, is a DTCG 2025.10 colour object", () =
 
 test("the output needs a path, never tokens/, and a declared kit", () => {
   const dir = kit();
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" } };\n');
-  expect(run(dir).stderr.toString()).toContain("path");
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" }, dtcg: { path: "tokens" } };\n');
-  expect(run(dir).stderr.toString()).toContain("tokens/ is the project's own token source");
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" } };\n');
+  expect(run(dir, "build").stderr.toString()).toContain("path");
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "acme" }, dtcg: { path: "tokens" } };\n');
+  expect(run(dir, "build").stderr.toString()).toContain("tokens/ is the project's own token source");
 });

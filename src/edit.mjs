@@ -1,8 +1,7 @@
 // breacan edit: serves the project on localhost (/ opens the playground, when the config has one) and the Kit panel,
 // builds every edit in memory as the engine builds it, and pushes the result live to every page that listens to
-// /_kumiko/events. Save writes the edits into the kit's token files (theme.toml, else the colours of tokens/*.tokens.json),
+// /_breacan/events. Save writes the edits into the kit's token files (theme.toml, else the colours of tokens/*.tokens.json),
 // one changed value each, and rebuilds; a change to the kit's sources on disk rebuilds every output and sends "reload".
-// `breacan dev` is a hidden alias for it, until the contract task removes aliases.
 import { existsSync, watch } from "node:fs";
 import { readFile, readdir, realpath, writeFile } from "node:fs/promises";
 import { basename, extname, join, resolve, sep } from "node:path";
@@ -132,18 +131,18 @@ export const edit = async ({ config, port = 4400 }) => {
       if (!["127.0.0.1", "localhost"].some((name) => host === `${name}:${server.port}`)) return new Response("Unknown host", { status: 403 });
       const url = new URL(request.url);
       if (url.pathname === "/" && config.playground?.path) return Response.redirect(`/${config.playground.path.replace(/^\.?\//, "")}/index.html`, 302);
-      if (url.pathname === "/_kumiko/live") return json(live);
-      if (url.pathname === "/_kumiko/panel") return new Response(await panel(), { headers: { ...NO_STORE, "Content-Type": "text/html" } });
-      if (url.pathname === "/_kumiko/events") {
+      if (url.pathname === "/_breacan/live") return json(live);
+      if (url.pathname === "/_breacan/panel") return new Response(await panel(), { headers: { ...NO_STORE, "Content-Type": "text/html" } });
+      if (url.pathname === "/_breacan/events") {
         // An event stream stays open while idle; Bun closes idle requests after 10s otherwise.
         server.timeout(request, 0);
         let client;
         return new Response(new ReadableStream({
-          start(controller) { client = controller; clients.add(client); controller.enqueue(": kumiko\n\n"); },
+          start(controller) { client = controller; clients.add(client); controller.enqueue(": breacan\n\n"); },
           cancel() { clients.delete(client); },
         }), { headers: { ...NO_STORE, "Content-Type": "text/event-stream" } });
       }
-      if (url.pathname === "/_kumiko/edit" && request.method === "POST") {
+      if (url.pathname === "/_breacan/edit" && request.method === "POST") {
         if (!ours(request)) return json({ error: "Edits come from a page this server serves" }, 403);
         const before = edits;
         try {
@@ -155,7 +154,7 @@ export const edit = async ({ config, port = 4400 }) => {
           return json({ error: error.message }, 400);
         }
       }
-      if (url.pathname === "/_kumiko/save" && request.method === "POST") {
+      if (url.pathname === "/_breacan/save" && request.method === "POST") {
         if (!ours(request)) return json({ error: "Saves come from a page this server serves" }, 403);
         try {
           const { changed, contrast } = await preview();

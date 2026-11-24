@@ -13,7 +13,7 @@ const project = () => {
 
 test("builds byte-identical outputs to the 2.1.0 template", () => {
   const dir = project();
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   for (const file of ["src/styles/tokens.css", "DESIGN.md"]) {
     expect(read(dir, file)).toBe(read(join(root, "tests/expected"), file));
   }
@@ -21,10 +21,10 @@ test("builds byte-identical outputs to the 2.1.0 template", () => {
 
 test("--check passes when current and names the stale file otherwise", () => {
   const dir = project();
-  run(dir);
-  expect(run(dir, "--check").exitCode).toBe(0);
+  run(dir, "build");
+  expect(run(dir, "check").exitCode).toBe(0);
   appendFileSync(join(dir, "src/styles/tokens.css"), "/* hand edit */\n");
-  const stale = run(dir, "--check");
+  const stale = run(dir, "check");
   expect(stale.exitCode).toBe(1);
   expect(stale.stderr.toString()).toContain("src/styles/tokens.css was edited by hand");
   expect(stale.stderr.toString()).toContain("run breacan build");
@@ -33,7 +33,7 @@ test("--check passes when current and names the stale file otherwise", () => {
 test("a token file that isn't valid JSON fails the build with the parse error, not a hang", () => {
   const dir = project();
   writeFileSync(join(dir, "tokens/broken.tokens.json"), '{ "a": { "$type": "color", "$value": "#fff", "$description": "say "hi"" } }\n');
-  const result = Bun.spawnSync([...command], { cwd: dir, stderr: "pipe", timeout: 10_000 });
+  const result = Bun.spawnSync([...command, "build"], { cwd: dir, stderr: "pipe", timeout: 10_000 });
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("tokens/broken.tokens.json is not valid JSON");
 });
@@ -43,8 +43,8 @@ test("a token set in two source files fails the build naming both, not a hang (#
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ x: { $type: "number", $value: 1 } }));
   writeFileSync(join(dir, "tokens/b.tokens.json"), JSON.stringify({ x: { $type: "number", $value: 3 } }));
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css"] };\n');
-  const result = Bun.spawnSync([...command], { cwd: dir, stderr: "pipe", timeout: 10_000 });
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"] };\n');
+  const result = Bun.spawnSync([...command, "build"], { cwd: dir, stderr: "pipe", timeout: 10_000 });
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("x is set in both tokens/a.tokens.json and tokens/b.tokens.json");
 });
@@ -53,9 +53,9 @@ test("a project target is a module the config imports and lists", () => {
   const dir = project();
   writeFileSync(join(dir, "local.mjs"),
     'export default { name: "local", build: async (ctx) => [{ path: "local.txt", content: `${ctx.tokens.length}\\n` }] };\n');
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'import local from "./local.mjs";\nexport default { targets: ["css", local] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'import local from "./local.mjs";\nexport default { targets: ["css", local] };\n');
   rmSync(join(dir, "tokens/stack.tokens.json"));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(Number(read(dir, "local.txt"))).toBeGreaterThan(0);
 });
 
@@ -67,8 +67,8 @@ test("token files build in sorted order, whatever order the filesystem lists the
   for (const name of names) {
     writeFileSync(join(dir, `tokens/${name}.tokens.json`), JSON.stringify({ [`t${name}`]: { gap: { $type: "dimension", $value: { value: 1, unit: "px" } } } }));
   }
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css"] };\n');
-  expect(run(dir).exitCode).toBe(0);
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"] };\n');
+  expect(run(dir, "build").exitCode).toBe(0);
   const css = read(dir, "src/styles/tokens.css");
   const order = [...css.matchAll(/--t([a-z]+)-gap/g)].map((m) => m[1]);
   expect(order).toEqual([...names].sort());
@@ -76,16 +76,16 @@ test("token files build in sorted order, whatever order the filesystem lists the
 
 test("an unknown target fails loudly", () => {
   const dir = project();
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["nope"] };\n');
-  const result = run(dir);
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["nope"] };\n');
+  const result = run(dir, "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("Unknown token target nope");
 });
 
 test("a config that still lists the removed storybook output fails naming it", () => {
   const dir = project();
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css", "storybook"] };\n');
-  const result = run(dir);
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css", "storybook"] };\n');
+  const result = run(dir, "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("Removed output storybook");
 });
@@ -99,11 +99,11 @@ test("include files are a silent base: project tokens override them, in the base
   writeFileSync(join(dir, "vendor/base.tokens.json"), JSON.stringify({ t: { a: dim(1), b: dim(2) } }));
   writeFileSync(join(dir, "tokens/project.tokens.json"), JSON.stringify({ t: { a: dim(10), c: dim(3) } }));
   writeFileSync(join(dir, "tokens/narrow.tokens.json"), JSON.stringify({ t: { c: dim(30) } }));
-  writeFileSync(join(dir, "kumiko.config.mjs"), `export default {
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default {
     targets: ["css"], include: ["vendor/*.tokens.json"],
     media: { "(max-width: 600px)": ["tokens/narrow.tokens.json"] },
   };\n`);
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   const css = read(dir, "src/styles/tokens.css");
@@ -122,7 +122,7 @@ const kitProject = (kit: string | undefined, version: string | null = "1.2.3\n")
   const dir = project();
   rmSync(join(dir, "tokens/stack.tokens.json"));
   writeFileSync(join(dir, "echo.mjs"), echoTarget);
-  writeFileSync(join(dir, "kumiko.config.mjs"),
+  writeFileSync(join(dir, "breacan.config.mjs"),
     `import echo from "./echo.mjs";\nexport default { targets: [echo]${kit === undefined ? "" : `, kit: ${kit}`} };\n`);
   if (version !== null) writeFileSync(join(dir, "VERSION"), version);
   return dir;
@@ -130,7 +130,7 @@ const kitProject = (kit: string | undefined, version: string | null = "1.2.3\n")
 
 test("a kit hands every target its root, version and name", () => {
   const dir = kitProject('{ name: "acme", root: "kit" }');
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   const ctx = JSON.parse(read(dir, "echo.json"));
   expect(ctx.root).toBe(join(dir, "kit"));
   expect(ctx.version).toBe("1.2.3");
@@ -139,31 +139,31 @@ test("a kit hands every target its root, version and name", () => {
 
 test("a kit root defaults to design", () => {
   const dir = kitProject('{ name: "acme" }');
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(JSON.parse(read(dir, "echo.json")).root).toBe(join(dir, "design"));
 });
 
 test("a kit needs a name", () => {
-  const result = run(kitProject("{ root: \"kit\" }"));
+  const result = run(kitProject("{ root: \"kit\" }"), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("kit.name");
 });
 
 test("a kit with no VERSION file fails naming VERSION", () => {
-  const result = run(kitProject('{ name: "acme" }', null));
+  const result = run(kitProject('{ name: "acme" }', null), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("VERSION");
 });
 
 test("a kit with a non-semver VERSION fails naming VERSION", () => {
-  const result = run(kitProject('{ name: "acme" }', "v1\n"));
+  const result = run(kitProject('{ name: "acme" }', "v1\n"), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("VERSION");
 });
 
 test("with no kit, a target's ctx carries no kit keys", () => {
   const dir = kitProject(undefined, null);
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(JSON.parse(read(dir, "echo.json")).keys).toEqual(
     ["built", "config", "list", "media", "mediaTokens", "options", "readExisting", "render", "tokens"]);
 });
@@ -174,9 +174,9 @@ test("a kit with hex-string colours passes --check", () => {
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/brand.tokens.json"), JSON.stringify({ color: { ink: { $type: "color", $value: "#121416" } } }));
   writeFileSync(join(dir, "VERSION"), "1.0.0\n");
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
-  expect(run(dir).exitCode).toBe(0);
-  const result = run(dir, "--check");
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
+  expect(run(dir, "build").exitCode).toBe(0);
+  const result = run(dir, "check");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
 });
@@ -188,13 +188,13 @@ const materialProject = (include: string) => {
   writeFileSync(join(dir, "tokens/project.tokens.json"), JSON.stringify({
     md: { sys: { shape: { corner: { medium: { $type: "dimension", $value: { value: 20, unit: "px" } } } } } },
   }));
-  writeFileSync(join(dir, "kumiko.config.mjs"), `export default { targets: ["css"], include: [${include}] };\n`);
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default { targets: ["css"], include: [${include}] };\n`);
   return dir;
 };
 
 test("builtin:material gives a project Material's tokens beneath its own", () => {
   const dir = materialProject('"builtin:material"');
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   const css = read(dir, "src/styles/tokens.css");
@@ -204,7 +204,7 @@ test("builtin:material gives a project Material's tokens beneath its own", () =>
   expect(css).toContain("--md-sys-motion-duration-short3: 150ms;");
   expect(css).toContain("--md-sys-shape-corner-medium: 20px;");
   expect(css).not.toContain("--md-sys-shape-corner-medium: 12px;");
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
 });
 
 test("builtin:material sits beneath file includes too", () => {
@@ -213,21 +213,21 @@ test("builtin:material sits beneath file includes too", () => {
   writeFileSync(join(dir, "vendor/base.tokens.json"), JSON.stringify({
     md: { sys: { shape: { corner: { small: { $type: "dimension", $value: { value: 3, unit: "px" } } } } } },
   }));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(read(dir, "src/styles/tokens.css")).toContain("--md-sys-shape-corner-small: 3px;");
 });
 
 // What a target receives, written as JSON by a project's own target.
 const tokensOf = (dir: string) => {
   writeFileSync(join(dir, "dump.mjs"), 'export default { name: "dump", build: ({ tokens }) => [{ path: "tokens.json", content: JSON.stringify(tokens) }] };\n');
-  writeFileSync(join(dir, "kumiko.config.mjs"), read(dir, "kumiko.config.mjs").replace('targets: ["css"]', 'targets: [(await import("./dump.mjs")).default]'));
-  expect(run(dir).exitCode).toBe(0);
+  writeFileSync(join(dir, "breacan.config.mjs"), read(dir, "breacan.config.mjs").replace('targets: ["css"]', 'targets: [(await import("./dump.mjs")).default]'));
+  expect(run(dir, "build").exitCode).toBe(0);
   return JSON.parse(read(dir, "tokens.json")) as { path: string; builtin?: boolean }[];
 };
 
 test("builtin:material is Material 3 only, with no TV layer beside it", () => {
   expect(tokensOf(materialProject('"builtin:material"')).some((token) => token.path.startsWith("md.comp.tv-card."))).toBe(false);
-  expect(run(materialProject('"builtin:material", "builtin:material-tv"')).stderr.toString()).toContain("Unknown built-in include builtin:material-tv");
+  expect(run(materialProject('"builtin:material", "builtin:material-tv"'), "build").stderr.toString()).toContain("Unknown built-in include builtin:material-tv");
 });
 
 test("css writes Material's own component tokens only where Beer's layer reads them, and a project's own always", () => {
@@ -235,7 +235,7 @@ test("css writes Material's own component tokens only where Beer's layer reads t
   writeFileSync(join(dir, "tokens/component.tokens.json"), JSON.stringify({
     md: { comp: { "filled-card": { "container-elevation": { $type: "dimension", $value: { value: 2, unit: "px" } } } } },
   }));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   const css = read(dir, "src/styles/tokens.css");
   const names = [...css.matchAll(/^  --(md-comp-[a-z0-9-]+):/gm)].map((match) => match[1]);
   expect(names.filter((name) => !reads.has(name) && !/^md-comp-.*-(size|line-height|weight|tracking)$/.test(name))).toEqual(["md-comp-filled-card-container-elevation"]);
@@ -245,7 +245,7 @@ test("css writes Material's own component tokens only where Beer's layer reads t
 });
 
 test("an unknown built-in include fails loudly", () => {
-  const result = run(materialProject('"builtin:nope"'));
+  const result = run(materialProject('"builtin:nope"'), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("Unknown built-in include builtin:nope");
 });

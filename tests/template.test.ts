@@ -23,7 +23,7 @@ blue = "#2e7de9"
 const kit = (templates: Record<string, string>) => {
   const dir = scratch("tokens-template-");
   writeFileSync(join(dir, "VERSION"), "0.5.0\n");
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates", to: "ports" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates", to: "ports" } };\n');
   mkdirSync(join(dir, "design"));
   writeFileSync(join(dir, "design/theme.toml"), THEME);
   for (const [path, text] of Object.entries(templates)) {
@@ -38,42 +38,42 @@ test("each template is written to the same path under `to`, every slot filled fr
     "term/acme-night.json": '{ "background": "{{night.ink}}", "blue": "{{ night.blue }}", "dim": "{{night.blue}}80", "name": "{{name}}" }\n',
     "tmux/both.conf": "set -g status-style 'bg={{night.ink}}' # day: {{day.ink}} {{day.blue}}\n\tkeep #2c2c2c as is\n",
   });
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   expect(read(dir, "ports/term/acme-night.json")).toBe('{ "background": "#101010", "blue": "#7aa2f7", "dim": "#7aa2f780", "name": "acme" }\n');
   expect(read(dir, "ports/tmux/both.conf")).toBe("set -g status-style 'bg=#101010' # day: #fafafa #2e7de9\n\tkeep #2c2c2c as is\n");
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
 });
 
 test("--check flags a rendered file that no longer matches its template or palette", () => {
   const dir = kit({ "a.conf": "fg {{night.blue}}\n" });
-  run(dir);
+  run(dir, "build");
   writeFileSync(join(dir, "design/theme.toml"), THEME.replace('blue = "#7aa2f7"', 'blue = "#7da6ff"'));
-  const stale = run(dir, "--check");
+  const stale = run(dir, "check");
   expect(stale.exitCode).toBe(1);
   expect(stale.stderr.toString()).toContain("design/theme.toml changed since the last build");
 });
 
 test("a slot the palette lacks fails, naming the template and the slot", () => {
-  const result = run(kit({ "a.conf": "fg {{night.pink}}\n" }));
+  const result = run(kit({ "a.conf": "fg {{night.pink}}\n" }), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("template: templates/a.conf has {{night.pink}}, which the theme lacks (slots: <mode>.<palette colour>, name)");
 });
 
 test("it needs a declared kit, and `from` and `to`", () => {
   const dir = kit({ "a.conf": "x\n" });
-  writeFileSync(join(dir, "kumiko.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates" } };\n');
-  expect(run(dir).stderr.toString()).toContain('template option "to" is required');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates" } };\n');
+  expect(run(dir, "build").stderr.toString()).toContain('template option "to" is required');
 });
 
 test("a theme that extends another takes its modes, palette and faces, then adds or changes its own", () => {
   const dir = kit({ "a.conf": "{{night.ink}} {{night.blue}} {{night.accent}} {{day.ink}} {{day.accent}}\n" });
   writeFileSync(join(dir, "design/base.toml"), THEME.replace('name = "acme"', 'name = "plain"'));
   writeFileSync(join(dir, "design/theme.toml"), 'name = "acme"\nextends = "base.toml"\n\n[palette.night]\nblue = "#7da6ff"\naccent = "#ff00aa"\n\n[palette.day]\naccent = "#aa0055"\n');
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(read(dir, "ports/a.conf")).toBe("#101010 #7da6ff #ff00aa #fafafa #aa0055\n");
   writeFileSync(join(dir, "design/theme.toml"), 'name = "acme"\nextends = "none.toml"\n');
-  expect(run(dir).stderr.toString()).toContain("theme.toml: extends: no theme at design/none.toml");
+  expect(run(dir, "build").stderr.toString()).toContain("theme.toml: extends: no theme at design/none.toml");
 });

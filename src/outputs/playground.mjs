@@ -32,14 +32,14 @@ const beerCss = async () => {
 // The client as one script: a page opened from disk cannot import modules beside it. Bundled from a scratch copy, so
 // the binary's embedded sources and a checkout's files take the same path.
 export const bundle = async (client, color, entry = "playground.js") => {
-  const dir = mkdtempSync(join(tmpdir(), "kumiko-playground-"));
+  const dir = mkdtempSync(join(tmpdir(), "breacan-playground-"));
   try {
     for (const [file, text] of client) writeFileSync(join(dir, file), text.replaceAll('"../color.mjs"', '"./color.mjs"'));
     writeFileSync(join(dir, "color.mjs"), color);
     const result = await Bun.build({ entrypoints: [join(dir, entry)], target: "browser", format: "esm" });
     if (!result.success) throw new Error(`playground: the client did not bundle\n${result.logs.join("\n")}`);
     // The bundler marks each module with its path from here; the scratch copy's name changes every run.
-    return (await result.outputs[0].text()).replace(/^\/\/ \S*kumiko-playground-[^/]+\//gm, "// ");
+    return (await result.outputs[0].text()).replace(/^\/\/ \S*breacan-playground-[^/]+\//gm, "// ");
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

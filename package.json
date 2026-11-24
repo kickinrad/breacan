@@ -4,8 +4,7 @@
   "description": "Build one look into each platform's native theme files from DTCG 2025.10 design tokens, as one binary named breacan.",
   "type": "module",
   "bin": {
-    "breacan": "bin/breacan.mjs",
-    "kumiko": "bin/breacan.mjs"
+    "breacan": "bin/breacan.mjs"
   },
   "license": "UNLICENSED",
   "private": true,

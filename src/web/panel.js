@@ -1,4 +1,4 @@
-// The Tune panel's page, served by breacan edit at /_kumiko/panel. It reads the kit from the server, sends every edit to
+// The Tune panel's page, served by breacan edit at /_breacan/panel. It reads the kit from the server, sends every edit to
 // it, and the server builds the edit and sends the result here. Inputs stay put while the rest redraws, so an open colour picker stays open.
 import { controls, tuneView, valueOf } from "./tune.js";
 import { contrast } from "../color.mjs";
@@ -67,7 +67,7 @@ const flush = async () => {
   try {
     while (unsent()) {
       const body = queued;
-      const result = await post("/_kumiko/edit", body);
+      const result = await post("/_breacan/edit", body);
       for (const [path, value] of Object.entries(body)) if (queued[path] === value) delete queued[path];
       state.problem = result.error ?? "";
     }
@@ -114,7 +114,7 @@ document.addEventListener("click", async (event) => {
         state.problem = `Not saved: ${unsent()} edit${unsent() === 1 ? "" : "s"} not sent`;
         return draw();
       }
-      const result = await post("/_kumiko/save", {});
+      const result = await post("/_breacan/save", {});
       state.problem = result.error ?? "";
       if (!result.error) state.edits = {};
     } catch (error) {
@@ -124,9 +124,9 @@ document.addEventListener("click", async (event) => {
   }
 });
 
-fetch("/_kumiko/live").then((response) => response.json()).then((live) => {
+fetch("/_breacan/live").then((response) => response.json()).then((live) => {
   apply(live);
-  const events = new EventSource("/_kumiko/events");
+  const events = new EventSource("/_breacan/events");
   events.addEventListener("live", (event) => apply(JSON.parse(event.data)));
   events.addEventListener("reload", () => location.reload());
   events.addEventListener("problem", (event) => { state.problem = JSON.parse(event.data).message; refresh(); });

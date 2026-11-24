@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "kumiko",
+      "name": "breacan",
       "dependencies": {
         "@adobe/leonardo-contrast-colors": "latest",
         "@material/material-color-utilities": "latest",

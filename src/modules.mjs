@@ -15,7 +15,7 @@ export const SLOTS = ["source", "foundation", "output"];
 const removed = { storybook: "the storybook output was removed; use Swatchbook, configured in the project" };
 const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour, [scheme.name]: scheme };
 
-// The kumiko target shape { name, build }, still read until every consumer has moved.
+// The older target shape { name, build }, still read.
 const normalize = (module) => module && typeof module.build === "function" && module.run === undefined
   ? { slot: "output", reads: [], writes: {}, ...module, run: module.build } : module;
 

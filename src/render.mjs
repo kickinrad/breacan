@@ -99,7 +99,7 @@ const walk = async () => {
 };
 
 export const audit = async (dir) => {
-  if (!(await Bun.file(join(dir, "index.html")).exists())) throw new Error(`breacan audit: no playground at ${dir} (run breacan first)`);
+  if (!(await Bun.file(join(dir, "index.html")).exists())) throw new Error(`breacan audit: no playground at ${dir} (run breacan build first)`);
   const profile = mkdtempSync(join(tmpdir(), "tokens-audit-"));
   const browser = Bun.spawn([chrome(), "--headless=new", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--no-first-run", "--no-default-browser-check", "about:blank"], { stderr: "pipe", stdout: "ignore" });
   const failures = [];

@@ -23,7 +23,7 @@ const failure = (dir: string) => { const result = run(dir, "check"); expect(resu
 test("a build records every input it read and every file it wrote, and check passes on it", () => {
   const dir = kit();
   const held = receipt(dir);
-  expect(Object.keys(held.inputs)).toEqual(expect.arrayContaining(["kumiko.config.mjs", "VERSION", "design/theme.toml", "templates/ports/bat/tokyo-mono.tmTheme"]));
+  expect(Object.keys(held.inputs)).toEqual(expect.arrayContaining(["breacan.config.mjs", "VERSION", "design/theme.toml", "templates/ports/bat/tokyo-mono.tmTheme"]));
   expect(held.outputs["ports/bat/tokyo-mono.tmTheme"].sha256).toBe(sha(read(dir, "ports/bat/tokyo-mono.tmTheme")));
   expect(held.outputs["ports/mealie/tokyo-mono.css"].header).toBe(true);
   expect(run(dir, "check").exitCode).toBe(0);
@@ -66,10 +66,10 @@ test("an output that lost its generated header fails, even with a matching recei
   expect(failure(dir)).toContain(`${file} has no generated header`);
 });
 
-test("with no receipt (a kit kumiko built), check compares every output to a fresh build", () => {
+test("with no receipt (a kit built before receipts), check compares every output to a fresh build", () => {
   const dir = kit();
   rmSync(join(dir, "breacan.receipt.json"));
-  expect(run(dir, "--check").exitCode).toBe(0);
+  expect(run(dir, "check").exitCode).toBe(0);
   appendFileSync(join(dir, "ports/tmux/tokyo-mono.conf"), "# mine\n");
   expect(failure(dir)).toContain("ports/tmux/tokyo-mono.conf is stale");
   expect(readFileSync(join(dir, "ports/tmux/tokyo-mono.conf"), "utf8")).toEndWith("# mine\n");
@@ -117,13 +117,13 @@ test("a theme's extended file outside the kit folder is an input", () => {
   appendFileSync(join(dir, "shared/base.toml"), "\n");
   expect(failure(dir)).toContain("shared/base.toml changed since the last build");
 });
-test("with no receipt, a file kumiko never wrote is named, not failed, and an edited one still fails", () => {
+test("with no receipt, a file the last build never wrote is named, not failed, and an edited one still fails", () => {
   const dir = scratch("receipt-legacy-");
   cpSync(join(root, "tests/kits/tokyo-material"), dir, { recursive: true });
   expect(run(dir, "build").exitCode).toBe(0);
   rmSync(join(dir, "breacan.receipt.json"));
   rmSync(join(dir, "ports/tokens/tokyo-material.resolver.json"));
-  const result = run(dir, "--check");
+  const result = run(dir, "check");
   expect(result.exitCode).toBe(0);
   expect(result.stdout.toString()).toContain("ports/tokens/tokyo-material.resolver.json is new in breacan");
   appendFileSync(join(dir, "docs/playground/tokyo-material.css"), "/* mine */\n");

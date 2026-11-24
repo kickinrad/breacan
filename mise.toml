@@ -11,10 +11,8 @@ run = "bun build bin/breacan.mjs --target=bun --outdir=dist/check >/dev/null"
 run = "bun test"
 
 [tasks.build]
-# One release asset holds the binary under both names, so `mise use github:kickinrad/breacan` (or the old
-# kickinrad/kumiko, which GitHub redirects) puts `breacan` and `kumiko` on the PATH.
+# The release asset holds the one binary, so `mise use github:kickinrad/breacan` puts `breacan` on the PATH.
 run = [
   "bun build --compile --target=bun-linux-x64 --asset src/color.mjs --asset src/web --asset node_modules/beercss/dist/cdn bin/breacan.mjs --outfile dist/breacan",
-  "cp dist/breacan dist/kumiko",
-  "tar -czf dist/breacan-linux-x64.tar.gz -C dist breacan kumiko",
+  "tar -czf dist/breacan-linux-x64.tar.gz -C dist breacan",
 ]

@@ -21,7 +21,7 @@ const roles = (css: string) => css.split("\n").filter((line) => /^\s*--(md-sys-c
 
 test("the derived roles in both modes, as the golden", () => {
   const dir = project();
-  const result = run(dir);
+  const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
   expect(`${roles(read(dir, "tokens.css"))}\n`).toBe(read(root, "tests/derived/expected/roles.css"));
@@ -29,17 +29,17 @@ test("the derived roles in both modes, as the golden", () => {
 
 test("nothing derived is written: the build writes only its outputs", () => {
   const dir = project();
-  run(dir);
+  run(dir, "build");
   expect(new Bun.Glob("**/*.tokens.json").scanSync(dir).toArray()).toEqual([]);
 });
 
 test("after a palette change one run is final", () => {
   const dir = project();
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   writeFileSync(join(dir, "design/theme.toml"), read(dir, "design/theme.toml").replace('blue = "#7aa2f7"', 'blue = "#f7768e"'));
-  expect(run(dir).exitCode).toBe(0);
+  expect(run(dir, "build").exitCode).toBe(0);
   expect(read(dir, "tokens.css")).toContain("--md-sys-color-primary-fixed-dim: #f7768e;");
-  const again = run(dir, "--check");
+  const again = run(dir, "check");
   expect(again.stderr.toString()).toBe("");
   expect(again.exitCode).toBe(0);
 });
@@ -49,7 +49,7 @@ test.each([
   ["marks.group", (t: string) => t.replace('group = "track", ', ""), "[derived] marks.group must be a non-empty string"],
   ["an unknown key", (t: string) => t.replace("[derived]\n", "[derived]\nprefix = \"acme\"\n"), '[derived]: unknown key "prefix"'],
 ])("[derived] without %s fails, naming it", (_, edit, message) => {
-  const result = run(themed(edit));
+  const result = run(themed(edit), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain(message);
 });
