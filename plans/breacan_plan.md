@@ -175,9 +175,9 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 
 ### Phase 3: inputs, editing and public-ready
 
-19. [ ] **Scheme imports.** Base16/24 and iTerm2 sources. Route: implementation. Demo: walkthrough C from a tinted-theming scheme. Blocked by: 18.
+19. [x] **Scheme imports.** Base16/24 and iTerm2 sources. Route: implementation. Demo: walkthrough C from a tinted-theming scheme. Blocked by: 18.
 20. [ ] **Website, image and Figma imports.** Dembrandt with `needs-review`, an image palette, and `tz import` for Figma. Route: implementation. Demo: acceptance 11. Blocked by: 19.
-21. [ ] **Local editor.** Live swatches and contrast that save back to token files; the dev server is then deleted. Route: implementation. Demo: acceptance 12. Blocked by: 18.
+21. [x] **Local editor.** Live swatches and contrast that save back to token files; the dev server is then deleted. Route: implementation. Demo: acceptance 12. Blocked by: 18.
 22. [ ] **Penpot plugin.** Push and pull a kit's tokens through Penpot's plugin API, mapping Penpot themes to resolver sets. Route: implementation-hard. Demo: acceptance 13. Blocked by: 21.
 23. [ ] **Contract.** Remove the `kumiko` alias, the old config name and `--check`; archive tokyo-material (tokyo-mono stays). Route: implementation-light. Demo: acceptance 14. Blocked by: 11, 17.
 24. [ ] **Public-ready.** LICENSE, NOTICE, CLA, SPDX headers, the licence audit in CI and the trademark search; Curator updates the hub. Route: here. Demo: acceptance 17. Blocked by: 22, 23.
@@ -288,6 +288,12 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Both playground goldens moved for `docs/playground/index.html` only, the Boombox one checked against the `pre-breacan` checkout. Found on the way and filed: #131 (a six-item bottom bar scrolls sideways on a phone) and #132 (Rules is blank below 840px).
   - Shipped: PR #130, released as 0.29.0. Phase 2 is done.
   - Phase 3 shape (owner's call): task 21's editor is `breacan edit`, which replaces `breacan dev`.
+- Task 19, scheme imports (implementation, Claude; Demo passed; merged).
+  - The `scheme` source reads an iTerm2 `.itermcolors` file beside Base16/24 YAML: ANSI 0 to 15 as given, ANSI 1 to 6 the accents, background, foreground and selection as base00, base05 and base02, and the steps between mixed. No new dependency.
+  - Walkthrough C: a kit builds from a real Dracula `.itermcolors` fixture (MIT, noted in the file). Shipped: PR #135, released as 0.30.0.
+- Task 21, local editor (implementation, Claude; Demo passed first try; merged).
+  - `breacan edit` replaces `breacan dev` (owner's call; `dev` stays a hidden alias until task 23). A kit with no `theme.toml` saves colour edits into `tokens/*.tokens.json`, rewriting only the changed `$value`. The cross-site live bridge is gone; no consumer loaded it.
+  - Acceptance 12: `tests/edit.test.ts` changes one colour through the editor's API, for a `theme.toml` kit and a plain DTCG kit, and checks the token file and the rebuilt playground. Shipped: PR #136, released as 0.31.0.
 
 ## Related
 
