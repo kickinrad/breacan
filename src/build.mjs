@@ -59,7 +59,7 @@ const loadKit = async (kit) => {
 // `preview` (breacan edit): read theme.toml from `theme` (its text) and a tokens file from `drafts` (path to text), write
 // nothing, and return contrast failures beside the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
 // the one in this directory.
-export const build = async (config = {}, { check = false, preview = false, theme: themeText, drafts = {},
+export const build = async (config = {}, { check = false, refresh = false, preview = false, theme: themeText, drafts = {},
   configFile = existsSync("breacan.config.mjs") ? "breacan.config.mjs" : undefined } = {}) => {
   const modules = resolveModules(config);
   // Sources, then foundations: each gives { light, dark } colour trees over the base.
@@ -82,7 +82,10 @@ export const build = async (config = {}, { check = false, preview = false, theme
   // light, with dark under (prefers-color-scheme: dark).
   // A colour engine (a foundation module) builds on the base, which fills every role it leaves.
   const base = (config.include ?? []).includes("builtin:base") || foundations.length > 0;
-  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]) })));
+  // Every file a module reads, and every folder it lists, is an input the receipt holds; a source reads its own through `read`.
+  const reads = new Set();
+  const read = async (path) => { const text = await readFile(path, "utf8"); reads.add(path); return text; };
+  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]), check, refresh, read })));
   const schemeQuery = Object.keys(media).find((query) => /prefers-color-scheme:\s*(light|dark)/.test(query));
   if (base && !modes) {
     modes = { base: "light", media: { "(prefers-color-scheme: dark)": "dark" } };
@@ -92,7 +95,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   if (base) {
     const query = schemeQuery ?? "(prefers-color-scheme: dark)";
     const other = baseScheme === "dark" ? "light" : "dark";
-    media[query]?.unshift({ tree: colours(other), file: "builtin:base" }, ...engines.map((engine, i) => ({ tree: engine[other], file: foundations[i].name })));
+    media[query]?.unshift({ tree: colours(other), file: "builtin:base" }, ...engines.map((engine, i) => ({ tree: engine[other], file: `module:${foundations[i].name}` })));
   }
   const mediaPaths = new Set(Object.values(media).flat().filter((layer) => layer.file).map((layer) => resolve(layer.file)));
   const baseFiles = standard ? [] : listed.filter((file) => file.endsWith(".tokens.json")).map((file) => `tokens/${file}`)
@@ -108,7 +111,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   if (base) {
     if (!builtins.some((layer) => layer.file === material.name)) builtins.push({ tree: material.tokens(), file: material.name });
     builtins.push({ tree: shared(), file: "builtin:base" }, { tree: colours(baseScheme), file: "builtin:base" },
-      ...engines.map((engine, i) => ({ tree: engine[baseScheme], file: foundations[i].name })));
+      ...engines.map((engine, i) => ({ tree: engine[baseScheme], file: `module:${foundations[i].name}` })));
   }
   include.unshift(...builtins);
   if (theme.tree) include.push({ tree: theme.tree, file: "theme.toml" });
@@ -189,7 +192,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   // and the colour engine when the kit has one), and with a platform's language over it at Native, resolved in each mode
   // as a platform is (`columns.base`, and `native` on each platform).
   const neutral = (scheme) => [{ tree: material.tokens(), file: material.name }, { tree: shared(), file: "builtin:base" }, { tree: colours(scheme), file: "builtin:base" },
-    ...engines.map((engine, i) => ({ tree: engine[scheme], file: foundations[i].name }))];
+    ...engines.map((engine, i) => ({ tree: engine[scheme], file: `module:${foundations[i].name}` }))];
   const schemeIn = (query) => /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1] ?? baseScheme;
   const column = async (layersFor) => {
     const mine = new Set();
@@ -233,8 +236,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   }
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
-  // Every file a module reads, and every folder it lists, is an input the receipt holds.
-  const reads = new Set();
+  // An output module's reads and lists join them.
   const folders = new Set();
   const scan = (dir) => { try { return [...new Bun.Glob("**/*").scanSync({ cwd: dir, dot: true })].sort().map((file) => `${dir}/${file}`); } catch { return []; } };
   const list = (dir) => { folders.add(dir); return scan(dir).map((path) => path.slice(dir.length + 1)); };
@@ -263,7 +265,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   }
   // The inputs: the config, VERSION, every file in the kit folder and tokens/, the layers' files and what modules read.
   const candidates = [configFile, ...(theme.files ?? []), kit.name && "VERSION", ...(kit.root ? scan(kit.root) : []), ...scan("tokens"), ...[...folders].flatMap(scan)].filter(Boolean);
-  const layerFiles = [...include, ...source, ...Object.values(media).flat()].map((layer) => layer.file).filter((file) => file && !file.startsWith("builtin:"));
+  const layerFiles = [...include, ...source, ...Object.values(media).flat()].map((layer) => layer.file).filter((file) => file && !file.startsWith("builtin:") && !file.startsWith("module:"));
   const inputs = [...candidates, ...layerFiles, ...(standard?.files ?? []), ...reads];
   const header = (output) => Boolean(kit.name && !output.shared && wantsHeader(output.path));
   if (check) {

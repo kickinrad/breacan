@@ -5,15 +5,17 @@ import outputs from "./outputs/index.mjs";
 import leonardo from "./foundations/leonardo.mjs";
 import materialColour from "./foundations/material.mjs";
 import scheme from "./sources/scheme.mjs";
+import site from "./sources/site.mjs";
+import image from "./sources/image.mjs";
 import { needKit } from "./system.mjs";
 
-// The slots that run today, in run order. A source reads a look from outside (a scheme file) and a foundation
+// The slots that run today, in run order. A source reads a look from outside (a scheme file, a website, an image) and a foundation
 // generates one (a colour engine); each gives colour roles in both schemes ({ light, dark } token trees) over the
 // base, later modules over earlier ones. An output writes files.
 export const SLOTS = ["source", "foundation", "output"];
 // Outputs deleted, with what to say; a config that still lists one fails by name instead of as an unknown target.
 const removed = { storybook: "the storybook output was removed; use Swatchbook, configured in the project" };
-const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour, [scheme.name]: scheme };
+const builtin = { ...outputs, [leonardo.name]: leonardo, [materialColour.name]: materialColour, [scheme.name]: scheme, [site.name]: site, [image.name]: image };
 
 // The older target shape { name, build }, still read.
 const normalize = (module) => module && typeof module.build === "function" && module.run === undefined
