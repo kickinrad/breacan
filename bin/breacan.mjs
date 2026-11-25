@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import pkg from "../package.json" with { type: "json" };
 import { build } from "../src/build.mjs";
 
-const USAGE = "breacan [build | check | new --seed <hex>… [<dir>] | lint <file>… | audit [<dir>] | edit [--port <n>] | --version]";
+const USAGE = "breacan [build [--refresh] | check | new --seed <hex>… [<dir>] | lint <file>… | audit [<dir>] | edit [--port <n>] | --version]";
 const fail = (message) => { console.error(message); process.exit(1); };
 const exit = (findings) => { if (findings.length) console.log(findings.join("\n")); process.exit(findings.length ? 1 : 0); };
 
@@ -25,7 +25,8 @@ if (verb === "--version") {
 const port = verb === "edit" && rest[0] === "--port" && /^\d+$/.test(rest[1] ?? "") ? Number(rest[1]) : undefined;
 const extra = verb === "lint" || verb === "audit" || verb === "new" ? undefined
   : verb === "edit" ? (port ? rest.slice(2) : rest)[0]
-  : verb === "build" || verb === "check" ? rest[0]
+  : verb === "build" ? rest.find((arg) => arg !== "--refresh")
+  : verb === "check" ? rest[0]
   : verb;
 if (extra !== undefined) fail(`breacan: unknown ${extra} (${USAGE})`);
 
@@ -75,5 +76,5 @@ if (verb === "edit") {
     console.log(`breacan edit: http://localhost:${server.port}/ (the Kit panel is /_breacan/panel); it answers only to localhost and 127.0.0.1`);
   } catch (error) { fail(error.message); }
 } else {
-  try { await build(config, { check: verb === "check" }); } catch (error) { fail(error.message); }
+  try { await build(config, { check: verb === "check", refresh: verb === "build" && rest.includes("--refresh") }); } catch (error) { fail(error.message); }
 }

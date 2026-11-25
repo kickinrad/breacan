@@ -59,7 +59,7 @@ const loadKit = async (kit) => {
 // `preview` (breacan edit): read theme.toml from `theme` (its text) and a tokens file from `drafts` (path to text), write
 // nothing, and return contrast failures beside the outputs instead of failing on them. `configFile` is the config's path, an input the receipt holds; by default
 // the one in this directory.
-export const build = async (config = {}, { check = false, preview = false, theme: themeText, drafts = {},
+export const build = async (config = {}, { check = false, refresh = false, preview = false, theme: themeText, drafts = {},
   configFile = existsSync("breacan.config.mjs") ? "breacan.config.mjs" : undefined } = {}) => {
   const modules = resolveModules(config);
   // Sources, then foundations: each gives { light, dark } colour trees over the base.
@@ -82,7 +82,10 @@ export const build = async (config = {}, { check = false, preview = false, theme
   // light, with dark under (prefers-color-scheme: dark).
   // A colour engine (a foundation module) builds on the base, which fills every role it leaves.
   const base = (config.include ?? []).includes("builtin:base") || foundations.length > 0;
-  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]), check })));
+  // Every file a module reads, and every folder it lists, is an input the receipt holds; a source reads its own through `read`.
+  const reads = new Set();
+  const read = async (path) => { const text = await readFile(path, "utf8"); reads.add(path); return text; };
+  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]), refresh, read })));
   const schemeQuery = Object.keys(media).find((query) => /prefers-color-scheme:\s*(light|dark)/.test(query));
   if (base && !modes) {
     modes = { base: "light", media: { "(prefers-color-scheme: dark)": "dark" } };
@@ -233,8 +236,7 @@ export const build = async (config = {}, { check = false, preview = false, theme
   }
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
-  // Every file a module reads, and every folder it lists, is an input the receipt holds.
-  const reads = new Set();
+  // An output module's reads and lists join them.
   const folders = new Set();
   const scan = (dir) => { try { return [...new Bun.Glob("**/*").scanSync({ cwd: dir, dot: true })].sort().map((file) => `${dir}/${file}`); } catch { return []; } };
   const list = (dir) => { folders.add(dir); return scan(dir).map((path) => path.slice(dir.length + 1)); };
