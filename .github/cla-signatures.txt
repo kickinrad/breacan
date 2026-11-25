@@ -1,2 +1,0 @@
-# One line per contributor who agreed to CLA.md: GitHub login, then the date (YYYY-MM-DD).
-# Add yours in your first pull request. The cla check reads this file.

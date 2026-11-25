@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2026 Kick In Rad
+# SPDX-FileCopyrightText: 2026 William Tierney
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -7,13 +7,13 @@
 # beer and playground outputs embed them as written), and the third-party works the repo holds.
 version = 1
 SPDX-PackageName = "breacan"
-SPDX-PackageSupplier = "Kick In Rad"
+SPDX-PackageSupplier = "William Tierney"
 SPDX-PackageDownloadLocation = "https://github.com/kickinrad/breacan"
 
-# Everything else is Kick In Rad's. A file's own header wins over this entry.
+# Everything else is William Tierney's. A file's own header wins over this entry.
 [[annotations]]
 path = "**"
-SPDX-FileCopyrightText = "2026 Kick In Rad"
+SPDX-FileCopyrightText = "2026 William Tierney"
 SPDX-License-Identifier = "Apache-2.0"
 
 # Google's Material 3 tokens, converted, and the Kotlin sources they come from. The Kotlin files carry the Apache

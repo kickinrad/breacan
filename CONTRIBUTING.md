@@ -1,23 +1,8 @@
 # Contributing to Breacán
 
-Breacán is Apache-2.0, and every contributor signs a licence agreement once (`CLA.md`).
+Breacán is Apache-2.0. A contribution you intentionally submit is under the same licence, as [section 5 of the licence](https://www.apache.org/licenses/LICENSE-2.0#contributions) says. There is nothing to sign.
 
-## Agree to the CLA
-
-In your first pull request:
-
-1. Read `CLA.md`.
-2. Add one line to `.github/cla-signatures.txt`: your GitHub login, a space and today's date (`YYYY-MM-DD`).
-3. Tick the agreement box in the pull request description (the template has it).
-
-The `cla` check in CI passes when your line is in the file and the box is ticked. You sign once; later pull
-requests pass without a new line, but each still has the box to tick. Pull requests from the owner (`kickinrad`) and from
-`dependabot[bot]` and `github-actions[bot]` (dependency and release PRs) are exempt. If you contribute for an employer, ask the maintainers
-for a company agreement first (`CLA.md`, section 3).
-
-The check reads your own pull request's file, and the line must carry the login that opened the pull request, so
-signing for someone else does not pass. This is a lightweight record, not a legal signature service: it needs no
-GitHub app, and the file in git is the record.
+You keep the copyright in what you write, and the git history records who wrote what. The project itself is William Tierney's.
 
 ## Make a change
 
@@ -29,10 +14,12 @@ GitHub app, and the file in git is the record.
 - `AGENTS.md` lists the rules that matter (frozen goldens, generated headers, the module shape).
 
 ```
-// SPDX-FileCopyrightText: <year> Kick In Rad
+// SPDX-FileCopyrightText: <year> <your name>
 //
 // SPDX-License-Identifier: Apache-2.0
 ```
+
+A new file carries its author's name, and an edited file keeps its existing line.
 
 A file that cannot carry a header (JSON, generated output, a golden) is covered in `REUSE.toml`. Third-party code
 needs its own licence and an entry in `NOTICE`.
