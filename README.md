@@ -106,14 +106,7 @@ Every build runs the same nine steps:
 
 A kit can list the platforms it ships on, each with a design language and a dial level. Breacán has built-in languages for Apple (iOS) and Material (Android).
 
-The dial has four levels:
-
-- `native` takes everything from the platform.
-- `tinted` keeps your colours.
-- `branded` keeps colour, type and shape.
-- `signature` keeps your whole look.
-
-Below `signature`, system bars and sheets stay native, tinted with your primary colour.
+The dial has four levels: `native` takes everything from the platform, `tinted` keeps your colours, `branded` keeps colour, type and shape, and `signature` keeps your whole look. Below `signature`, system bars and sheets stay native, tinted with your primary colour.
 
 ```js
 platforms: { ios: { language: "apple", dial: "tinted" } }

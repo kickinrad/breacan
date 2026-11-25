@@ -20,7 +20,7 @@ jobs:
       - run: mise run setup
       - run: mise run check
       - run: mise run reuse
-      - run: mise run licence
+      - run: mise run license
       # The playground's client is linted as a consumer would be.
       - run: bun bin/breacan.mjs lint src/web/playground.js src/web/foundations.js src/web/components.js src/web/cards.js src/web/pages.js src/web/examples.js src/web/tailwind.html
       - name: Material baseline matches androidx

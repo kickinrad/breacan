@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// Fails when a production dependency, direct or transitive, carries a copyleft licence or none we can read.
-//   bun scripts/licence-audit.mjs [--root <dir>]   prints one line per package, then exits 1 on any failure
+// Fails when a production dependency, direct or transitive, carries a copyleft license or none we can read.
+//   bun scripts/license-audit.mjs [--root <dir>]   prints one line per package, then exits 1 on any failure
 // It walks package.json's `dependencies` through node_modules the way Node resolves them, so dev dependencies are
 // not read. An SPDX `OR` passes when one side is permissive (the licensee picks it); `AND` fails if either side fails.
 import { existsSync, readFileSync } from "node:fs";
@@ -16,7 +16,7 @@ const read = (file) => JSON.parse(readFileSync(file, "utf8"));
 const rootArg = process.argv.indexOf("--root");
 const root = resolve(rootArg > 0 ? process.argv[rootArg + 1] : ".");
 
-// The licence expression a manifest declares, in its modern, legacy-object or legacy-array form.
+// The license expression a manifest declares, in its modern, legacy-object or legacy-array form.
 const declared = (pkg) => {
   const one = (value) => (typeof value === "string" ? value : value?.type);
   if (pkg.license) return one(pkg.license);
@@ -72,6 +72,6 @@ const counts = Object.groupBy(rows, (row) => row.family);
 console.log(`\n${rows.length} production packages: ${Object.entries(counts).map(([name, list]) => `${list.length} ${name}`).join(", ")}`);
 const bad = rows.filter((row) => row.family !== "permissive");
 if (bad.length) {
-  console.error(`\nlicence audit failed: ${bad.map((row) => `${row.name}@${row.version} (${row.expression ?? "no licence"})`).join(", ")}`);
+  console.error(`\nlicense audit failed: ${bad.map((row) => `${row.name}@${row.version} (${row.expression ?? "no license"})`).join(", ")}`);
   process.exit(1);
 }

@@ -22,6 +22,6 @@ run = [
 [tasks.reuse]
 run = "uvx reuse lint"
 
-[tasks.licence]
-# Fails when a production dependency, transitive ones included, is copyleft or has no readable licence.
-run = "bun scripts/licence-audit.mjs"
+[tasks.license]
+# Fails when a production dependency, transitive ones included, is copyleft or has no readable license.
+run = "bun scripts/license-audit.mjs"
