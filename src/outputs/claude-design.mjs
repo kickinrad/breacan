@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Claude Design: the kit as the files of a Claude Design System artifact, written under options.path/project/
 // (publish that folder to the artifact). README.md is notes.md without its title, plus the kit's exceptions;
 // tokens.json is the type's list-shaped tokens, one theme per mode; tokens.css is the same values compiled the way

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The fifteen Material type styles as targets emit them, read from the resolved tokens
 // (md.sys.typescale.*: the built-in Material layer with a kit's overrides over it). Emphasized styles
 // stay in the tokens; no target emits them yet.

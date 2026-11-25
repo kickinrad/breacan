@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The plugin output: a kit's agent plugin beside the kit's own SKILL.md, its references from theme.toml, notes.md and
 // the components. Two kits prove it: tests/playground (acme: Beer on the web, a playground) and tests/plugin (tern).
 import { expect, test } from "bun:test";

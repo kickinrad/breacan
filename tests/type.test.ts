@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The fifteen Material type styles, read from resolved tokens.
 import { expect, test } from "bun:test";
 import { STYLES, typeScale } from "../src/type.mjs";

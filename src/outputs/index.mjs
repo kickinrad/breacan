@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The built-in output modules, by name.
 import beer from "./beer.mjs";
 import claudeDesign from "./claude-design.mjs";

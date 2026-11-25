@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Reads and edits a DTCG tokens file in place, so a saved edit changes one token's `$value` and nothing else: the
 // file's spacing, key order and every other token stay as written.
 // shortcut: a token name with a "." in it is not found; a `$value` that is an object or an alias is not edited.

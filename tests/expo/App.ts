@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import { Platform, type TextStyle } from "react-native";
 import { themes, type ThemeMode, type ThemePlatform } from "./theme";
 

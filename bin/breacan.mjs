@@ -1,4 +1,9 @@
 #!/usr/bin/env bun
+
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Build a kit's tokens into the outputs its breacan.config.mjs names. The old kumiko spellings fail naming their replacement.
 import { existsSync, readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";

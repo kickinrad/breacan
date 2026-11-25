@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Columns: one specimen screen in four sets of variables, side by side: the base alone, the theme (the kit's own
 // look), a platform's language alone at Native, and the kit on that platform at its own dial. Each column is the
 // same markup under its own style attribute, the variables the css output writes for that set in the shown mode

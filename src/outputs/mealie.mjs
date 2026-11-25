@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Mealie output: the theme files for Mealie (v3.x), from the kit's palette (<name>.palette.*, per mode).
 // The base mode is Mealie's dark theme, the first media mode its light one.
 //

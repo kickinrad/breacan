@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A colour engine's seeds option: one to three six-digit hex colours, primary first.
 export const seedsOf = (options, engine) => {
   const { seeds } = options;

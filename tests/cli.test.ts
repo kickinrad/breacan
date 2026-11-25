@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The breacan verbs, and the old kumiko spellings, which fail naming their replacement.
 import { expect, test } from "bun:test";
 import { appendFileSync, copyFileSync, cpSync, renameSync } from "node:fs";

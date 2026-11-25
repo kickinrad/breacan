@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // What the website and image sources share: seed colours become colour roles through one of the colour engines,
 // and extra token trees (the source's own primitives) join each scheme's tree.
 import leonardo from "../foundations/leonardo.mjs";

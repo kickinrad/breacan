@@ -271,3 +271,7 @@ Five more built-in outputs for a declared kit (they read `ctx.name` and `VERSION
 | `mealie` | `<out>.env` (Mealie's colour slots) and `<out>.css` (a full-look overlay) | `out`; the slots are the theme's `[mealie]` |
 
 `mealie` reads theme.toml's `[mealie]`: `slots` and `overlay` map Mealie's seven slots (`primary`, `accent`, `secondary`, `success`, `info`, `warning`, `error`) to a palette colour each, and `stars` names the rating stars' colour. Its five layers are the palette colours of Material's `surface`, `surface-container-low`, `surface-container`, `surface-container-high` and `surface-container-highest`, its text `on-surface`'s and its quieter text `on-surface-variant`'s, each one colour in both modes. `obsidian` fills Minimal's hue slots from Material's accents and the kit's colour roles named for the other hues (`<name>.color.orange`, `yellow`, `green`, `cyan`), leaving a slot it lacks to Minimal; its third text tier and strong border take the kit's `on-surface-muted` and `comment` roles, else Material's `outline` and `outline-variant`.
+
+## Licence and contributing
+
+Breacán is Apache-2.0 (`LICENSE`, `NOTICE`). Contributors sign a licence agreement once; see `CONTRIBUTING.md`.

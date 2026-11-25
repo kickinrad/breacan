@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // What every CLI test shares: the repo root, the binary (BREACAN_BIN, or the source under Bun), run/read, and scratch
 // directories that are removed when the test run ends.
 import { afterAll } from "bun:test";

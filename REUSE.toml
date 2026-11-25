@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Kick In Rad
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Source files carry their own SPDX headers. This file covers what cannot: JSON, lockfiles, Markdown, generated
+# outputs and the golden fixtures (a header would change their bytes), the src/web stylesheets and tailwind.html (the
+# beer and playground outputs embed them as written), and the third-party works the repo holds.
+version = 1
+SPDX-PackageName = "breacan"
+SPDX-PackageSupplier = "Kick In Rad"
+SPDX-PackageDownloadLocation = "https://github.com/kickinrad/breacan"
+
+# Everything else is Kick In Rad's. A file's own header wins over this entry.
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2026 Kick In Rad"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Google's Material 3 tokens, converted, and the Kotlin sources they come from. The Kotlin files carry the Apache
+# text without an SPDX tag, so this entry replaces it.
+[[annotations]]
+path = ["material/material.tokens.json", "scripts/fixtures/**"]
+precedence = "override"
+SPDX-FileCopyrightText = ["2021 The Android Open Source Project", "2022 The Android Open Source Project", "2023 The Android Open Source Project", "2024 The Android Open Source Project"]
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "tests/schemes/dracula.itermcolors"
+precedence = "override"
+SPDX-FileCopyrightText = ["2011 Mark Badolato", "Zeno Rocha"]
+SPDX-License-Identifier = "MIT"

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import { expect, test } from "bun:test";
 import { cpSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

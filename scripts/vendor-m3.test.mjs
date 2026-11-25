@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The Kotlin-to-DTCG conversion, on excerpts of the real androidx files in scripts/fixtures/.
 import { test } from 'bun:test';
 import assert from 'node:assert/strict';

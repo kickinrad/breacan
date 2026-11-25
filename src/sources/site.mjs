@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A website's look. Dembrandt (MIT) renders the page in Chromium and reads its computed styles; the colours, fonts,
 // corner radii and spacing it finds become primitives under `site`, each marked `needs-review` for a person to
 // confirm. Only what it elects with confidence fills roles: its primary, secondary and accent colours seed a colour

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The built-in Material 3 baseline: androidx's token files (Apache-2.0), vendored as one file by
 // scripts/vendor-m3.mjs, plus the Material values those files lack, hand-written with their sources in
 // material-guidance.tokens.json. Both are bundled JSON imports, so a compiled binary carries them. A config lists

@@ -20,4 +20,4 @@ Open a pull request at [kickinrad/breacan](https://github.com/kickinrad/breacan)
 
 ## License
 
-UNLICENSED.
+Apache-2.0. See the repository's `LICENSE` and `NOTICE`.

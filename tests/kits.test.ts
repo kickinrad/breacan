@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The real kits, frozen at d0d1c10: each builds byte-identical to its golden manifest (path → sha256), apart from the generated header.
 // tests/kits/<kit>/ holds the Tokyo kits' inputs. Boombox's inputs stay in its private repo, so its golden runs only
 // when BOOMBOX_DESIGN names a checkout of it. That checkout's config from before it moved to Swatchbook still lists the

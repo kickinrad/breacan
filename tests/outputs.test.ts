@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The tailwind, obsidian and mealie outputs, built from a small kit (tests/outputs/) with a design/theme.toml.
 import { expect, test } from "bun:test";
 import { cpSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The template output: a kit's own files for apps the engine has no output for (terminal and editor themes), each a
 // template whose {{<mode>.<colour>}} slots the theme's palette fills.
 import { expect, test } from "bun:test";

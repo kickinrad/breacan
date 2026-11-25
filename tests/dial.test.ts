@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The dial for every foundation, from outside the engine: fixture kit D (walkthrough D) built on iOS with the fixture
 // Apple language, at each level and with a per-foundation override (acceptance 5). tests/dial/kit-d.golden.json holds
 // each level's resolved values, foundation by foundation; `BREACAN_DIAL_GOLDEN=write bun test tests/dial.test.ts`

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The Tune panel's page, served by breacan edit at /_breacan/panel. It reads the kit from the server, sends every edit to
 // it, and the server builds the edit and sends the result here. Inputs stay put while the rest redraws, so an open colour picker stays open.
 import { controls, tuneView, valueOf } from "./tune.js";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // DESIGN.md (Google's format, github.com/google-labs-code/design.md): replaces only the schema-supported front matter
 // groups; name, description, other keys and the body stay. A kit on the role contract writes its roles: the colour
 // roles by name, the fifteen type roles, the corners and the spacing scale, a component for each on-colour pair the

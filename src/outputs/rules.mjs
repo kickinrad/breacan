@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Rules: the kit's lint config, breacan.rules.json, which `breacan lint` reads in a consumer's repo. It names every
 // CSS variable the kit defines (so a reference to one it lacks is a finding), each variable's usage rules (the
 // contract's, then the kit's own from $extensions["com.kickinrad.breacan"].usage, which win) and the tokens an import

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The Kit panel's page in a DOM: a live update from the server redraws each control's status in place; an edit whose
 // request fails says so, frees the panel, and stays queued until the server has it; Save sends the queue first and
 // refuses while any of it is unsent.

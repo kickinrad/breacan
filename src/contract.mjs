@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The role contract: the one list of named roles every output may read, whatever kit or platform built it. It starts
 // from Material's system roles (the vendored md.sys tokens, so it follows Material) and adds, under breacan.sys, what
 // Apple and Fluent need beside them: a spacing scale, the smallest touch target, the icon set and the density.

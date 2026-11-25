@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The playground output: one kit-agnostic page on the kit's web outputs that carries the kit's data (tests/playground/ is the kit).
 import { expect, test } from "bun:test";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";

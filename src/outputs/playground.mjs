@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The playground: one page on the kit's generated web outputs, so the kit shows itself on its own theme.
 // Writes into options.path index.html, one file that opens from disk: its shell names no kit, and it carries the
 // kit's data (name, version, title, tokens per mode, notes and examples), the engine's client

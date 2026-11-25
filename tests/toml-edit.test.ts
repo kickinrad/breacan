@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // theme.toml edits change the edited value's line and nothing else (breacan edit's save).
 import { expect, test } from "bun:test";
 import { setValue } from "../src/toml-edit.mjs";

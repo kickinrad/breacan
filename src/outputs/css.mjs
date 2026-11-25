@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // CSS custom properties named from token paths, with optional media overrides,
 // an @layer wrapper, and a raw prelude before it.
 // A component's type role (Material names it as a string on an md.comp *-font token, such as "label-large")

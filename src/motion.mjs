@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Springs for the web. Material names a spring by damping ratio and stiffness (Compose's SpringSpec on
 // unit mass); CSS has no spring, so each becomes a linear() easing: the spring's position sampled from
 // rest to its settle time (within 0.1 % of the target), plus that settle time as the duration to pair

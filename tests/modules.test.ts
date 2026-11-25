@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The module shape { slot, name, reads, writes, run } and presets, from outside the engine.
 import { expect, test } from "bun:test";
 import { cpSync, existsSync, writeFileSync } from "node:fs";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Walkthrough C: a Base16 or Base24 scheme becomes a whole kit; the base fills the rest.
 import { expect, test } from "bun:test";
 import { cpSync, writeFileSync } from "node:fs";

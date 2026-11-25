@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The platform layer and the dial (flow steps 6 and 7). A kit lists its platforms in `platforms`, each with a
 // language (a module { slot: "language", name, run() → { <foundation or chrome>: <DTCG tree> } }, the platform's
 // native values) and a dial: a level, or { level, <foundation>: "theme" | "platform" } to set one foundation against

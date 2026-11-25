@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A kit's hand-written design/theme.toml becomes token layers in memory: nothing is written beside it.
 import { expect, test } from "bun:test";
 import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";

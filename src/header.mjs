@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A kit's generated text files start with a header saying so; the check fails one that lacks it.
 // Contract (the systems guard reads the same): one of the first 10 lines matches HEADER_LINE.
 import { extname } from "node:path";

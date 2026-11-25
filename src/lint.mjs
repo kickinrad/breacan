@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Drift guard: flag a value a consumer hand-typed that the theme defines. Text scanning, line by line. With a kit's
 // rules (breacan.rules.json, the rules output) it also flags a kit variable the kit lacks, a token used against its
 // usage rule, and an emoji standing in for an icon in markup. The checks follow the static gates of

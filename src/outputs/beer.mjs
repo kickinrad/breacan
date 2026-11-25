@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Beer CSS (github.com/beercss/beercss, MIT) themed by the kit: Beer's variables set from the kit's, so the
 // kit's stylesheet decides the mode. Beer names its colour variables after Material's roles, so every
 // md.sys.color role the kit has becomes one; Beer reads the ones it knows. Three values read the kit's own tokens,

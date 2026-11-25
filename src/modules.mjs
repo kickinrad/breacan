@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Every part of a build outside the engine is a module of one shape: { slot, name, reads, writes, run(ctx) }.
 // `slot` says when the engine runs it, `reads` names what of ctx it needs, and `writes` maps each option that says
 // where it writes to its default, null when the config must set it. A preset is a named list of built-in modules.

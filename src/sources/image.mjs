@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // An image's palette as seeds. Material's quantiser (material-color-utilities, Apache-2.0) counts the picture's
 // colours and its scorer ranks the ones fit to seed a scheme; the top three go to a colour engine, which makes every
 // role from them. Bun decodes any format it reads, and the pixels are read from a small PNG of it.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // breacan edit: serves the project on localhost (/ opens the playground, when the config has one) and the Kit panel,
 // builds every edit in memory as the engine builds it, and pushes the result live to every page that listens to
 // /_breacan/events. Save writes the edits into the kit's token files (theme.toml, else the colours of tokens/*.tokens.json),

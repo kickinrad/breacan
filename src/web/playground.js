@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The playground's client: a page drawn with Beer's own markup on the kit's generated theme. It reads the kit's
 // data from the page (the #kit element), and names no kit. Each destination's items come from its own module beside this
 // one; everything that draws is a pure function of the data and is exported; the page starts only where there is

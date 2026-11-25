@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Foundations: the kit's values, read from the mode's tokens and drawn in the live theme's variables.
 // Each item is { id, name, body(data, tokens) → html }; the colour maths are the engine's, in "../color.mjs".
 import { bestOn, contrast } from "../color.mjs";

@@ -5,6 +5,6 @@
     "name": "Wils",
     "email": "wils@bestfootforward.business"
   },
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "keywords": ["apple", "ios", "design-tokens", "breacan"]
 }

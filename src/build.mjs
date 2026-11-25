@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // DTCG 2025.10 tokens/*.tokens.json is the only value source. The engine loads and stacks the layers, resolves
 // them, runs the config's modules (src/modules.mjs) and writes or checks their files.
 import { existsSync } from "node:fs";
