@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Components: Beer's full set, live on the theme, in Beer's own markup. Each item is { id, name, body(data, tokens) → html }.
 // The small builders are exported: cards.js composes cards from them and pages.js composes pages from both.
 // Every string is trusted literal markup, so nothing is escaped. A toggle is Beer's data-ui with no target, which

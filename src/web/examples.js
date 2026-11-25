@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Examples: a project's own previews of the kit it builds from, each from an entry the project owns (a JSON file its
 // config names, carried in the page as { base, entry }, base the path from the page to the entry's folder). An entry
 // is { name, surface, output, preview?, captures?, devices? }: `preview` a live web page, `captures`

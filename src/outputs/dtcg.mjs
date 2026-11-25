@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // DTCG: the kit's resolved tokens as DTCG 2025.10 files that any tool reads, breacan too (as an `include` layer, with
 // each other mode's file under that mode's `media` query). <path>/<name>.tokens.json holds the base mode;
 // <path>/<name>.<mode>.tokens.json holds each other mode's tokens whose value differs from the base. Aliases are

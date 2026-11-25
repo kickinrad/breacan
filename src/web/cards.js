@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Cards: M3's three cards (elevated, filled, outlined), composed from the components' builders into four realistic cards.
 // Each item is { id, name, body(data, tokens) → html }; the card builders are exported for pages.js.
 import { button, card, chip, icon, iconButton, list, listItem, reference, row, switchRow, toggles } from "./components.js";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The resolver: layers merge lowest first, and a token's type comes from itself, its group, its alias, or the
 // token it replaced.
 import { expect, test } from "bun:test";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Tailwind v4 output: one @theme inline block mapping Tailwind's namespaces onto the kit's runtime CSS
 // variables (the `css` output's file), so a utility reads the kit's variable where it is used and follows
 // every mode like everything else. Every value is one variable; the lists come from the tokens, so the file

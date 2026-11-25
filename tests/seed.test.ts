@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Walkthrough A: two seed colours make a whole kit. The colour engines meet their own standards.
 import { expect, test } from "bun:test";
 import { join } from "node:path";

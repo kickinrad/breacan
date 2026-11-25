@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Standard in, standard out: a kit's resolver output loads in Terrazzo's parser and Swatchbook's loader, and a plain
 // DTCG folder governed by a resolver, with no theme.toml, builds.
 import { expect, test } from "bun:test";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Derived colour roles: the on-colours, containers and fixed roles Material names but a palette has no step for,
 // computed from a kit's roles by its theme's [derived] recipe, before the build resolves anything else, so one
 // run is final. The result is two token trees, one for the base mode and one for the other mode:

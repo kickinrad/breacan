@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The role contract and the Breacán-neutral base: a kit that sets nothing builds whole, every role in every mode.
 import { expect, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";

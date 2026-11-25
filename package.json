@@ -6,7 +6,7 @@
   "bin": {
     "breacan": "bin/breacan.mjs"
   },
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "private": true,
   "author": "wils <wils@bestfootforward.business>",
   "dependencies": {
@@ -26,5 +26,8 @@
     "happy-dom": "latest",
     "react-native": "latest",
     "typescript": "latest"
+  },
+  "overrides": {
+    "apca-w3": "file:./stubs/apca-w3"
   }
 }

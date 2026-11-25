@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The Leonardo colour engine (Adobe, Apache-2.0), the default: each seed becomes an accent family whose every role
 // is generated at a target contrast against the base's surface in that scheme. Greys stay the base's.
 // Options: seeds (one to three hex colours: primary, then secondary, then tertiary).

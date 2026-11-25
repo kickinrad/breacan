@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The Kit panel's control model: plain names first (the theme.toml path is the detail), DTCG's groups, each colour
 // with the pairs that hold it and whether they pass, and units on every length and time.
 import { expect, test } from "bun:test";

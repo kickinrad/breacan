@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Acceptance 10 from outside: each DESIGN.md passes Google's design.md lint, a kit's plugin gives an agent its skill,
 // rules and lint config, and the rules lint it carries flags a planted breach.
 import { expect, test } from "bun:test";

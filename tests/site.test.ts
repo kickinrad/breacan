@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Walkthrough B: a website becomes a kit, from a local fixture page served on localhost (acceptance 11). The values
 // it extracts are primitives marked `needs-review`; confident matches fill roles and the base fills the rest.
 import { afterAll, beforeAll, expect, test } from "bun:test";

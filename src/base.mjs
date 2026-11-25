@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The Breacán-neutral base: a value for every role in the contract, so a kit that sets nothing still builds whole.
 // Material's role model is the spine (builtin:material sits beneath). Greys and the accent scales are Radix Colors
 // (MIT); the type and spacing scales follow Spectrum; motion durations, easings and elevation tiers follow Fluent 2.

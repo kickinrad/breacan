@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Springs for the web: Material's damping ratio and stiffness become a CSS linear() easing (the
 // unit-mass spring's position sampled over its settle time), so a web port animates with the same
 // curve Compose's SpringSpec gives.

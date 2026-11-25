@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Obsidian output: a CSS snippet per mode for the Minimal theme, from the Material roles. Minimal's contract
 // is eight accent slots, an interactive accent as HSL parts, three backgrounds, three UI tints, three text
 // tiers, two highlights, the code colours and the monospace face. The base mode comes first, the first media mode second.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The built-in Material layer: the vendored androidx data plus the cited values it lacks.
 import { expect, test } from "bun:test";
 import vendored from "../material/material.tokens.json" with { type: "json" };

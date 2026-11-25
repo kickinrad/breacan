@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // `breacan audit`: the playground as a browser draws it. Opens the generated playground from disk in headless Chrome
 // (over the DevTools protocol, so the engine needs no browser library) at a desktop and a phone size, under a host's
 // reset as a page that embeds or publishes it would add, and runs src/audit.js on every destination and item in

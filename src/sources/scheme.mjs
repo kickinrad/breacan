@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A Base16 or Base24 scheme (tinted-theming's YAML) as a kit's colours. base00 to base07 are the neutral ramp, the
 // accents fill Material's accent roles, and the sixteen ANSI colours map as tinted-theming's shell templates map
 // them. A scheme gives its own variant (light or dark); the other scheme stays the base's unless a second file

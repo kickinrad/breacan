@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Template output: a kit's own files for apps the engine has no output for (terminal and editor themes, say). Every
 // file under options.from is written to the same path under options.to, each {{<mode>.<colour>}} slot the theme's
 // palette colour in that mode (#rrggbb, so an alpha can follow it), {{name}} the kit's name; every other byte stays

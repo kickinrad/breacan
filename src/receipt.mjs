@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The receipt: breacan.receipt.json, written by each build, holds the sha256 of every input the build read and every
 // file it wrote. `breacan check` holds the working tree to it: an input changed since the build, or an output edited
 // by hand, fails naming the file. A newer engine that would write different bytes does not fail a check; the next

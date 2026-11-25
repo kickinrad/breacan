@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // `breacan lint` fails a consumer's hand-typed colour, motion, type size, radius, spacing or z-index, and markup off Beer.
 import { expect, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";

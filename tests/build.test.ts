@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Golden outputs were frozen from the design-system 2.1.0 template; any byte change fails.
 import { expect, test } from "bun:test";
 import { appendFileSync, cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";

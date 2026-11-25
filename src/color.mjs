@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Colour arithmetic shared by every target and check: WCAG contrast, sRGB mixes, on-colours and
 // Material state layers over a surface. Pure functions over hex strings; no palette knowledge.
 // sRGB to linear, the sRGB spec's threshold (IEC 61966-2-1: 0.04045; WCAG 2.0 printed 0.03928, WCAG 2.1 corrected it).

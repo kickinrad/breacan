@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A kit's hand-written <root>/theme.toml: its palette per mode, the Material roles it fills from it, its faces,
 // the other values it adds or changes, and the recipes and floors the build applies. The build reads it as token
 // trees in memory, one for the base mode and one per other mode; nothing is written beside it.

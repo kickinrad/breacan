@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The derived roles: on-colours, accent containers, fixed roles and group marks, from theme.toml's [derived],
 // computed in memory and read by every output, as the css output shows.
 import { expect, test } from "bun:test";

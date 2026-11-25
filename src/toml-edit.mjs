@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Sets one value in a theme.toml's text in place, so a saved edit changes that value's line and nothing else.
 // `path` is the value's full key ("palette.night.primary", "faces.brand", "tokens.acme.layout.gap"); `value` is a
 // string, a number or a list of strings. A key already set keeps its line, its spelling and its comment, and a token

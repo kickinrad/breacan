@@ -1,0 +1,46 @@
+Breacán
+Copyright 2026 Kick In Rad
+
+This product includes software developed at Kick In Rad (https://github.com/kickinrad/breacan).
+Breacán is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It carries and bundles the third-party works below. Each stays under its own licence.
+
+Material 3 tokens, from the Android Open Source Project (Apache-2.0)
+  The files under material/ are Google's androidx Compose Material 3 token files, converted to DTCG by
+  scripts/vendor-m3.mjs; scripts/fixtures/ holds the Kotlin sources the converter's tests read. The pinned
+  commit is in material/manifest.json.
+  Copyright 2021, 2022, 2023, 2024 The Android Open Source Project
+  https://github.com/androidx/androidx
+
+Beer CSS (MIT)
+  The compiled binary embeds beer.min.css and beer.min.js from the beercss package, and the beer, playground
+  and Claude Design outputs write them into a project.
+  Copyright (c) 2021 Beer css!
+  https://github.com/beercss/beercss
+
+Dracula colour scheme (MIT), a test fixture
+  tests/schemes/dracula.itermcolors, from github.com/mbadolato/iTerm2-Color-Schemes.
+  Copyright (c) 2011 Mark Badolato; the Dracula theme is Copyright (c) Zeno Rocha.
+
+Enki Tokyo Night scope structure (MIT), a test fixture
+  The bat and Codex tmTheme templates under tests/kits/tokyo-mono/ derive their scope structure from
+  Enki-Tokyo-Night by Kristi Russell. https://github.com/enkia/enki-theme
+
+Packages bundled into the binary
+  The binary bundles the production dependencies in package.json and everything they install. Their licences
+  are permissive (MIT, ISC, BSD-2-Clause, BSD-3-Clause and Apache-2.0); `bun scripts/licence-audit.mjs`
+  lists each one and fails on any copyleft or unreadable licence. Those that need a notice:
+  - @adobe/leonardo-contrast-colors, Apache-2.0, Copyright Adobe
+  - @material/material-color-utilities, Apache-2.0, Copyright 2021 Google LLC
+  - playwright-core, Apache-2.0, Copyright (c) Microsoft Corporation (derived in part from Puppeteer, Apache-2.0)
+  - @radix-ui/colors, MIT, Copyright (c) 2021 Radix
+  - @terrazzo/parser, MIT, Copyright (c) 2024 Drew Powers
+  - dembrandt, MIT, Copyright (c) 2025 thevangelist
+  - pngjs, MIT, Copyright (c) 2015 Luke Page & Original Contributors, (c) 2012 Kuba Niegowski
+  - yaml, ISC, Copyright Eemeli Aro
+  - @modelcontextprotocol/sdk, MIT, Copyright (c) 2024 Anthropic, PBC
+  The remaining packages are MIT, ISC or BSD, each with the copyright line in its own LICENSE file.
+
+  Leonardo imports apca-w3 (a restrictive W3 licence, which depends on AGPL-3.0 colorparsley) for an APCA
+  formula Breacán never selects. package.json's `overrides` swaps it for stubs/apca-w3, so neither ships.

@@ -1,5 +1,6 @@
 [tools]
 bun = "latest"
+uv = "latest"
 
 [tasks.setup]
 run = "bun install"
@@ -17,3 +18,10 @@ run = [
   "bun build --compile --target=bun-linux-x64 --external \"chromium-bidi/*\" --asset src/color.mjs --asset src/web --asset node_modules/beercss/dist/cdn bin/breacan.mjs --outfile dist/breacan",
   "tar -czf dist/breacan-linux-x64.tar.gz -C dist breacan",
 ]
+
+[tasks.reuse]
+run = "uvx reuse lint"
+
+[tasks.licence]
+# Fails when a production dependency, transitive ones included, is copyleft or has no readable licence.
+run = "bun scripts/licence-audit.mjs"

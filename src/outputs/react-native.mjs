@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // React Native / Expo values for both theme modes. CSS-only shadows and Material's unchanged
 // component defaults stay out; the rest keep their DTCG path as a nested, typed object.
 import { twoModes } from "../system.mjs";

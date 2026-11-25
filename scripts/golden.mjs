@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Rebuild a frozen kit in a scratch copy and print its golden manifest (output path → sha256) for tests/kits/.
 // Usage: bun scripts/golden.mjs <kit directory> > tests/kits/<kit>.golden.json. Review the diff: a changed digest is a
 // changed output and the PR says why.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Pages: M3's canonical layouts, each composed from cards and components in a framed area. A layout with panes is a
 // main of its own, so layout.css lays its panes out as it does the page's.
 // Each item is { id, name, body(data, tokens) → html }.

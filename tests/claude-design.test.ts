@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The claude-design output: the kit as a Claude Design System artifact's files (tests/playground/ is the kit).
 import { expect, test } from "bun:test";
 import { cpSync, renameSync, writeFileSync } from "node:fs";

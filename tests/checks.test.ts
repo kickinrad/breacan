@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Acceptance 6 from outside: each check fails correctly, naming what is wrong.
 import { expect, test } from "bun:test";
 import { appendFileSync, cpSync, mkdirSync, writeFileSync } from "node:fs";

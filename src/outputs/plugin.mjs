@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Plugin: the kit's agent plugin, one directory that Claude Code and Codex both install, written under options.path:
 // .claude-plugin/plugin.json (the manifest) and, beside the kit's own skills/<name>/SKILL.md, its references:
 // components.md (each component with its Material 3 guidance and, with a beer output, Beer's markup), DESIGN.md (the

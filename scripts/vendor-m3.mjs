@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Vendors Google's generated androidx Compose Material 3 token files (Apache-2.0) as DTCG 2025.10 under material/,
 // the engine's built-in Material baseline (`builtin:material` in a config's include, see src/material.mjs). References
 // become aliases by name; a declaration or value form not listed here throws naming file:line.

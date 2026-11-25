@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A DTCG 2025.10 resolver document as the build's layers, read through Terrazzo's parser. The resolver's default
 // input is the base mode. It may have one modifier, the mode: each other context becomes a media layer, under the
 // query its $extensions name ({ "com.kickinrad.breacan": { "media": { "<context>": "<query>" } } }).

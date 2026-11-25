@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // iOS foundations for the dial. Point measurements use DTCG's px unit because the current output contract has no pt.
 // A native renderer should use the named UIKit/SwiftUI APIs for adaptive colour, type, materials and motion.
 // Only what Apple publishes as fixed values is here: colour swatches (light and dark), the 44 pt hit region, type

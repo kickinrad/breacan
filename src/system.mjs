@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // What the outputs read of a kit's tokens, by the kit's name (ctx.name): the colour roles, the corner scale,
 // a role's path. Pure functions over the resolved tokens.
 import { byPath } from './color.mjs';

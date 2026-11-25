@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // `breacan new --seed <hex> [--seed <hex>…] [--engine leonardo|material] [<dir>]`: a starter kit in <dir> (here by
 // default), named for the folder. Its look is the seeds alone; the base fills everything else. Writes nothing over
 // an existing kit.

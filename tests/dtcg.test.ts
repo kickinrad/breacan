@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // The dtcg output: a kit's resolved tokens as DTCG files, which a consumer includes to build its own outputs.
 import { expect, test } from "bun:test";
 import { cpSync, mkdirSync, writeFileSync } from "node:fs";

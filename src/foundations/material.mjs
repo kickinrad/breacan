@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Material's colour engine (material-color-utilities, Apache-2.0): the first seed makes Material's tonal-spot scheme,
 // every colour role in both schemes, greys included. A second or third seed replaces the secondary or tertiary
 // palette with that seed's own tones.

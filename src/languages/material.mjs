@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Android foundations for the dial: Material 3's baseline, from the vendored androidx tokens (material/, Apache-2.0).
 // Only what Material publishes as fixed values is here: baseline colour roles (light and dark), Roboto and the type
 // scale, the shape corner scale, motion durations and easings, elevation levels, the 48 dp touch target and Material

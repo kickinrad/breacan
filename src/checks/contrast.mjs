@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // A kit's theme.toml sets contrast floors: [contrast] text and graphics. The build checks Material's own pairs at
 // them (each on-colour on its colour, the fixed roles, on-surface on the page, the card and the top surface,
 // outline on every surface), each derived mark group's pairs, and any pairs the kit lists; a named exception

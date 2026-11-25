@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // DTCG 2025.10 trees in, resolved tokens out. Layers merge in order, a later one overriding an earlier one;
 // a token set in two `strict` layers is an error. Groups pass their $type down, aliases resolve, and each
 // value becomes its CSS scalar.

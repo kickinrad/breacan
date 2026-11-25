@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // `breacan audit` on a kit: the sample kit (tests/playground/ with tests/render.theme.toml, a complete theme) passes in
 // headless Chrome; a page that breaks a rule fails, naming it. Needs Chrome (`breacan audit` finds it).
 import { expect, test } from "bun:test";

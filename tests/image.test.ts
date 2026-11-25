@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // An image's palette seeds a colour engine (acceptance 11). tests/image/bands.png is three bands, teal #1b9a8a,
 // coral #e86a4f and navy #222f5b, made for this test with a script; it is dedicated to the public domain (CC0).
 import { expect, test } from "bun:test";

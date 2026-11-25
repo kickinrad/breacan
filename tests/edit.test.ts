@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Kick In Rad
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // breacan edit: an edit is built in memory and sent live; only its own pages may edit or save; save writes exactly the
 // edited values into theme.toml, and the outputs pass --check after (tests/playground/ is the kit).
 import { afterAll, expect, test } from "bun:test";
