@@ -5,7 +5,7 @@ description: Make or change design tokens and a design kit with Breacán. Use wh
 
 # Make a kit
 
-A kit is one look that Breacán builds into every platform's files. The engine's [README](https://github.com/kickinrad/breacan#readme) is the authority for every config option, module and check; read the section you need before configuring.
+A kit is one look that Breacán builds into every platform's files. The engine's [reference docs](https://github.com/kickinrad/breacan/tree/main/docs) are the authority for every config option, module and check; read the page you need before configuring.
 
 1. **Start.** With seed colours, run `breacan new --seed <hex> [--seed <hex>…] [<dir>]` (add `--engine material` for Material's tonal scheme). The base fills type, spacing, shape, motion and icons, so two seeds already build whole. An existing kit keeps its `breacan.config.mjs`.
 2. **Change the look in one place.** Seeds live in the engine's options. Palette, roles and faces live in `<kit root>/theme.toml`. Anything else goes in `tokens/*.tokens.json`, DTCG 2025.10. Write only what differs from the base, with a comment wherever a value departs from Material saying why. Never edit a generated file.
