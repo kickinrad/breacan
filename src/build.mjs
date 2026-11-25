@@ -149,51 +149,6 @@ export const build = async (config = {}, { check = false, preview = false, theme
   }
   const mark = (token) => own.has(token.path) ? token : { ...token, builtin: true };
   const tokens = resolved.map(entry).map(mark);
-  // Resolve each platform after each mode's theme layers, so the dial's selected language values win in both modes.
-  const platforms = {};
-  // A language is told each mode's colour scheme: the kit names its modes, but a mode's media query says light or dark,
-  // and the base mode takes the opposite of the scheme query's.
-  const schemeOf = (query, name) => {
-    const scheme = /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1];
-    if (!scheme) throw new Error(`platforms need each mode's colour scheme, and the mode ${name} has no prefers-color-scheme media query`);
-    return scheme;
-  };
-  const schemes = config.platforms ? Object.fromEntries(Object.keys(media).map((query) => [query, schemeOf(query, modes?.media?.[query] ?? query)])) : {};
-  const [otherScheme] = Object.values(schemes);
-  if (config.platforms && !otherScheme) throw new Error(`platforms need each mode's colour scheme, and the base mode ${modes?.base ?? "base"} has no other mode to tell it from`);
-  const tint = tokens.find((token) => token.path === "md.sys.color.primary")?.value;
-  // The playground's columns: the Breacán-neutral base alone (Material's spec, the shared scales and one scheme's colours,
-  // and the colour engine when the kit has one), and with a platform's language over it at Native, resolved in each mode
-  // as a platform is (`columns.base`, and `native` on each platform).
-  const neutral = (scheme) => [{ tree: material.tokens(), file: material.name }, { tree: shared(), file: "builtin:base" }, { tree: colours(scheme), file: "builtin:base" },
-    ...engines.map((engine, i) => ({ tree: engine[scheme], file: `module:${foundations[i].name}` }))];
-  const schemeIn = (query) => /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1] ?? baseScheme;
-  const column = async (layersFor) => {
-    const mine = new Set();
-    const at = async (mode, scheme) => {
-      const extra = layersFor ? await layersFor({ mode, scheme }) : [];
-      for (const layer of extra) collect(layer.tree, [], mine);
-      return (await resolveLayers([...neutral(scheme), ...extra])).map(entry).map((token) => mine.has(token.path) ? token : { ...token, builtin: true });
-    };
-    const result = { tokens: await at(modes?.base, baseScheme), media: {} };
-    for (const query of Object.keys(media)) result.media[modes?.media?.[query] ?? query] = await at(modes?.media?.[query], schemeIn(query));
-    return result;
-  };
-  const columns = modules.some((module) => module.name === "playground") ? { base: await column() } : undefined;
-  for (const { platform, level, layersFor, nativeFor } of await platformLayers(config.platforms, { tint })) {
-    const ownHere = new Set(own);
-    const baseLayers = await layersFor({ mode: modes?.base, scheme: otherScheme === "dark" ? "light" : "dark" });
-    for (const layer of baseLayers) collect(layer.tree, [], ownHere);
-    const markHere = (token) => ownHere.has(token.path) ? token : { ...token, builtin: true };
-    const platformModes = {};
-    for (const [query] of Object.entries(media)) {
-      const layers = await layersFor({ mode: modes?.media?.[query], scheme: schemes[query] });
-      for (const layer of layers) collect(layer.tree, [], ownHere);
-      platformModes[modes?.media?.[query] ?? query] = (await resolveLayers([...modeLayers(query), ...layers])).map(entry).map(markHere);
-    }
-    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...baseLayers])).map(entry).map(markHere), media: platformModes, ...(columns && { native: await column(nativeFor) }) };
-  }
-
   // Each other mode resolves once, when a target or the contrast check first asks for it. A target passes back the
   // layers it was given in ctx.media.
   const cache = new Map();
@@ -217,6 +172,51 @@ export const build = async (config = {}, { check = false, preview = false, theme
     });
   };
 
+  // Resolve each platform after each mode's theme layers, so the dial's selected language values win in both modes.
+  const platforms = {};
+  // A language is told each mode's colour scheme: the kit names its modes, but a mode's media query says light or dark,
+  // and the base mode takes the opposite of the scheme query's.
+  const schemeOf = (query, name) => {
+    const scheme = /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1];
+    if (!scheme) throw new Error(`platforms need each mode's colour scheme, and the mode ${name} has no prefers-color-scheme media query`);
+    return scheme;
+  };
+  const schemes = config.platforms ? Object.fromEntries(Object.keys(media).map((query) => [query, schemeOf(query, modes?.media?.[query] ?? query)])) : {};
+  // Each mode's primary colour is the tint on that mode's system chrome.
+  const tintOf = (set) => set.find((token) => token.path === "md.sys.color.primary")?.value;
+  const tints = config.platforms ? Object.fromEntries(await Promise.all(Object.keys(media).map(async (query) => [query, tintOf(await mediaTokens(media[query]))]))) : {};
+  // The playground's columns: the Breacán-neutral base alone (Material's spec, the shared scales and one scheme's colours,
+  // and the colour engine when the kit has one), and with a platform's language over it at Native, resolved in each mode
+  // as a platform is (`columns.base`, and `native` on each platform).
+  const neutral = (scheme) => [{ tree: material.tokens(), file: material.name }, { tree: shared(), file: "builtin:base" }, { tree: colours(scheme), file: "builtin:base" },
+    ...engines.map((engine, i) => ({ tree: engine[scheme], file: `module:${foundations[i].name}` }))];
+  const schemeIn = (query) => /prefers-color-scheme:\s*(light|dark)/.exec(query)?.[1] ?? baseScheme;
+  const column = async (layersFor) => {
+    const mine = new Set();
+    const at = async (mode, scheme, tint) => {
+      const extra = layersFor ? await layersFor({ mode, scheme, tint }) : [];
+      for (const layer of extra) collect(layer.tree, [], mine);
+      return (await resolveLayers([...neutral(scheme), ...extra])).map(entry).map((token) => mine.has(token.path) ? token : { ...token, builtin: true });
+    };
+    const result = { tokens: await at(modes?.base, baseScheme, tintOf(tokens)), media: {} };
+    for (const query of Object.keys(media)) result.media[modes?.media?.[query] ?? query] = await at(modes?.media?.[query], schemeIn(query), tints[query]);
+    return result;
+  };
+  const columns = modules.some((module) => module.name === "playground") ? { base: await column() } : undefined;
+  for (const { platform, level, layersFor, nativeFor } of await platformLayers(config.platforms)) {
+    const ownHere = new Set(own);
+    const baseLayers = await layersFor({ mode: modes?.base, scheme: baseScheme, tint: tintOf(tokens) });
+    for (const layer of baseLayers) collect(layer.tree, [], ownHere);
+    const markHere = (token) => ownHere.has(token.path) ? token : { ...token, builtin: true };
+    const platformModes = {};
+    for (const [query] of Object.entries(media)) {
+      const layers = await layersFor({ mode: modes?.media?.[query], scheme: schemes[query], tint: tints[query] });
+      for (const layer of layers) collect(layer.tree, [], ownHere);
+      platformModes[modes?.media?.[query] ?? query] = (await resolveLayers([...modeLayers(query), ...layers])).map(entry).map(markHere);
+    }
+    platforms[platform] = { level, tokens: (await resolveLayers([...include, ...source, ...baseLayers])).map(entry).map(markHere), media: platformModes, ...(columns && { native: await column(nativeFor) }) };
+  }
+
   const review = tokens.filter((token) => token.review);
   if (review.length && !preview) console.log(`${review.length} token${review.length === 1 ? " needs" : "s need"} review (flagged by an import): ${review.map((token) => token.path).join(", ")}`);
   if (base) {
@@ -224,7 +224,13 @@ export const build = async (config = {}, { check = false, preview = false, theme
     for (const [query, layers] of Object.entries(media)) byMode[modes.media[query] ?? query] = await mediaTokens(layers);
     checkContract(byMode);
   }
-  const contrast = await checkContrast(theme.contrast && contrastPairs(theme, tokens), { tokens, media, mediaTokens, names: modes });
+  const pairs = theme.contrast && contrastPairs(theme, tokens);
+  const contrast = await checkContrast(pairs, { tokens, media, mediaTokens, names: modes });
+  // Each platform's resolved modes meet the same floors, so a language's colours can't slip under them.
+  for (const [platform, each] of Object.entries(platforms)) {
+    const byQuery = Object.fromEntries(Object.keys(media).map((query) => [query, each.media[modes?.media?.[query] ?? query]]));
+    contrast.push(...(await checkContrast(pairs, { tokens: each.tokens, media: byQuery, mediaTokens: (set) => set, names: modes })).map((line) => `platform ${platform}: ${line}`));
+  }
   if (contrast.length && !preview) throw new Error(`Contrast check failed:\n${contrast.map((line) => `  ${line}`).join("\n")}`);
 
   // Every file a module reads, and every folder it lists, is an input the receipt holds.
