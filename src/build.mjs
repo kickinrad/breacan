@@ -85,7 +85,7 @@ export const build = async (config = {}, { check = false, refresh = false, previ
   // Every file a module reads, and every folder it lists, is an input the receipt holds; a source reads its own through `read`.
   const reads = new Set();
   const read = async (path) => { const text = await readFile(path, "utf8"); reads.add(path); return text; };
-  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]), refresh, read })));
+  const engines = await Promise.all(foundations.map(async (module) => module.run({ options: optionsFor(module, {}, config[module.name]), check, refresh, read })));
   const schemeQuery = Object.keys(media).find((query) => /prefers-color-scheme:\s*(light|dark)/.test(query));
   if (base && !modes) {
     modes = { base: "light", media: { "(prefers-color-scheme: dark)": "dark" } };

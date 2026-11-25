@@ -1,9 +1,9 @@
 // Walkthrough B: a website becomes a kit, from a local fixture page served on localhost (acceptance 11). The values
 // it extracts are primitives marked `needs-review`; confident matches fill roles and the base fills the rest.
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { writeFileSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { command, read, root, scratch } from "./helpers";
+import { command, read, root, run, scratch } from "./helpers";
 
 let server: ReturnType<typeof Bun.serve>;
 beforeAll(() => { server = Bun.serve({ port: 0, fetch: () => new Response(Bun.file(join(root, "tests/site/index.html")), { headers: { "content-type": "text/html" } }) }); });
@@ -58,6 +58,14 @@ test("a website builds a whole kit: its values are primitives marked needs-revie
   expect(JSON.parse(read(dir, "breacan.receipt.json")).inputs.map((input: { path: string }) => input.path)).toContain("design/site.json");
   expect((await build(dir, "--refresh")).stderr).toContain("net::ERR_CONNECTION_REFUSED");
   expect(files.map((file) => read(dir, file))).toEqual(before);
+}, 60_000);
+
+test("breacan check with no snapshot fails naming the file, and neither writes it nor reads the page", () => {
+  const dir = kit({ url: `http://localhost:${server.port}/` });
+  const result = run(dir, "check");
+  expect(result.exitCode).not.toBe(0);
+  expect(result.stderr.toString()).toContain("site: design/site.json is missing; run breacan build");
+  expect(existsSync(join(dir, "design"))).toBe(false);
 }, 60_000);
 
 test("a bad url, or an unknown engine, fails naming the option", async () => {

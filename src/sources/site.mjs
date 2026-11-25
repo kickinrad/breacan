@@ -56,12 +56,14 @@ export default {
   name: "site",
   reads: [],
   writes: {},
-  async run({ options, refresh, read }) {
+  async run({ options, check, refresh, read }) {
     const { url, snapshot = "design/site.json" } = options;
     if (typeof url !== "string" || !/^https?:\/\//.test(url)) throw new Error('site option "url" must be an http or https address');
     engineOf("site", options);
     // The page is read once and kept: a build reads the snapshot, so the same kit builds the same offline, and the
     // network is touched only when the snapshot is missing or a refresh is asked for.
+    // A check never writes and never reads the page.
+    if (check && !existsSync(snapshot)) throw new Error(`site: ${snapshot} is missing; run breacan build`);
     if (refresh || !existsSync(snapshot)) {
       mkdirSync(dirname(snapshot), { recursive: true });
       writeFileSync(snapshot, `${JSON.stringify(await extract(url), null, 2)}\n`);
