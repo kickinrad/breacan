@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2026 Kick In Rad
+// SPDX-FileCopyrightText: 2026 William Tierney
 //
 // SPDX-License-Identifier: Apache-2.0
 
