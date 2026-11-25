@@ -83,7 +83,7 @@ A preset is a named list of modules. The default preset holds DTCG with the reso
 - An old repo is archived only after its last consumer has moved.
 - The aliases go in the final contract step.
 
-**Licence.** Apache-2.0 core with a CLA. Paid add-ons later live in a separate private repo.
+**Licence.** Apache-2.0, copyright William Tierney, with no CLA: contributions come in under Apache-2.0 itself (its section 5), and each contributor keeps the copyright in what they wrote. Paid add-ons later live in a separate private repo and use no community code.
 
 **Decisions taken here.**
 
@@ -310,6 +310,7 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - Trademark search on record, preliminary and not legal advice: risk low to low-medium. No Breacán or Breacan mark, brand or package found; the name is free on npm, PyPI, crates.io and Homebrew. Nearest hit: a UK Class 9 application, Breacanaute (UK00004244839), owner and status unconfirmed. Two empty GitHub names, `breacan-dev` and `breacan-systems`, were created 18 Oct 2026. Still to do by hand: USPTO, EUIPO TMview and WIPO for BREACAN, BRECAN, BREACHAN and BRACKAN in Classes 9, 42 and 35, and the UK IPO register for Breacanaute.
   - The repo was already public (ADR-016); the owner kept it public, since every consumer installs the binary from its public releases.
   - Tasks 20 (Figma part) and 22 (Penpot) stay open until the owner has the accounts.
+- Licence follow-up (owner's call, #150): the copyright holder is William Tierney, replacing a wrong guess ("Kick In Rad") from #148, and the CLA is gone. Contributions come in under Apache-2.0's section 5, with nothing to sign; a new file carries its author's name. A CLA can be added before outside code arrives if relicensing ever matters.
 
 ## Related
 
