@@ -69,7 +69,7 @@ A preset is a named list of modules. The default preset holds DTCG with the reso
 
 **Homes.**
 
-- `kickinrad/breacan`: the renamed kumiko repo, private. It holds the engine, its modules, and a market with the `breacan` plugin and the language plugins.
+- `kickinrad/breacan`: the renamed kumiko repo, public (ADR-016). It holds the engine, its modules, and a market with the `breacan` plugin and the language plugins.
 - `kickinrad/tokyo`: the merged theme repo. It holds the palette, the app themes, the Material kit and a market of kit plugins.
 - `boombox-design`: the private Boombox theme repo, with web, iOS and Android kits and its own market.
 
@@ -180,7 +180,7 @@ Each check is red at kumiko d0d1c10 and is proved from outside the engine. Task 
 21. [x] **Local editor.** Live swatches and contrast that save back to token files; the dev server is then deleted. Route: implementation. Demo: acceptance 12. Blocked by: 18.
 22. [ ] **Penpot plugin.** Push and pull a kit's tokens through Penpot's plugin API, mapping Penpot themes to resolver sets. Route: implementation-hard. Demo: acceptance 13. Blocked by: 21.
 23. [x] **Contract.** Remove the `kumiko` alias, the old config name and `--check`; archive tokyo-material (tokyo-mono stays). Route: implementation-light. Demo: acceptance 14. Blocked by: 11, 17.
-24. [ ] **Public-ready.** LICENSE, NOTICE, CLA, SPDX headers, the licence audit in CI and the trademark search; Curator updates the hub. Route: here. Demo: acceptance 17. Blocked by: 22, 23.
+24. [x] **Public-ready.** LICENSE, NOTICE, CLA, SPDX headers, the licence audit in CI and the trademark search; Curator updates the hub. Route: here. Demo: acceptance 17. Blocked by: 22, 23.
 
 ## Run
 
@@ -303,6 +303,13 @@ Assumption: the repo stays public through the rename, as kumiko is today. ADR-01
   - `site` reads a page through Dembrandt (MIT, a new dependency, driving Chrome through playwright-core) into `needs-review` primitives; its primary, secondary and accent seed a colour engine, and its heading and body fonts fill the typefaces. The first build keeps the values in a snapshot (`design/site.json`), an input the receipt holds; later builds read it offline, `breacan build --refresh` reads the page again, and `breacan check` never writes or fetches.
   - `image` gives seeds from a picture through Material's quantiser and scorer, with pngjs (MIT).
   - Acceptance 11, these parts: binary tests build from a localhost fixture page (a second build with the server stopped is byte-identical) and from a CC0 image; a manual run on python.org passed `check`. The binary grew to about 115 MB. Review caught a live re-scrape on every build and a check that wrote the snapshot; both fixed before merge. Shipped: PR #145, released as 0.33.0.
+- Task 24, public-ready (implementation, Claude; owner signed off Apache-2.0 with a CLA; merged).
+  - #148 adds LICENSE (Apache-2.0), NOTICE, `CLA.md` and `CONTRIBUTING.md`, and sets Apache-2.0 in `package.json` and the plugin manifests. SPDX headers cover every source file; `REUSE.toml` covers JSON, goldens, generated files and third-party works, and `uvx reuse lint` passes on 237 files. The CSS that outputs embed byte for byte carries no header, noted in AGENTS.md.
+  - CLA: a contributor adds `login YYYY-MM-DD` to `.github/cla-signatures.txt` and ticks the PR template's box; the `cla` workflow checks both. The owner, Dependabot and release-please are exempt.
+  - Licence audit in CI fails on any copyleft or unknown licence among production dependencies; a planted GPL, LGPL, AGPL, restrictive and unlicensed package each failed it. It found `@adobe/leonardo-contrast-colors` → `apca-w3` (Limited W3 License) → `colorparsley` (AGPL-3.0); Breacán never selects APCA, so an override points `apca-w3` at a stub that throws if called (owner's call). All 154 production packages are now MIT, ISC, Apache-2.0 or BSD.
+  - Trademark search on record, preliminary and not legal advice: risk low to low-medium. No Breacán or Breacan mark, brand or package found; the name is free on npm, PyPI, crates.io and Homebrew. Nearest hit: a UK Class 9 application, Breacanaute (UK00004244839), owner and status unconfirmed. Two empty GitHub names, `breacan-dev` and `breacan-systems`, were created 18 Oct 2026. Still to do by hand: USPTO, EUIPO TMview and WIPO for BREACAN, BRECAN, BREACHAN and BRACKAN in Classes 9, 42 and 35, and the UK IPO register for Breacanaute.
+  - The repo was already public (ADR-016); the owner kept it public, since every consumer installs the binary from its public releases.
+  - Tasks 20 (Figma part) and 22 (Penpot) stay open until the owner has the accounts.
 
 ## Related
 
