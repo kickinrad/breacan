@@ -14,10 +14,12 @@ You keep the copyright in what you write, and the git history records who wrote 
 - `AGENTS.md` lists the rules that matter (frozen goldens, generated headers, the module shape).
 
 ```
-// SPDX-FileCopyrightText: <year> William Tierney
+// SPDX-FileCopyrightText: <year> <your name>
 //
 // SPDX-License-Identifier: Apache-2.0
 ```
+
+A new file carries its author's name, and an edited file keeps its existing line.
 
 A file that cannot carry a header (JSON, generated output, a golden) is covered in `REUSE.toml`. Third-party code
 needs its own licence and an entry in `NOTICE`.
