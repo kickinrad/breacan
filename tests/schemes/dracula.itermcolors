@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Dracula, from github.com/mbadolato/iTerm2-Color-Schemes (MIT licence, Copyright (c) 2011 Mark Badolato; Dracula theme MIT, Zeno Rocha). -->
+<!-- Dracula, from github.com/mbadolato/iTerm2-Color-Schemes (MIT license, Copyright (c) 2011 Mark Badolato; Dracula theme MIT, Zeno Rocha). -->
 <plist version="1.0">
 <dict>
 	<key>Ansi 0 Color</key>

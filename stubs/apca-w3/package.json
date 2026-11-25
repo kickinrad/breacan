@@ -1,7 +1,7 @@
 {
   "name": "apca-w3",
   "version": "0.0.0-breacan-stub",
-  "description": "Stands in for apca-w3, which Leonardo imports for its APCA contrast formula. apca-w3 carries a restrictive W3 licence and pulls in colorparsley (AGPL-3.0), so Breacán does not ship either.",
+  "description": "Stands in for apca-w3, which Leonardo imports for its APCA contrast formula. apca-w3 carries a restrictive W3 license and pulls in colorparsley (AGPL-3.0), so Breacán does not ship either.",
   "type": "module",
   "main": "index.js",
   "license": "Apache-2.0"
