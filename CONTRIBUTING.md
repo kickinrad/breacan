@@ -11,8 +11,8 @@ In your first pull request:
 3. Tick the agreement box in the pull request description (the template has it).
 
 The `cla` check in CI passes when your line is in the file and the box is ticked. You sign once; later pull
-requests pass without a new line, but each still has the box to tick. Pull requests from `dependabot[bot]` and
-`github-actions[bot]` (dependency and release PRs) are exempt. If you contribute for an employer, ask the maintainers
+requests pass without a new line, but each still has the box to tick. Pull requests from the owner (`kickinrad`) and from
+`dependabot[bot]` and `github-actions[bot]` (dependency and release PRs) are exempt. If you contribute for an employer, ask the maintainers
 for a company agreement first (`CLA.md`, section 3).
 
 The check reads your own pull request's file, and the line must carry the login that opened the pull request, so

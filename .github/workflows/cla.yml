@@ -12,8 +12,8 @@ jobs:
   cla:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # Dependency and release pull requests are exempt (CONTRIBUTING.md).
-    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    # Bots (dependency and release pull requests) and the repository owner are exempt (CONTRIBUTING.md).
+    if: ${{ github.event.pull_request.user.login != 'kickinrad' && !endsWith(github.event.pull_request.user.login, '[bot]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
