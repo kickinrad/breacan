@@ -1,7 +1,7 @@
 {
   "name": "@breacan/design-md",
-  "version": "0.0.0",
-  "description": "The Breac\u00e1n design-md addon.",
+  "version": "1.0.0",
+  "description": "The Breacán design-md addon.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
