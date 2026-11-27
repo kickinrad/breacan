@@ -13,5 +13,5 @@
   "packages/claude-design": "0.0.0",
   "packages/agent-plugin": "0.0.0",
   "packages/image": "0.0.0",
-  "packages/website": "0.0.0"
+  "packages/website": "1.0.0"
 }
