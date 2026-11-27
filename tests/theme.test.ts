@@ -42,7 +42,7 @@ const kitProject = (toml: string | null = theme, config = 'kit: { name: "acme" }
   writeFileSync(join(dir, "tokens/own.tokens.json"),
     JSON.stringify({ own: { gap: { $type: "dimension", $value: { value: 4, unit: "px" } } } }));
   writeFileSync(join(dir, "VERSION"), "1.0.0\n");
-  writeFileSync(join(dir, "breacan.config.mjs"), `export default { targets: ["css"], ${config} };\n`);
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default { modules: ["css"], ${config} };\n`);
   if (toml !== null) writeFileSync(join(dir, "design/theme.toml"), toml);
   return dir;
 };

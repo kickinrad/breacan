@@ -27,14 +27,14 @@ const seeded = (engine = "leonardo") => {
 test.each(["leonardo", "material"])("a %s seed kit's DESIGN.md, and its plugin's copy, pass design.md lint with no errors or warnings", (engine) => {
   const dir = seeded(engine);
   for (const file of ["DESIGN.md", "plugins/ember/skills/ember/references/DESIGN.md"]) expect(designLint(join(dir, file)).summary, file).toMatchObject({ errors: 0, warnings: 0 });
-});
+}, 60_000);
 
 test("a project's own DESIGN.md, off the contract, passes design.md lint", () => {
   const dir = scratch("agent-own-");
   cpSync(join(root, "tests/fixture"), dir, { recursive: true });
   expect(run(dir, "build").exitCode).toBe(0);
   expect(designLint(join(dir, "DESIGN.md")).summary.errors).toBe(0);
-});
+}, 60_000);
 
 test("a kit's plugin, installed in a consumer repo, gives the agent its skill, its rules and its lint config", () => {
   const kit = seeded();

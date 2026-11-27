@@ -274,20 +274,10 @@ export const build = async (config = {}, { check = false, refresh = false, previ
   const header = (output) => Boolean(kit.name && !output.shared && wantsHeader(output.path));
   if (check) {
     const held = await readReceipt();
-    if (held !== undefined) {
-      // Every input this build found is a candidate, globbed includes too, so one the receipt lacks is caught.
-      const written = new Set(outputs.map((output) => resolve(output.path)));
-      await checkReceipt(held, inputs.filter((path) => !written.has(resolve(path)) && existsSync(path)), outputs.map((output) => output.path));
-      return outputs;
-    }
-    // No receipt yet (a kit last built before receipts): every output must match a fresh build. A file this engine writes
-    // that is not there at all is one the last build never wrote, so it is named, not failed; the next build adds it.
-    for (const output of outputs) {
-      const existing = await readExisting(output.path);
-      if (existing === undefined) { console.log(`${output.path} is new in breacan; run breacan build to add it`); continue; }
-      if (header(output)) checkHeader(output.path, existing);
-      if (existing !== output.content) throw new Error(`${output.path} is stale; run breacan build`);
-    }
+    if (held === undefined) throw new Error(`${RECEIPT} is missing; run breacan build to make it, then commit it`);
+    // Every input this build found is a candidate, globbed includes too, so one the receipt lacks is caught.
+    const written = new Set(outputs.map((output) => resolve(output.path)));
+    await checkReceipt(held, inputs.filter((path) => !written.has(resolve(path)) && existsSync(path)), outputs.map((output) => output.path));
     return outputs;
   }
   for (const { path, content } of outputs) {

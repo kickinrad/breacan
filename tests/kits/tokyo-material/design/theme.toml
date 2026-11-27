@@ -1,6 +1,6 @@
-# Tokyo Material: Material 3 (kumiko's built-in, from Google's androidx token files) on the Tokyo Mono palette, with
+# Tokyo Material: Material 3 (Breacán's built-in, from Google's androidx token files) on the Tokyo Mono palette, with
 # a few named exceptions. base.toml is Tokyo Mono's theme file at the version this kit builds on (its palette and
-# faces); this file adds the ink tones, fills Material's roles and holds the exceptions. kumiko builds every output.
+# faces); this file adds the ink tones, fills Material's roles and holds the exceptions. Breacán builds every output.
 name = "tokyo-material"
 title = "Tokyo Material"
 tagline = "Material 3 on Tokyo Night's accents and the Windows 11 greys."

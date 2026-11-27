@@ -32,7 +32,7 @@ const built = (dir = project()) => {
   return dir;
 };
 // The fixture with the Tailwind output built just before the playground, which inlines it.
-const withTailwind = () => edited('c.targets = ["css", "beer", "tailwind", "playground"]; c.tailwind = { path: "ports/css/kit-tailwind.css", css: "ports/css/kit.css" };');
+const withTailwind = () => edited('c.modules = ["css", "beer", "tailwind", "playground"]; c.tailwind = { path: "ports/css/kit-tailwind.css", css: "ports/css/kit.css" };');
 // The client is kit-agnostic: the page bundles src/web, so the tests import it from there. `dir` is the kit it draws.
 const client = async () => ({ ...(await import(join(root, "src/web/playground.js"))), ...(await import(join(root, "src/web/foundations.js"))) });
 // The page's parts: the kit's data (the #kit element) and the bundled client (the inline module script).
@@ -131,7 +131,7 @@ test("a missing path fails, naming it", () => {
 });
 
 test.each(["css", "beer"])("a config without the %s output still builds the playground, with that stylesheet made in memory", (target) => {
-  const dir = edited(`c.targets = c.targets.filter((each) => each !== "${target}");`);
+  const dir = edited(`c.modules = c.modules.filter((each) => each !== "${target}");`);
   const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");
   expect(read(dir, "docs/play/index.html")).toContain(target === "css" ? "--md-sys-color-primary:" : "--primary: var(--md-sys-color-primary);");
@@ -139,7 +139,7 @@ test.each(["css", "beer"])("a config without the %s output still builds the play
 
 test("without a declared kit it fails, saying so", () => {
   const dir = project();
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["playground"], playground: { path: "p" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["playground"], playground: { path: "p" } };\n');
   const result = run(dir, "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("needs a declared kit");
@@ -419,7 +419,7 @@ test("tailwind.html inlines the kit's Tailwind file and css, loads the browser b
 });
 
 test("a tailwind output listed after the playground fails, saying so", () => {
-  const result = run(edited('c.targets = ["css", "beer", "playground", "tailwind"]; c.tailwind = { path: "ports/css/kit-tailwind.css", css: "ports/css/kit.css" };'), "build");
+  const result = run(edited('c.modules = ["css", "beer", "playground", "tailwind"]; c.tailwind = { path: "ports/css/kit-tailwind.css", css: "ports/css/kit.css" };'), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("playground: list the tailwind output before it");
 });

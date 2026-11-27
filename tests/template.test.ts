@@ -27,7 +27,7 @@ blue = "#2e7de9"
 const kit = (templates: Record<string, string>) => {
   const dir = scratch("tokens-template-");
   writeFileSync(join(dir, "VERSION"), "0.5.0\n");
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates", to: "ports" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["template"], kit: { name: "acme" }, template: { from: "templates", to: "ports" } };\n');
   mkdirSync(join(dir, "design"));
   writeFileSync(join(dir, "design/theme.toml"), THEME);
   for (const [path, text] of Object.entries(templates)) {
@@ -67,7 +67,7 @@ test("a slot the palette lacks fails, naming the template and the slot", () => {
 
 test("it needs a declared kit, and `from` and `to`", () => {
   const dir = kit({ "a.conf": "x\n" });
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["template"], kit: { name: "acme" }, template: { from: "templates" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["template"], kit: { name: "acme" }, template: { from: "templates" } };\n');
   expect(run(dir, "build").stderr.toString()).toContain('template option "to" is required');
 });
 

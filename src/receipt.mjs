@@ -38,9 +38,9 @@ export const receipt = async ({ engine, inputs, outputs, header }) => {
 };
 
 const isMap = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
-// A receipt's lists as path-keyed maps; 0.21 and 0.22 wrote the maps themselves, which still read.
+// A receipt's lists as path-keyed maps; anything else is no receipt.
 const asMap = (list, value) => Array.isArray(list) && list.every((entry) => isMap(entry) && typeof entry.path === "string")
-  ? Object.fromEntries(list.map((entry) => [entry.path, value(entry)])) : list;
+  ? Object.fromEntries(list.map((entry) => [entry.path, value(entry)])) : undefined;
 
 export const readReceipt = async () => {
   const text = await readOrUndefined(RECEIPT);

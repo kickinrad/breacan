@@ -141,7 +141,7 @@ test("an output without a declared kit fails, saying so", () => {
   const dir = scratch("tokens-outputs-");
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/own.tokens.json"), JSON.stringify({ own: { gap: { $type: "dimension", $value: { value: 4, unit: "px" } } } }));
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["tailwind"], tailwind: { path: "a.css", css: "b.css" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["tailwind"], tailwind: { path: "a.css", css: "b.css" } };\n');
   const result = run(dir, "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("needs a declared kit");
@@ -161,7 +161,7 @@ test("the engine holds no kit: only platform languages carry their system swatch
 });
 
 test("obsidian and mealie build from the palette alone: the kit's own roles in place of Material's give the same files", () => {
-  const dir = edited('c.targets = ["obsidian", "mealie"]; delete c.include;');
+  const dir = edited('c.modules = ["obsidian", "mealie"]; delete c.include;');
   const theme = join(dir, "design/theme.toml");
   writeFileSync(theme, read(dir, "design/theme.toml").replaceAll('"md.sys.color.', '"acme.color.').replace(/\n"md\.sys\.typescale[^\n]*/, ""));
   const result = run(dir, "build");

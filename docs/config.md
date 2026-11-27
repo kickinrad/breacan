@@ -25,7 +25,6 @@ export default {
 | `preset` | A named list of built-in modules. The one preset is `default`: `dtcg`, `css`, `beer`, `design-md`, `claude-design` and `playground`. An unknown name fails, listing the presets. |
 | `without` | Names to leave out of the preset. |
 | `modules` | More modules, after the preset's. Each is a built-in's name, or a module the config imports, listed as its object ([Modules](modules.md)). |
-| `targets` | The old name for `modules`. It still works. |
 | `include` | Base layers beneath `tokens/`: file globs, `builtin:material` and `builtin:base` ([Sources](sources.md)). |
 | `media` | Each media query and the token files that apply under it. |
 | `kit` | The kit's name and folder (below). |

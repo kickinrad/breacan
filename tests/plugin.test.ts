@@ -21,7 +21,7 @@ const acme = (edit = "") => {
   const dir = scratch("tokens-plugin-acme-");
   for (const entry of ["design", "tokens", "VERSION", "breacan.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   renameSync(join(dir, "breacan.config.mjs"), join(dir, "base.config.mjs"));
-  writeFileSync(join(dir, "breacan.config.mjs"), `import base from "./base.config.mjs";\nconst c = structuredClone(base);\nc.targets.push("plugin");\nc.plugin = { path: "plugins/acme", author: { name: "Acme" } };\n${edit}\nexport default c;\n`);
+  writeFileSync(join(dir, "breacan.config.mjs"), `import base from "./base.config.mjs";\nconst c = structuredClone(base);\nc.modules.push("plugin");\nc.plugin = { path: "plugins/acme", author: { name: "Acme" } };\n${edit}\nexport default c;\n`);
   skill(dir, "plugins/acme/skills/acme");
   return dir;
 };
@@ -104,7 +104,7 @@ test("a kit without notes.md builds its plugin without that reference", () => {
 test("the output needs a path and a declared kit", () => {
   const result = run(acme("delete c.plugin.path;"), "build");
   expect(result.stderr.toString()).toContain('plugin option "path" is required');
-  const bare = run(acme("delete c.kit; c.targets = ['plugin'];"), "build");
+  const bare = run(acme("delete c.kit; c.modules = ['plugin'];"), "build");
   expect(bare.stderr.toString()).toContain("plugin needs a declared kit");
 });
 

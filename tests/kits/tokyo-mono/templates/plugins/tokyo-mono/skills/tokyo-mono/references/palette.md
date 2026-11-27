@@ -1,6 +1,6 @@
 # Tokyo Mono's palette
 
-Built from `design/theme.toml` by `kumiko`; change the palette there, never here.
+Built from `design/theme.toml` by `breacan`; change the palette there, never here.
 
 | Name | Night | Day | Role |
 | --- | --- | --- | --- |

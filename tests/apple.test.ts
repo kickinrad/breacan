@@ -51,7 +51,7 @@ test("a kit whose modes are named night and day still gets Apple's dark colours 
   const dir = scratch("apple-modes-");
   for (const entry of ["design", "tokens", "VERSION"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   writeFileSync(join(dir, "breacan.config.mjs"), `export default {
-  targets: ["react-native"],
+  modules: ["react-native"],
   include: ["builtin:material"],
   kit: { name: "acme" },
   "react-native": { path: "theme.ts" },
@@ -70,7 +70,7 @@ test("a platform fails, naming the mode, when a mode's colour scheme can't be to
   const theme = join(dir, "design/theme.toml");
   writeFileSync(theme, readFileSync(theme, "utf8").replace("(prefers-color-scheme: light)", "(prefers-contrast: more)"));
   writeFileSync(join(dir, "breacan.config.mjs"), `export default {
-  targets: ["css"], include: ["builtin:material"], kit: { name: "acme" }, css: { path: "kit.css" },
+  modules: ["css"], include: ["builtin:material"], kit: { name: "acme" }, css: { path: "kit.css" },
   platforms: { ios: { language: "apple", dial: "native" } },
 };\n`);
   const result = run(dir, "build");
@@ -89,7 +89,7 @@ const playground = (config: string, theme = "") => {
 
 test("a platform's colours are held to the contrast floor in every mode, naming the platform", () => {
   const dir = playground(`import language from "./flat.mjs";
-export default { targets: ["css"], include: ["builtin:material"], kit: { name: "acme" }, css: { path: "kit.css" },
+export default { modules: ["css"], include: ["builtin:material"], kit: { name: "acme" }, css: { path: "kit.css" },
   platforms: { ios: { language, dial: "native" } } };\n`, `[[contrast.pairs]]
 fg = "md.sys.color.on-primary"
 bg = "md.sys.color.primary"
@@ -106,7 +106,7 @@ min = 3
 });
 
 test("iOS chrome is tinted with each mode's own primary", async () => {
-  const dir = playground(`export default { targets: ["react-native"], include: ["builtin:material"], kit: { name: "acme" },
+  const dir = playground(`export default { modules: ["react-native"], include: ["builtin:material"], kit: { name: "acme" },
   "react-native": { path: "theme.ts" }, platforms: { ios: { language: "apple", dial: "tinted" } } };\n`);
   expect(run(dir, "build").stderr.toString()).toBe("");
   const { themes } = await import(join(dir, "theme.ts"));
@@ -119,7 +119,7 @@ test("iOS chrome is tinted with each mode's own primary", async () => {
 test("a kit with one mode builds with platforms, taking the light scheme", () => {
   const dir = scratch("apple-solo-");
   cpSync(join(root, "tests/playground/VERSION"), join(dir, "VERSION"));
-  writeFileSync(join(dir, "breacan.config.mjs"), `export default { targets: ["dtcg"], include: ["builtin:material"], kit: { name: "solo" },
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default { modules: ["dtcg"], include: ["builtin:material"], kit: { name: "solo" },
   dtcg: { path: "out" }, platforms: { ios: { language: "apple", dial: "native" } } };\n`);
   const result = run(dir, "build");
   expect(result.stderr.toString()).toBe("");

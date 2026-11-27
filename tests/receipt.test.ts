@@ -15,11 +15,15 @@ const kit = () => {
   expect(run(dir, "build").stderr.toString()).toBe("");
   return dir;
 };
-// The receipt as path-keyed maps, as 0.21 wrote it; the engine still reads that form, so tests write it back.
+// The receipt as path-keyed maps, for reading and editing; `save` writes it back as the lists the engine writes.
 const receipt = (dir: string) => {
   const raw = JSON.parse(read(dir, "breacan.receipt.json"));
   const map = (list: { path: string; sha256: string; header?: boolean }[], value: (entry: any) => unknown) => Object.fromEntries(list.map((entry) => [entry.path, value(entry)]));
   return { ...raw, inputs: map(raw.inputs, (entry) => entry.sha256), outputs: map(raw.outputs, ({ path, ...entry }) => entry) };
+};
+const save = (dir: string, held: any) => {
+  const list = (map: Record<string, any>, value: (digest: any) => object) => Object.entries(map).map(([path, entry]) => ({ path, ...value(entry) }));
+  writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify({ ...held, inputs: list(held.inputs, (sha256) => ({ sha256 })), outputs: list(held.outputs, (entry) => entry) }));
 };
 const sha = (text: string) => createHash("sha256").update(text).digest("hex");
 const failure = (dir: string) => { const result = run(dir, "check"); expect(result.exitCode).toBe(1); return result.stderr.toString(); };
@@ -55,7 +59,7 @@ test("check holds the tree to the receipt, not to what this engine would write n
   writeFileSync(join(dir, file), text);
   const held = receipt(dir);
   held.outputs[file].sha256 = sha(text);
-  writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify(held));
+  save(dir, held);
   expect(run(dir, "check").exitCode).toBe(0);
 });
 
@@ -66,17 +70,14 @@ test("an output that lost its generated header fails, even with a matching recei
   writeFileSync(join(dir, file), text);
   const held = receipt(dir);
   held.outputs[file].sha256 = sha(text);
-  writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify(held));
+  save(dir, held);
   expect(failure(dir)).toContain(`${file} has no generated header`);
 });
 
-test("with no receipt (a kit built before receipts), check compares every output to a fresh build", () => {
+test("with no receipt, check fails and says how to make one", () => {
   const dir = kit();
   rmSync(join(dir, "breacan.receipt.json"));
-  expect(run(dir, "check").exitCode).toBe(0);
-  appendFileSync(join(dir, "ports/tmux/tokyo-mono.conf"), "# mine\n");
-  expect(failure(dir)).toContain("ports/tmux/tokyo-mono.conf is stale");
-  expect(readFileSync(join(dir, "ports/tmux/tokyo-mono.conf"), "utf8")).toEndWith("# mine\n");
+  expect(failure(dir)).toContain("breacan.receipt.json is missing; run breacan build");
 });
 
 test("a new file an include glob matches fails until the next build", () => {
@@ -94,7 +95,7 @@ test("a new file an include glob matches fails until the next build", () => {
 test("a receipt that lost its outputs fails, rather than checking nothing", () => {
   const dir = kit();
   const held = receipt(dir);
-  writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify({ ...held, outputs: {} }));
+  save(dir, { ...held, outputs: {} });
   expect(failure(dir)).toContain("is not in the receipt");
   writeFileSync(join(dir, "breacan.receipt.json"), JSON.stringify({ engine: "0.0.0" }));
   expect(failure(dir)).toContain("breacan.receipt.json is not a receipt this engine reads");
@@ -121,19 +122,6 @@ test("a theme's extended file outside the kit folder is an input", () => {
   appendFileSync(join(dir, "shared/base.toml"), "\n");
   expect(failure(dir)).toContain("shared/base.toml changed since the last build");
 });
-test("with no receipt, a file the last build never wrote is named, not failed, and an edited one still fails", () => {
-  const dir = scratch("receipt-legacy-");
-  cpSync(join(root, "tests/kits/tokyo-material"), dir, { recursive: true });
-  expect(run(dir, "build").exitCode).toBe(0);
-  rmSync(join(dir, "breacan.receipt.json"));
-  rmSync(join(dir, "ports/tokens/tokyo-material.resolver.json"));
-  const result = run(dir, "check");
-  expect(result.exitCode).toBe(0);
-  expect(result.stdout.toString()).toContain("ports/tokens/tokyo-material.resolver.json is new in breacan");
-  appendFileSync(join(dir, "docs/playground/tokyo-material.css"), "/* mine */\n");
-  expect(failure(dir)).toContain("docs/playground/tokyo-material.css is stale");
-});
-
 test("the receipt lists each file as { path, sha256 }, so a path beside a digest never reads as a secret", () => {
   const dir = kit();
   const raw = JSON.parse(read(dir, "breacan.receipt.json"));
