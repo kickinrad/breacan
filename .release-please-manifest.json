@@ -7,7 +7,7 @@
   "packages/apple": "0.0.0",
   "packages/tailwind": "0.0.0",
   "packages/react-native": "0.0.0",
-  "packages/template": "0.0.0",
+  "packages/template": "1.0.0",
   "packages/obsidian": "0.0.0",
   "packages/mealie": "0.0.0",
   "packages/claude-design": "0.0.0",
