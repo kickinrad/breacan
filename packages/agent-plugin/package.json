@@ -1,7 +1,7 @@
 {
   "name": "@breacan/agent-plugin",
-  "version": "0.0.0",
-  "description": "The Breac\u00e1n agent-plugin addon.",
+  "version": "1.0.0",
+  "description": "The Breacán agent-plugin addon.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
