@@ -30,12 +30,11 @@ export const presets = {
   default: ["dtcg", "css", "beer", "design-md", "claude-design", "playground"],
 };
 
-// The config's modules, in order: its preset's (less any `without` names), then its own `modules` (or the older
-// `targets`). Each is a built-in by name or a module the config imports, listed as its object.
+// The config's modules, in order: its preset's (less any `without` names), then its own `modules`. Each is a built-in by name or a module the config imports, listed as its object.
 export const resolveModules = (config) => {
   if (config.preset !== undefined && !presets[config.preset]) throw new Error(`Unknown preset ${config.preset} (presets: ${Object.keys(presets).join(", ")})`);
   const without = new Set(config.without ?? []);
-  const listed = [...(presets[config.preset] ?? []).filter((name) => !without.has(name)), ...(config.modules ?? config.targets ?? [])];
+  const listed = [...(presets[config.preset] ?? []).filter((name) => !without.has(name)), ...(config.modules ?? [])];
   if (!listed.length) throw new Error("breacan.config.mjs names no modules");
   return listed.map((spec) => {
     if (typeof spec === "string" && removed[spec]) throw new Error(`Removed output ${spec}: ${removed[spec]}`);

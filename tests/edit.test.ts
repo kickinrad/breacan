@@ -146,7 +146,7 @@ for (const entry of ["design", "tokens", "VERSION", "breacan.config.mjs"]) cpSyn
 const plain = scratch("breacan-edit-plain-");
 mkdirSync(join(plain, "tokens"));
 writeFileSync(join(plain, "VERSION"), "1.0.0\n");
-writeFileSync(join(plain, "breacan.config.mjs"), 'export default { targets: ["css", "playground"], kit: { name: "plain" }, css: { path: "out/kit.css" }, playground: { path: "docs/play" } };\n');
+writeFileSync(join(plain, "breacan.config.mjs"), 'export default { modules: ["css", "playground"], kit: { name: "plain" }, css: { path: "out/kit.css" }, playground: { path: "docs/play" } };\n');
 writeFileSync(join(plain, "tokens/colors.tokens.json"), '{\n  "color": {\n    "$type": "color",\n    "brand": { "$value": "#2e7de9" },\n    "accent":   {"$value":"#ff9e64", "$description": "kept"}\n  }\n}\n');
 
 test.each([

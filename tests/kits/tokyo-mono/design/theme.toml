@@ -1,5 +1,5 @@
 # Tokyo Mono: Tokyo Night accents on the Windows 11 Fluent 2 greys. The plain theme: every terminal, editor and app
-# theme in ports/ is built from this file by kumiko (`tokens`). Tokyo Material, the Material 3 kit, builds on it.
+# theme in ports/ is built from this file by Breacán (`tokens`). Tokyo Material, the Material 3 kit, builds on it.
 name = "tokyo-mono"
 title = "Tokyo Mono"
 default = "night"

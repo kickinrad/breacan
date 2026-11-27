@@ -34,10 +34,10 @@ file is generated: its first line names the kit version, and it stays exactly as
   way: "in a hurry", "inline styles" and "no dependencies" all still mean these links and Beer's markup. When the page
   cannot load the two files, say so and ask.
 - **Everything else**, web on another stack (Tailwind, a component library) or any other platform: the app builds its
-  own files with `kumiko`. Download the kit's token files with `-p '*.tokens.json'`, list `tokyo-material.tokens.json`
+  own files with `breacan build`. Download the kit's token files with `-p '*.tokens.json'`, list `tokyo-material.tokens.json`
   after `builtin:material` in `include`, put `tokyo-material.day.tokens.json` under `media` for
-  `(prefers-color-scheme: light)`, and list the targets the stack needs (`css`, `tailwind` and the rest; kumiko's
-  README names them). The app commits its outputs and runs `kumiko --check` in CI.
+  `(prefers-color-scheme: light)`, and list the targets the stack needs (`css`, `tailwind` and the rest; Breacán's
+  README names them). The app commits its outputs and runs `breacan check` in CI.
 
 ## Build
 
@@ -59,7 +59,7 @@ name.
 ## Tweak
 
 A value only one app needs stays in that app, in an **override** the app owns: a stylesheet loaded after the kit's,
-or, with kumiko, the app's own token file listed after the kit's in `include`. Each override names what it changes and
+or, with Breacán, the app's own token file listed after the kit's in `include`. Each override names what it changes and
 why. The kit's files stay as released, so an update never wipes a tweak.
 
 When the kit itself is wrong for every app (a contrast failure, a missing component, a broken state), draft an Issue
@@ -72,7 +72,7 @@ an override that names the Issue.
    kickinrad/tokyo-material` names the newest.
 2. **Read the release notes** for every release in between. At 0.x a minor release can break things.
 3. **Take the new release** the way the app adopted it: download the stylesheets again, or download the token files
-   again and run `kumiko`.
+   again and run `breacan build`.
 4. **Recheck:** run the app's own checks and look at its screens in both modes. Delete each override the kit now
    covers, and each one whose Issue a release has fixed.
 
@@ -85,7 +85,7 @@ Done when the app's kit files name the newest release, its checks pass, and ever
 - [Material 3](https://m3.material.io/): [components](https://m3.material.io/components),
   [styles](https://m3.material.io/styles) and [foundations](https://m3.material.io/foundations).
 - [Beer CSS](https://github.com/beercss/beercss/tree/main/docs): the markup of each web component.
-- [kumiko](https://github.com/kickinrad/kumiko#readme): the build tool, its config and its targets.
+- [Breacán](https://github.com/kickinrad/breacan#readme): the build tool, its config and its targets.
 - [Claude Design System](https://claude.ai/artifact/DhVvb2ANewmkqi6Kpp5E9c): the kit for Claude Design.
 - The playground, `docs/playground/index.html` in the kit's checkout: every component live in both modes. Open it
   from disk.

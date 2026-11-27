@@ -27,7 +27,7 @@ The receipt stores each entry as `{ path, sha256 }` in a list. A path-to-digest 
 
 It does not compare bytes with a fresh build. A newer engine that writes the same files differently never fails a check, and the next build takes its bytes.
 
-A project with no receipt yet, last built by kumiko, is checked against a fresh build instead. A file this engine writes that is not on disk is named as new, and the next build adds it.
+A project with no receipt fails the check and is told to run `breacan build`, which writes one to commit.
 
 Run `breacan check` in the kit's CI.
 

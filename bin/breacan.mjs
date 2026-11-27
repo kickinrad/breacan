@@ -4,9 +4,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// Build a kit's tokens into the outputs its breacan.config.mjs names. The old kumiko spellings fail naming their replacement.
+// Build a kit's tokens into the outputs its breacan.config.mjs names.
 import { existsSync, readFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import pkg from "../package.json" with { type: "json" };
 import { build } from "../src/build.mjs";
@@ -15,12 +15,8 @@ const USAGE = "breacan [build [--refresh] | check | new --seed <hex>… [<dir>] 
 const fail = (message) => { console.error(message); process.exit(1); };
 const exit = (findings) => { if (findings.length) console.log(findings.join("\n")); process.exit(findings.length ? 1 : 0); };
 
-// The old spellings are gone; each fails naming its replacement.
-if ([process.argv0, process.execPath].some((path) => basename(path, ".exe") === "kumiko")) fail("kumiko is now breacan: run the same command as breacan");
 const [verb, ...rest] = process.argv.slice(2);
-if (verb === undefined) fail(`breacan: name a verb; breacan build is what a bare breacan did (${USAGE})`);
-if (verb === "--check") fail("breacan: --check is now the check verb: run breacan check");
-if (verb === "dev") fail("breacan: dev is now the edit verb: run breacan edit");
+if (verb === undefined) fail(`breacan: name a verb (${USAGE})`);
 
 if (verb === "--version") {
   if (rest.length) fail(`breacan: unknown ${rest[0]} (${USAGE})`);
@@ -72,7 +68,7 @@ if (verb === "audit") {
   } catch (error) { fail(error.message); }
 }
 
-if (!configPath) fail(existsSync("kumiko.config.mjs") ? "kumiko.config.mjs is now breacan.config.mjs: rename it" : "No breacan.config.mjs in this directory");
+if (!configPath) fail("No breacan.config.mjs in this directory");
 const config = await loadConfig();
 if (verb === "edit") {
   const { edit } = await import("../src/edit.mjs");

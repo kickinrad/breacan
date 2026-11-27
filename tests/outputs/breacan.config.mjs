@@ -1,6 +1,6 @@
 // A small kit for the tailwind, obsidian and mealie outputs.
 export default {
-  targets: ["tailwind", "obsidian", "mealie"],
+  modules: ["tailwind", "obsidian", "mealie"],
   include: ["builtin:material"],
   kit: { name: "acme" },
   tailwind: { path: "ports/tailwind/acme.css", css: "ports/css/acme.css" },

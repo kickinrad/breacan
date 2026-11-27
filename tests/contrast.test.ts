@@ -101,7 +101,7 @@ min = 3
     const dir = scratch("tokens-contrast-");
     mkdirSync(join(dir, "design"));
     writeFileSync(join(dir, "VERSION"), "1.0.0\n");
-    writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
+    writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["css"], kit: { name: "acme" } };\n');
     writeFileSync(join(dir, "design/theme.toml"), `name = "acme"
 default = "light"
 

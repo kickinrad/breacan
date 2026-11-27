@@ -16,7 +16,7 @@ const project = (edit = "") => {
   const dir = scratch("tokens-claude-design-");
   for (const entry of ["design", "tokens", "VERSION", "breacan.config.mjs"]) cpSync(join(root, "tests/playground", entry), join(dir, entry), { recursive: true });
   renameSync(join(dir, "breacan.config.mjs"), join(dir, "base.config.mjs"));
-  writeFileSync(join(dir, "breacan.config.mjs"), `import base from "./base.config.mjs";\nconst c = structuredClone(base);\nc.targets.push("claude-design");\nc["claude-design"] = { path: "ports/claude-design" };\n${edit}\nexport default c;\n`);
+  writeFileSync(join(dir, "breacan.config.mjs"), `import base from "./base.config.mjs";\nconst c = structuredClone(base);\nc.modules.push("claude-design");\nc["claude-design"] = { path: "ports/claude-design" };\n${edit}\nexport default c;\n`);
   return dir;
 };
 const built = (dir = project()) => {
@@ -80,13 +80,13 @@ test("the cover carries the theme's tagline when it has one", () => {
 });
 
 test.each(["css", "beer"])("a config without the %s output still builds, with that stylesheet made in memory", (target) => {
-  const result = run(project(`c.targets = c.targets.filter((each) => each !== "${target}" && each !== "playground");`), "build");
+  const result = run(project(`c.modules = c.modules.filter((each) => each !== "${target}" && each !== "playground");`), "build");
   expect(result.stderr.toString()).toBe("");
   expect(result.exitCode).toBe(0);
 });
 
 test.each(["css", "beer"])("a config with the %s output after it fails, naming it", (target) => {
-  const result = run(project(`c.targets = [...c.targets.filter((each) => each !== "${target}" && each !== "playground"), "${target}"];`), "build");
+  const result = run(project(`c.modules = [...c.modules.filter((each) => each !== "${target}" && each !== "playground"), "${target}"];`), "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain(`claude-design needs the ${target} output, listed before it`);
 });

@@ -2,7 +2,7 @@
 // check with `breacan check` and `breacan audit`. This file says where each output goes; the values are theme.toml's.
 // An app builds its own platform's files from the dtcg output, so the kit makes only these.
 export default {
-  targets: ['css', 'beer', 'dtcg', 'playground', 'claude-design', 'plugin'],
+  modules: ['css', 'beer', 'dtcg', 'playground', 'claude-design', 'plugin'],
   include: ['builtin:material'],
   kit: { name: 'tokyo-material' },
   // The web stylesheets sit beside the playground, which shows them, and go out with each release.

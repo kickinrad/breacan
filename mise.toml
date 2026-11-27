@@ -3,7 +3,7 @@ bun = "latest"
 uv = "latest"
 
 [tasks.setup]
-run = "bun install"
+run = "bun install --frozen-lockfile"
 
 [tasks.check]
 run = "bun build bin/breacan.mjs --target=bun --external \"chromium-bidi/*\" --outdir=dist/check >/dev/null"

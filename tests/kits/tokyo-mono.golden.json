@@ -1,7 +1,7 @@
 {
   "base16/tokyo-mono-day.yaml": "132023f8fde66ffcd8c2ac358d7e81c71d7c4fcc813bfccfb232356ba7f02f01",
   "base16/tokyo-mono-night.yaml": "a719efdaab82fc09685c2473df7fd285afbc53a931040545138199a7072215cb",
-  "plugins/tokyo-mono/skills/tokyo-mono/references/palette.md": "81fd3db093040ceed7a8c2be66ab2fc18466bf7fd7a993637923584b9bb092ae",
+  "plugins/tokyo-mono/skills/tokyo-mono/references/palette.md": "54fd8d2b1c320249bab680f4ce358af15ab774e3acf33f7a5f80ad30e71dc482",
   "ports/bat/tokyo-mono.tmTheme": "c7aee7fe9b5fbc4946893455972e699797876bb091e160e3d68496d46f18cdd9",
   "ports/claude-code/tokyo-mono-day.json": "66f4e258696a95af0a394873043a6b242a57a5ece4c9e2cb6f2ae9a26e61abd4",
   "ports/claude-code/tokyo-mono-night.json": "5d919b2a24658baa7f285912e02dde5347e7e1ca3349ef7a55269942b90668d5",

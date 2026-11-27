@@ -28,7 +28,7 @@ const kitProject = (kit = true) => {
   writeFileSync(join(dir, "tokens/kit.tokens.json"), JSON.stringify({ size: { $type: "dimension", gap: { $value: { value: 8, unit: "px" } } } }));
   writeFileSync(join(dir, "files.mjs"), filesTarget);
   writeFileSync(join(dir, "breacan.config.mjs"),
-    `import files from "./files.mjs";\nexport default { targets: [files]${kit ? ', kit: { name: "acme" }' : ""} };\n`);
+    `import files from "./files.mjs";\nexport default { modules: [files]${kit ? ', kit: { name: "acme" }' : ""} };\n`);
   if (kit) writeFileSync(join(dir, "VERSION"), "1.2.3\n");
   return dir;
 };
@@ -112,7 +112,7 @@ test("an output's lead lines stay first, and the header follows them", () => {
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/kit.tokens.json"), JSON.stringify({ size: { $type: "dimension", gap: { $value: { value: 8, unit: "px" } } } }));
   writeFileSync(join(dir, "lead.mjs"), `export default { name: "lead", build: async () => [{ path: "out/f.html", content: "<!-- marker -->\\n<main></main>\\n", lead: 1 }] };\n`);
-  writeFileSync(join(dir, "breacan.config.mjs"), 'import lead from "./lead.mjs";\nexport default { targets: [lead], kit: { name: "acme" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'import lead from "./lead.mjs";\nexport default { modules: [lead], kit: { name: "acme" } };\n');
   writeFileSync(join(dir, "VERSION"), "1.2.3\n");
   expect(run(dir, "build").exitCode).toBe(0);
   expect(read(dir, "out/f.html")).toBe(`<!-- marker -->\n<!-- ${line("lead")} -->\n<main></main>\n`);

@@ -47,7 +47,7 @@ test("a token set in two source files fails the build naming both, not a hang (#
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/a.tokens.json"), JSON.stringify({ x: { $type: "number", $value: 1 } }));
   writeFileSync(join(dir, "tokens/b.tokens.json"), JSON.stringify({ x: { $type: "number", $value: 3 } }));
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["css"] };\n');
   const result = Bun.spawnSync([...command, "build"], { cwd: dir, stderr: "pipe", timeout: 10_000 });
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("x is set in both tokens/a.tokens.json and tokens/b.tokens.json");
@@ -57,7 +57,7 @@ test("a project target is a module the config imports and lists", () => {
   const dir = project();
   writeFileSync(join(dir, "local.mjs"),
     'export default { name: "local", build: async (ctx) => [{ path: "local.txt", content: `${ctx.tokens.length}\\n` }] };\n');
-  writeFileSync(join(dir, "breacan.config.mjs"), 'import local from "./local.mjs";\nexport default { targets: ["css", local] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'import local from "./local.mjs";\nexport default { modules: ["css", local] };\n');
   rmSync(join(dir, "tokens/stack.tokens.json"));
   expect(run(dir, "build").exitCode).toBe(0);
   expect(Number(read(dir, "local.txt"))).toBeGreaterThan(0);
@@ -71,7 +71,7 @@ test("token files build in sorted order, whatever order the filesystem lists the
   for (const name of names) {
     writeFileSync(join(dir, `tokens/${name}.tokens.json`), JSON.stringify({ [`t${name}`]: { gap: { $type: "dimension", $value: { value: 1, unit: "px" } } } }));
   }
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["css"] };\n');
   expect(run(dir, "build").exitCode).toBe(0);
   const css = read(dir, "src/styles/tokens.css");
   const order = [...css.matchAll(/--t([a-z]+)-gap/g)].map((m) => m[1]);
@@ -80,7 +80,7 @@ test("token files build in sorted order, whatever order the filesystem lists the
 
 test("an unknown target fails loudly", () => {
   const dir = project();
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["nope"] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["nope"] };\n');
   const result = run(dir, "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("Unknown token target nope");
@@ -88,7 +88,7 @@ test("an unknown target fails loudly", () => {
 
 test("a config that still lists the removed storybook output fails naming it", () => {
   const dir = project();
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css", "storybook"] };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["css", "storybook"] };\n');
   const result = run(dir, "build");
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString()).toContain("Removed output storybook");
@@ -104,7 +104,7 @@ test("include files are a silent base: project tokens override them, in the base
   writeFileSync(join(dir, "tokens/project.tokens.json"), JSON.stringify({ t: { a: dim(10), c: dim(3) } }));
   writeFileSync(join(dir, "tokens/narrow.tokens.json"), JSON.stringify({ t: { c: dim(30) } }));
   writeFileSync(join(dir, "breacan.config.mjs"), `export default {
-    targets: ["css"], include: ["vendor/*.tokens.json"],
+    modules: ["css"], include: ["vendor/*.tokens.json"],
     media: { "(max-width: 600px)": ["tokens/narrow.tokens.json"] },
   };\n`);
   const result = run(dir, "build");
@@ -127,7 +127,7 @@ const kitProject = (kit: string | undefined, version: string | null = "1.2.3\n")
   rmSync(join(dir, "tokens/stack.tokens.json"));
   writeFileSync(join(dir, "echo.mjs"), echoTarget);
   writeFileSync(join(dir, "breacan.config.mjs"),
-    `import echo from "./echo.mjs";\nexport default { targets: [echo]${kit === undefined ? "" : `, kit: ${kit}`} };\n`);
+    `import echo from "./echo.mjs";\nexport default { modules: [echo]${kit === undefined ? "" : `, kit: ${kit}`} };\n`);
   if (version !== null) writeFileSync(join(dir, "VERSION"), version);
   return dir;
 };
@@ -178,7 +178,7 @@ test("a kit with hex-string colours passes --check", () => {
   mkdirSync(join(dir, "tokens"));
   writeFileSync(join(dir, "tokens/brand.tokens.json"), JSON.stringify({ color: { ink: { $type: "color", $value: "#121416" } } }));
   writeFileSync(join(dir, "VERSION"), "1.0.0\n");
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["css"], kit: { name: "acme" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["css"], kit: { name: "acme" } };\n');
   expect(run(dir, "build").exitCode).toBe(0);
   const result = run(dir, "check");
   expect(result.stderr.toString()).toBe("");
@@ -192,7 +192,7 @@ const materialProject = (include: string) => {
   writeFileSync(join(dir, "tokens/project.tokens.json"), JSON.stringify({
     md: { sys: { shape: { corner: { medium: { $type: "dimension", $value: { value: 20, unit: "px" } } } } } },
   }));
-  writeFileSync(join(dir, "breacan.config.mjs"), `export default { targets: ["css"], include: [${include}] };\n`);
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default { modules: ["css"], include: [${include}] };\n`);
   return dir;
 };
 
@@ -224,7 +224,7 @@ test("builtin:material sits beneath file includes too", () => {
 // What a target receives, written as JSON by a project's own target.
 const tokensOf = (dir: string) => {
   writeFileSync(join(dir, "dump.mjs"), 'export default { name: "dump", build: ({ tokens }) => [{ path: "tokens.json", content: JSON.stringify(tokens) }] };\n');
-  writeFileSync(join(dir, "breacan.config.mjs"), read(dir, "breacan.config.mjs").replace('targets: ["css"]', 'targets: [(await import("./dump.mjs")).default]'));
+  writeFileSync(join(dir, "breacan.config.mjs"), read(dir, "breacan.config.mjs").replace('modules: ["css"]', 'modules: [(await import("./dump.mjs")).default]'));
   expect(run(dir, "build").exitCode).toBe(0);
   return JSON.parse(read(dir, "tokens.json")) as { path: string; builtin?: boolean }[];
 };

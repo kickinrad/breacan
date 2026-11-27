@@ -10,7 +10,7 @@ import { read, root, run, scratch } from "./helpers";
 const project = () => {
   const dir = scratch("breacan-react-native-");
   for (const entry of ["design", "VERSION"]) cpSync(join(root, "tests/outputs", entry), join(dir, entry), { recursive: true });
-  writeFileSync(join(dir, "breacan.config.mjs"), `export default { targets: ["react-native"], include: ["builtin:material"], kit: { name: "acme" }, "react-native": { path: "ports/react-native/tokens.ts" } };\n`);
+  writeFileSync(join(dir, "breacan.config.mjs"), `export default { modules: ["react-native"], include: ["builtin:material"], kit: { name: "acme" }, "react-native": { path: "ports/react-native/tokens.ts" } };\n`);
   return dir;
 };
 
@@ -41,9 +41,9 @@ test("react-native writes typed mode tokens and native text styles", async () =>
 
 test("react-native requires a kit, output path and exactly one light/dark counterpart", () => {
   const dir = project();
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["react-native"], include: ["builtin:material"], kit: { name: "acme" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["react-native"], include: ["builtin:material"], kit: { name: "acme" } };\n');
   expect(run(dir, "build").stderr.toString()).toContain('option "path" is required');
-  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { targets: ["react-native"], include: ["builtin:material"], "react-native": { path: "out.ts" } };\n');
+  writeFileSync(join(dir, "breacan.config.mjs"), 'export default { modules: ["react-native"], include: ["builtin:material"], "react-native": { path: "out.ts" } };\n');
   expect(run(dir, "build").stderr.toString()).toContain("needs a declared kit");
 });
 

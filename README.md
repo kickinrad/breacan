@@ -124,8 +124,6 @@ platforms: { ios: { language: "apple", dial: "tinted" } }
 | `breacan lint [--rules <file>] <path>…` | Fails on app code that hand-types a value the kit defines. |
 | `breacan --version` | Prints the version. |
 
-The old `kumiko` binary, a bare `breacan`, `--check`, `breacan dev` and `kumiko.config.mjs` each fail and name their replacement.
-
 ## Reference
 
 - [Configuration](docs/config.md): every key in `breacan.config.mjs`, and the layer order.

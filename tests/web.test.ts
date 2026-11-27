@@ -22,7 +22,7 @@ const project = (config?: string) => {
   return dir;
 };
 const only = (target: string, options: string) => `export default {
-  targets: ["${target}"], media: { "(prefers-color-scheme: light)": ["tokens/day.tokens.json"] },
+  modules: ["${target}"], media: { "(prefers-color-scheme: light)": ["tokens/day.tokens.json"] },
   ${target}: ${options},
 };\n`;
 
@@ -84,7 +84,7 @@ const beerRoles = (css: string) => {
 };
 
 test("every colour role the installed Beer declares is set to Material's role of the same name", () => {
-  const dir = project(`export default { targets: ["beer"], include: ["builtin:material"], media: { "(prefers-color-scheme: light)": ["tokens/day.tokens.json"] }, beer: { path: "out/beer.css" } };\n`);
+  const dir = project(`export default { modules: ["beer"], include: ["builtin:material"], media: { "(prefers-color-scheme: light)": ["tokens/day.tokens.json"] }, beer: { path: "out/beer.css" } };\n`);
   expect(run(dir, "build").exitCode).toBe(0);
   const set = new Map([...read(dir, "out/beer.css").matchAll(/^  --([a-z0-9-]+): (.+);$/gm)].map((m) => [m[1], m[2]]));
   const roles = beerRoles(beerCss);
