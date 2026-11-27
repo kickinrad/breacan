@@ -108,9 +108,9 @@ Waves run in order. Tasks inside a wave run in parallel, one worktree each. Only
 **Wave 0: prefactors**
 
 - [ ] 0. The owner creates the `@breacan` npm organisation, claims `breacan`, and turns on trusted publishing for kickinrad/breacan. Route: here. Demo: GitHub Actions can publish with no stored token. Blocked by: none.
-- [ ] 1. Write the decision record for the core, addons, base chain and neutral roles through Curator. It supersedes the role-contract part of ADR-026. Route: here. Demo: Curator cites it. Blocked by: none.
-- [ ] 2. Pin every consumer that tracks `latest` to 0.33, each with an Issue to unpin: tokyo-mono, tokyo-mono-site, the astro, emdash and themeco-pro stacks templates, skylight and the dotfiles. boombox-design gets its pin by a PR the owner approves. Porchlight's unused kumiko line goes. Route: here. Demo: each repo's CI is green on the pin. Blocked by: none.
-- [ ] 3. Remove the kumiko traces and dead shims. These are the CLI guards, `targets`, the 0.21 receipt reader, the no-receipt check, the stale branches and the docs lines. Rename the local folder to `breacan`. Fix chezmoi, the material skill path, the markets link and the vault hub. Fix the stacks themeco-pro check and boombox-design's design-system skill (by PR). Ignore `.handoffs/`, stop `bun install` rewriting `bun.lock`, and fix #117. Route: implementation-light. Demo: the kumiko search is clean. Blocked by: 2.
+- [x] 1. Write the decision record for the core, addons, base chain and neutral roles through Curator. It supersedes the role-contract part of ADR-026. Route: here. Demo: Curator cites it. Blocked by: none.
+- [x] 2. Pin every consumer that tracks `latest` to 0.33, each with an Issue to unpin: tokyo-mono, tokyo-mono-site, the astro, emdash and themeco-pro stacks templates, skylight and the dotfiles. boombox-design gets its pin by a PR the owner approves. Porchlight's unused kumiko line goes. Route: here. Demo: each repo's CI is green on the pin. Blocked by: none.
+- [x] 3. Remove the kumiko traces and dead shims. These are the CLI guards, `targets`, the 0.21 receipt reader, the no-receipt check, the stale branches and the docs lines. Rename the local folder to `breacan`. Fix chezmoi, the material skill path, the markets link and the vault hub. Fix the stacks themeco-pro check and boombox-design's design-system skill (by PR). Ignore `.handoffs/`, stop `bun install` rewriting `bun.lock`, and fix #117. Route: implementation-light. Demo: the kumiko search is clean. Blocked by: 2.
 - [ ] 4. Set up the bun workspace with `packages/core` and a package for every planned addon. Configure release-please for many packages so the core's release stays GitHub's Latest. Publish to npm with provenance, and add macOS to the CI matrix. Route: implementation. Demo: a 0.x prerelease of `breacan` installs from npm. Blocked by: 0, 2.
 
 **Wave 1: the spine**
@@ -163,7 +163,10 @@ Lane: here. This session orchestrates while the owner watches, and it merges in 
 
 Log:
 
-- 2026-11-27: build started; the Plan was committed to the repo and claimed.
+- 2026-11-27: build started; the Plan was committed to the repo and claimed (#155).
+- 2026-11-27, task 1 (here, Demo first try): Curator wrote ADR-027, marked ADR-026 superseded in part (roles and module shape), and added it to the hub's Decisions table.
+- 2026-11-27, task 2 (here, Demo passed after one fix): every consumer pins 0.33 with an Issue to unpin: tokyo-mono #127 (#126), tokyo-mono-site #18 (#17), skylight #46 (#45), porchlight #29 (#28), dotfiles #256 (#255), stacks #36 (#31), boombox-design #16 (#15, merged on Wils's approval). Porchlight's main already used `breacan lint`, so it was pinned, not dropped. Stacks first needed #32: the emdash creator now ships a `.claude/skills` link that Biome followed.
+- 2026-11-27, task 3 (implementation-light, Demo first try): #156 (closes #117), core #132, stacks #34 and boombox-design #17 leave no old-name match outside CHANGELOG and plans. The folder is now `~/projects/personal/breacan`; dotfiles #257 moved the marketplace path and landed the unpushed local commit, and the vault hub was updated. The Plan's own old-name mentions go in task 21.
 
 ## Related
 
