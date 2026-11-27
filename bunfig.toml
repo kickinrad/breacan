@@ -1,3 +1,8 @@
+[install]
+# A workspace makes bun default to the isolated linker. The license audit and the old CLI's asset paths read a flat
+# node_modules, so keep the hoisted layout.
+linker = "hoisted"
+
 [test]
 # The test helpers remove every scratch directory once the run ends.
 preload = ["./tests/helpers.ts"]
