@@ -1,7 +1,7 @@
 {
   "name": "@breacan/material",
-  "version": "0.0.0",
-  "description": "The Breac\u00e1n material addon.",
+  "version": "1.0.0",
+  "description": "The Breacán material addon.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",

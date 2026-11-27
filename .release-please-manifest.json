@@ -3,7 +3,7 @@
   "packages/core": "0.0.0",
   "packages/studio": "0.0.0",
   "packages/design-md": "0.0.0",
-  "packages/material": "0.0.0",
+  "packages/material": "1.0.0",
   "packages/apple": "0.0.0",
   "packages/tailwind": "0.0.0",
   "packages/react-native": "0.0.0",
