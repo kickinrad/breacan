@@ -1,7 +1,7 @@
 {
   "name": "@breacan/claude-design",
-  "version": "0.0.0",
-  "description": "The Breac\u00e1n claude-design addon.",
+  "version": "1.0.0",
+  "description": "The Breacán claude-design addon.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
