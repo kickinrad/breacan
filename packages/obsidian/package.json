@@ -1,0 +1,22 @@
+{
+  "name": "@breacan/obsidian",
+  "version": "0.0.0",
+  "description": "The Breac\u00e1n obsidian addon.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "William Tierney <wils@bestfootforward.business>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kickinrad/breacan.git",
+    "directory": "packages/obsidian"
+  },
+  "homepage": "https://github.com/kickinrad/breacan#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "peerDependencies": {
+    "breacan": "*"
+  },
+  "private": true
+}

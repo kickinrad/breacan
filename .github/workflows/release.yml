@@ -16,9 +16,20 @@ jobs:
     outputs:
       created: ${{ steps.release.outputs.release_created }}
       tag: ${{ steps.release.outputs.tag_name }}
+      paths: ${{ steps.release.outputs.paths_released }}
     steps:
       - id: release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+      # release-please has no make-latest option, and GitHub marks the newest release Latest. The core's release is
+      # the one that stays Latest; the old binary's `v0.x` tags and each addon's `<name>-v*` tag never take it.
+      - name: Keep the core's release marked Latest
+        if: steps.release.outputs.releases_created == 'true'
+        run: |
+          core="$(gh release list --limit 100 --json tagName --jq '[.[] | select(.tagName | startswith("core-v"))][0].tagName // empty')"
+          if [ -n "$core" ]; then gh release edit "$core" --latest; fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
   binary:
     needs: release-please
     if: needs.release-please.outputs.created == 'true'
@@ -42,3 +53,32 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.release-please.outputs.tag }}
+  # Trusted publishing (OIDC): npm trusts this workflow file, so there is no stored token. Provenance is automatic and
+  # `--provenance` states it. Private packages (stubs, the old CLI at the root) are skipped.
+  npm:
+    needs: release-please
+    if: needs.release-please.outputs.paths != '' && needs.release-please.outputs.paths != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install --global npm@latest
+      - name: Publish each released public package
+        run: |
+          for dir in $(jq -r '.[]' <<<"$PATHS"); do
+            if [ "$dir" = "." ] || [ "$(jq -r '.private // false' "$dir/package.json")" = "true" ]; then continue; fi
+            (cd "$dir" && npm publish --provenance --access public)
+          done
+        env:
+          PATHS: ${{ needs.release-please.outputs.paths }}

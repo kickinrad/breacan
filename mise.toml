@@ -19,6 +19,10 @@ run = [
   "tar -czf dist/breacan-linux-x64.tar.gz -C dist breacan",
 ]
 
+[tasks.pack-smoke]
+# The core as a consumer gets it: packed, installed in an empty folder, run through bunx.
+run = "scripts/pack-smoke.sh"
+
 [tasks.reuse]
 run = "uvx reuse lint"
 

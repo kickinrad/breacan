@@ -1,0 +1,25 @@
+{
+  "name": "breacan",
+  "version": "0.0.0",
+  "description": "Build one look into each platform's native theme files from DTCG design tokens.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "William Tierney <wils@bestfootforward.business>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kickinrad/breacan.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/kickinrad/breacan#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "bin": {
+    "breacan": "bin/breacan.mjs"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ]
+}
