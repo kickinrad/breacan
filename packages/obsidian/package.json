@@ -1,7 +1,7 @@
 {
   "name": "@breacan/obsidian",
-  "version": "0.0.0",
-  "description": "The Breac\u00e1n obsidian addon.",
+  "version": "1.0.0",
+  "description": "The Breacán obsidian addon.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
