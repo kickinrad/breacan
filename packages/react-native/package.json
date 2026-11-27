@@ -1,7 +1,7 @@
 {
   "name": "@breacan/react-native",
-  "version": "0.0.0",
-  "description": "The Breac\u00e1n react-native addon.",
+  "version": "1.0.0",
+  "description": "The Breacán react-native addon.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
