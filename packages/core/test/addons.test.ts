@@ -8,14 +8,14 @@ import { afterAll, expect, test } from "bun:test";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { contrast } from "../src/color.mjs";
+import { contrast, srgb } from "../src/color.mjs";
 import { text } from "../src/header.mjs";
 import oldDtcg from "../../../src/outputs/dtcg.mjs";
 import dtcg from "../src/dtcg.ts";
-import { apply, compile, loadBases, readTheme } from "../src/theme.ts";
+import { apply, compile, loadBases, loadInputs, readTheme } from "../src/theme.ts";
 import { builtins } from "../src/builtins.ts";
 import scheme from "../src/scheme.ts";
-import type { BasePart, OutputPart } from "../src/addon.ts";
+import type { BasePart, InputPart, OutputPart } from "../src/addon.ts";
 
 const core = join(import.meta.dir, "..");
 const fixture = join(import.meta.dir, "fixtures/seed");
@@ -240,4 +240,20 @@ test("the dtcg output writes the 0.x output's tokens and resolver files byte for
     media: {}, options: { path: "tokens-out" }, name: "seed", version: undefined,
   });
   expect(files).toEqual(await old);
+});
+
+test("an input runs before the bases: its palette sits under the theme's own, and its tokens are a set of its own", async () => {
+  const order: string[] = [];
+  const input: InputPart = { kind: "input", name: "source", load: () => { order.push("input"); return { palette: { found: "#112233", mine: "#000000" }, tokens: { extra: { $type: "number", one: { $value: 1 } } } }; } };
+  const base: BasePart = { kind: "base", name: "neutral", tokens: () => { order.push("base"); return { tokens: { color: { $type: "color", accent: { default: { $value: srgb("#ffffff") } } } } }; } };
+  const loaded = await loadInputs([input], (each) => each.load({} as never));
+  const bases = await loadBases({ file: "theme.toml", name: "t", base: "neutral", palette: { mine: "#445566" }, roles: { "color.accent.default": "found" } }, [base], (each) => each.tokens({} as never));
+  expect(order).toEqual(["input", "base"]);
+  const document = compile({ file: "theme.toml", name: "t", base: "neutral", palette: { mine: "#445566" }, roles: { "color.accent.default": "found" } }, bases, loaded);
+  const tokens = Object.fromEntries(apply(document)[0].tokens.map((token) => [token.path, token]));
+  expect(tokens["color.accent.default"]).toMatchObject({ alias: "palette.found", value: { hex: "#112233" } });
+  expect(tokens["palette.mine"].value).toMatchObject({ hex: "#445566" });
+  expect(tokens["extra.one"].value).toBe(1);
+  await expect(loadInputs([{ ...input, name: "theme" }], (each) => each.load({} as never))).rejects.toThrow('an input cannot be named "theme"');
+  expect(() => compile({ file: "theme.toml", name: "t", base: "neutral", palette: {}, roles: {} }, bases, [{ name: "neutral", result: { tokens: {} } }])).toThrow('input "neutral" has the name of a base');
 });

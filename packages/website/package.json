@@ -1,7 +1,7 @@
 {
   "name": "@breacan/website",
   "version": "0.0.0",
-  "description": "The Breac\u00e1n website addon.",
+  "description": "Breacán input: a starting palette and primitives from a live website.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
@@ -18,5 +18,13 @@
   "peerDependencies": {
     "breacan": "*"
   },
-  "private": true
+  "exports": "./src/index.ts",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "dependencies": {
+    "dembrandt": "latest",
+    "playwright-core": "latest"
+  }
 }

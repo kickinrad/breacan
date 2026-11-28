@@ -1,4 +1,6 @@
 {
   ".": "0.34.0",
-  "packages/core": "0.0.0"
+  "packages/core": "0.0.0",
+  "packages/image": "0.0.0",
+  "packages/website": "0.0.0"
 }

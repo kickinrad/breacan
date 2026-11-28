@@ -33,13 +33,16 @@ A role must be one the base chain defines, with the same type. A misspelled role
 
 An addon is `{ name, contract, parts }`. `defineAddon` stamps `contract: 1`, and the core refuses an addon written for another contract, naming it. An addon with no `contract` reads as 1.
 
-Each part has a `kind` and a `name`. A part's name is unique across all the project's addons, whatever the kind. Write a part with `defineBase`, `defineOutput` or `defineCommand` to get its options typed from its schema.
+Each part has a `kind` and a `name`. A part's name is unique across all the project's addons, whatever the kind. Write a part with `defineInput`, `defineBase`, `defineOutput` or `defineCommand` to get its options typed from its schema.
 
 | Kind | Method | Gets | Returns |
 | --- | --- | --- | --- |
+| `input` | `load` | `options` and the helpers `read`, `log` and `warn` | `{ palette?, tokens? }` |
 | `base` | `tokens` | `options`, `mode`, `platform`, and the helpers `read`, `log` and `warn` | `{ tokens, modes?, mapping? }` |
 | `output` | `write` | `theme: { name }`, `permutations`, `options`, the helpers, and `output(name)` | The files to write, as `{ path, content }` |
 | `command` | `run` | `root`, `args`, `options`, `build()`, `check()`, `tokens()` and `parts(kind)` | Nothing; it throws to fail |
+
+An input reads a starting point from outside the theme, such as an image or a live site. Every input of the project runs first, before the bases. Its `palette` is named `#rrggbb` colours that join the theme's `[palette]` beneath its own, so a role can name them (`"color.accent.default" = "image-1"`); the theme's own name wins a clash. Its `tokens` are a token tree of primitives that join the resolution as a set named after the part, after the bases and before the theme. An input's name cannot be a base's or `theme`.
 
 A base's `base` names the base it starts from in turn. A command has a one-line `summary` for `--help`.
 
@@ -78,9 +81,11 @@ Two addons live in the core and a project lists them, as it lists any addon: `im
 - `scheme` is a base that starts from `neutral`. Its options are `seed` (a hex that Material's tonal-spot scheme grows the four colour roles from), `file` (a Base16, Base24 or iTerm2 scheme file; give it or a seed) and `dark` (with a seed, make the dark scheme). A file also writes `scheme.palette.base00` to `base17` and `scheme.ansi.0` to `15`.
 - `dtcg` is an output with the option `path`, default `ports/tokens`. It writes `<name>.tokens.json`, the resolved tokens as DTCG 2025.10, and `<name>.resolver.json`, a resolver over it. The bytes match the 0.x dtcg output's for the same tokens.
 
+Two inputs ship as separate packages. `@breacan/image` takes `file` and gives the palette names `image-1` to `image-3`. `@breacan/website` takes `url` and `snapshot` (default `design/site.json`), gives `site-1` to `site-3` and the `site.*` primitives, and adds the command `breacan site`. An addon's options are keyed by its package name, such as `options: { "@breacan/image": { file: "logo.png" } }`.
+
 ## Build and check
 
-`breacan build` compiles the theme over its base chain into a [DTCG 2025.10 resolver document](https://www.designtokens.org/tr/2025.10/resolver/). Each base is one set, root first, and the theme's palette and roles are the last set, named `theme`. The core resolves that document and runs every output part.
+`breacan build` compiles the theme over its base chain into a [DTCG 2025.10 resolver document](https://www.designtokens.org/tr/2025.10/resolver/). Each base is one set, root first, then each input's tokens, and the theme's palette and roles are the last set, named `theme`. The core resolves that document and runs every output part.
 
 Before it writes anything, the build checks every output path. It fails, naming the outputs, on a path outside the project root, an input of the build, the receipt, or a path two outputs write. Each output's text files get the generated header, and the build writes the files and `breacan.receipt.json`.
 
@@ -88,7 +93,9 @@ Before it writes anything, the build checks every output path. It fails, naming 
 
 ## Limits
 
-- Input parts are not in the contract yet. The `image` and `website` inputs bring their shape.
+- An input cannot make roles by itself: it gives palette names and primitives, and a theme (or a later seed-reading base) points roles at them. The 0.x sources grew every role from their seeds through a colour engine.
+- An input reads text through `read`. A binary file such as an image goes through `read` only to record it as a build input, then through `Bun.file`.
+- `@breacan/website` reads the page with `breacan site`, not on build, so a build never touches the network. It needs Chrome, from `$CHROME`, the PATH or Playwright's download, and it keeps `design/site.json`, which the receipt holds. Its `site.brand` and `site.plain` fonts are primitives, since the neutral base has no font roles yet.
 - A base that returns `modes` fails, and the core does not read a base's `mapping`. The full role set brings both.
 - `permutations` holds one entry with an empty `input`, and the `css` output writes only that one, in one `:root` block. Modes and the dial add more.
 - The core reads only the resolver documents it writes: references to its own sets with inline sources. Modifiers and file references come with the dial.
