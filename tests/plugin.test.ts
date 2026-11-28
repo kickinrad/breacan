@@ -7,7 +7,7 @@
 import { expect, test } from "bun:test";
 import { cpSync, existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { HEADER_LINE } from "../src/header.mjs";
+import { HEADER_LINE } from "../packages/core/src/header.mjs";
 import { read, root, run, scratch } from "./helpers";
 
 const SKILL = "---\nname: kit\ndescription: The kit's own skill.\n---\n\n# The kit\n";

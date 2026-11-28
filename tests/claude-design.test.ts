@@ -8,7 +8,7 @@ import { cpSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { version as beerVersion } from "beercss/package.json";
 import specimens from "../src/web/components.js";
-import { HEADER_LINE } from "../src/header.mjs";
+import { HEADER_LINE } from "../packages/core/src/header.mjs";
 import { read, root, run, scratch } from "./helpers";
 
 // The fixture kit with this output after its css and beer outputs, and `edit` applied to the config.

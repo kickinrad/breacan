@@ -11,7 +11,7 @@
 // Options: files (one or two scheme paths, at most one per variant).
 import { readFileSync } from "node:fs";
 import YAML from "yaml";
-import { bestOn, luminance, mix, textSafe } from "../color.mjs";
+import { bestOn, luminance, mix, textSafe } from "../../packages/core/src/color.mjs";
 
 const HEX = /^#?[0-9a-fA-F]{6}$/;
 // tinted-theming's base16-shell order; Base24 has its own bright colours.

@@ -7,7 +7,7 @@ import { expect, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { read, run, scratch } from "./helpers";
-import { contrast } from "../src/color.mjs";
+import { contrast } from "../packages/core/src/color.mjs";
 import { checkContract, contract } from "../src/contract.mjs";
 
 const plain = (extra = "") => {

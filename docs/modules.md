@@ -97,6 +97,6 @@ Each token in `tokens` holds:
 
 The built-in modules share these helpers in the engine's source:
 
-- `src/color.mjs` holds the colour maths: `luminance`, `contrast`, `mix`, `bestOn`, `stateLayer`, `textSafe`, `hsl` and `rgb`.
+- `packages/core/src/color.mjs` holds the colour maths: `luminance`, `contrast`, `mix`, `bestOn`, `stateLayer`, `textSafe`, `hsl` and `rgb`.
 - `src/motion.mjs` turns springs into CSS `linear()` easings.
 - `src/type.mjs` holds the fifteen type styles.

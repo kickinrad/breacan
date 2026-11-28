@@ -7,7 +7,7 @@ import { expect, test } from "bun:test";
 import { cpSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { read, root, run, scratch } from "./helpers";
-import { contrast } from "../src/color.mjs";
+import { contrast } from "../packages/core/src/color.mjs";
 
 // Tokyo Mono's own Base24 schemes, as its repo builds them.
 const kit = (files: string[]) => {

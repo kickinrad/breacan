@@ -8,7 +8,7 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { join, resolve } from "node:path";
 import {
   bestOn, byPath, contrast, hsl, linear, luminance, mix, rgb, stateLayer, textSafe,
-} from "../src/color.mjs";
+} from "../packages/core/src/color.mjs";
 import { contrastPairs, toHex } from "../src/checks/contrast.mjs";
 import { scratch } from "./helpers";
 

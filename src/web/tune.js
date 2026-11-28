@@ -5,7 +5,7 @@
 // Tune: what theme.toml sets that a person changes, as controls. `controls` is the model (plain data, no markup),
 // so any host can draw it; `tuneView` draws it in breacan edit's panel (/_breacan/panel). Groups take DTCG 2025.10's type names (color,
 // fontFamily, dimension, duration); a control's label is its plain name and its theme.toml path is the detail.
-import { contrast } from "../color.mjs";
+import { contrast } from "../../packages/core/src/color.mjs";
 import { fills, pairs } from "./foundations.js";
 
 const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

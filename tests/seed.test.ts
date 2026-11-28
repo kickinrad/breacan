@@ -7,7 +7,7 @@ import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { Hct, SchemeTonalSpot, argbFromHex, hexFromArgb } from "@material/material-color-utilities";
 import { read, run, scratch } from "./helpers";
-import { contrast } from "../src/color.mjs";
+import { contrast } from "../packages/core/src/color.mjs";
 import { contract } from "../src/contract.mjs";
 import { TARGETS } from "../src/foundations/leonardo.mjs";
 

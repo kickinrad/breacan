@@ -8,8 +8,8 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import material from "./material.mjs";
-import { readTokens, resolve as resolveTokens, typography } from "./resolve.mjs";
-import { checkHeader, stamp } from "./header.mjs";
+import { readTokens, resolve as resolveTokens, typography } from "../packages/core/src/resolve.mjs";
+import { checkHeader, stamp } from "../packages/core/src/header.mjs";
 import { checkContrast, contrastPairs } from "./checks/contrast.mjs";
 import { derive } from "./derived.mjs";
 import { loadTheme, withMedia } from "./theme.mjs";
@@ -17,8 +17,8 @@ import { optionsFor, render, resolveModules, withDefaults } from "./modules.mjs"
 import { loadResolver } from "./resolver.mjs";
 import { colours, shared } from "./base.mjs";
 import { checkContract } from "./contract.mjs";
-import { checkReceipt, readReceipt, receipt, RECEIPT } from "./receipt.mjs";
-import { wantsHeader } from "./header.mjs";
+import { checkReceipt, readReceipt, receipt, RECEIPT } from "../packages/core/src/receipt.mjs";
+import { wantsHeader } from "../packages/core/src/header.mjs";
 import { platformLayers } from "./dial.mjs";
 import pkg from "../package.json" with { type: "json" };
 

@@ -9,7 +9,7 @@
 // yellow, green, cyan) when it has them; a slot without one keeps Minimal's. The third text tier and the strong
 // border take the kit's on-surface-muted and comment roles when it has them, else Material's outline and outline-variant.
 // Options: out (path prefix: <out>-<mode>.css). The title, the mode names and the monospace face are the theme's.
-import { byPath, contrast, hsl, rgb } from '../color.mjs';
+import { byPath, contrast, hsl, rgb } from '../../packages/core/src/color.mjs';
 import { rolePath, twoModes } from '../system.mjs';
 
 const SLOTS = { red: 'error', orange: 'orange', yellow: 'yellow', green: 'green', cyan: 'cyan', blue: 'primary', purple: 'tertiary', pink: 'secondary' };

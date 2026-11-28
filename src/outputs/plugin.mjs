@@ -12,7 +12,7 @@
 // UI on the kit), repository (a URL, where the kit's files are) and author ({ name, email?, url? }).
 import { join } from "node:path";
 import specimens from "../web/components.js";
-import { text } from "../header.mjs";
+import { text } from "../../packages/core/src/header.mjs";
 
 const NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const M3 = "https://m3.material.io/";
