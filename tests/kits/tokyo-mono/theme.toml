@@ -1,0 +1,22 @@
+# The new core's project for tokyo-mono, beside the old design/theme.toml: the night palette and the roles the new core has.
+# tests/migrate-theme.ts seeded it; each task that adds a theme.toml section extends it by hand.
+name = "tokyo-mono"
+
+[palette]
+crust = "#141414"
+mantle = "#1f1f1f"
+base = "#292929"
+surface0 = "#333333"
+surface1 = "#3d3d3d"
+text = "#ffffff"
+subtext1 = "#d6d6d6"
+subtext0 = "#adadad"
+overlay = "#666666"
+blue = "#7aa2f7"
+cyan = "#7dcfff"
+purple = "#bb9af7"
+green = "#9ece6a"
+red = "#f79178"
+orange = "#ff9e64"
+yellow = "#e0af68"
+teal = "#73daca"

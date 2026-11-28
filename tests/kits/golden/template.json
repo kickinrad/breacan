@@ -1,0 +1,24 @@
+{
+  "tokyo-mono": {
+    "base16/tokyo-mono-day.yaml": "132023f8fde66ffcd8c2ac358d7e81c71d7c4fcc813bfccfb232356ba7f02f01",
+    "base16/tokyo-mono-night.yaml": "a719efdaab82fc09685c2473df7fd285afbc53a931040545138199a7072215cb",
+    "plugins/tokyo-mono/skills/tokyo-mono/references/palette.md": "54fd8d2b1c320249bab680f4ce358af15ab774e3acf33f7a5f80ad30e71dc482",
+    "ports/bat/tokyo-mono.tmTheme": "c7aee7fe9b5fbc4946893455972e699797876bb091e160e3d68496d46f18cdd9",
+    "ports/claude-code/tokyo-mono-day.json": "66f4e258696a95af0a394873043a6b242a57a5ece4c9e2cb6f2ae9a26e61abd4",
+    "ports/claude-code/tokyo-mono-night.json": "5d919b2a24658baa7f285912e02dde5347e7e1ca3349ef7a55269942b90668d5",
+    "ports/codex/tokyo-mono-day.tmTheme": "8520e58c84f482aaf688adccb4856aa04b458b6149adf4a0e2031f7b6540d873",
+    "ports/codex/tokyo-mono-night.tmTheme": "e20b7f7ea35bc3fc3ccf4c5bd30b43aef9e01a0f6e1c776fcbc3c60f9554a94d",
+    "ports/delta/gitconfig-snippet.ini": "003be8a3b84ed4419bbb8e181b47b78133825fd61f17ba06aa391721ba9349c5",
+    "ports/dispatch/night.json": "49b07805f97ad230a679e75bcf86d735bcbd3e8bb2134dac4f68917ef29b2515",
+    "ports/hello-zsh/config-theme.toml": "b6ffa746a218ef29920aab56a8b81babb86baf7e79086db6af12d4e09d5499c7",
+    "ports/lazygit/config.yml": "91fa6abe2306e5e4030b810e2d802105bc0171c2d995f29d851e3d3b3a3b54b0",
+    "ports/starship/tokyo-mono.toml": "ea413a7ef5e422681e314ea05ed011ac9b71cdb8e662f652ebef80156f309bd5",
+    "ports/tmux/tokyo-mono-day.conf": "2c027fff8606c6c5a46ce1b3589dabaf23d7119570e976b6595f002d946ea729",
+    "ports/tmux/tokyo-mono.conf": "c99ab51228855f1fa90e407dce3b43559fed8d5b48abfdd3e3b41e266eb01b88",
+    "ports/vscode/package.json": "2b61e9809cec2e86c1989087348e0a96a920889ead36d7dcd08ac90959ad005b",
+    "ports/vscode/themes/tokyo-mono-day-color-theme.json": "bf6f8fae094445b131a2a4c9335e33ee70f16e9cdd2d53a7ed404194e70934bd",
+    "ports/vscode/themes/tokyo-mono-night-color-theme.json": "1e7f7692f0823d88dc75f7f1078d748a2fc987cb88c4fb3e3342fbe346cea7ea",
+    "ports/windows-terminal/tokyo-mono-day.json": "a313f78ea40cfce7206f41cc5a3663888768837661f31b2acb44fb076e048f0e",
+    "ports/windows-terminal/tokyo-mono-night.json": "795b76da8ad7f4a22fe000c1662de721f3207771180f1e0fb0207351ba80b452"
+  }
+}
