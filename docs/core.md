@@ -41,7 +41,7 @@ Each part has a `kind` and a `name`. A part's name is unique across all the proj
 | `output` | `write` | `theme: { name }`, `permutations`, `options`, the helpers, and `output(name)` | The files to write, as `{ path, content }` |
 | `command` | `run` | `root`, `args`, `options`, `build()`, `check()`, `tokens()` and `parts(kind)` | Nothing; it throws to fail |
 
-A base's `base` names the base it starts from in turn. A command has a one-line `summary` for `--help`.
+Any part may also carry `rules`, which `breacan lint` adds to its own (see Lint). A base's `base` names the base it starts from in turn. A command has a one-line `summary` for `--help`.
 
 `permutations` lists each resolution of the theme's resolver document, as `{ input, tokens }`. Each token has a `path`, `segments`, a `type` and a `value` typed by that type, with every alias resolved. The `breacan/css` export turns a token into CSS: `cssVar(token)` gives `--color-surface-default`, and `cssValue(token)` gives `#fbf7f0`.
 
@@ -78,6 +78,12 @@ Two addons live in the core and a project lists them, as it lists any addon: `im
 - `scheme` is a base that starts from `neutral`. Its options are `seed` (a hex that Material's tonal-spot scheme grows the four colour roles from), `file` (a Base16, Base24 or iTerm2 scheme file; give it or a seed) and `dark` (with a seed, make the dark scheme). A file also writes `scheme.palette.base00` to `base17` and `scheme.ansi.0` to `15`.
 - `dtcg` is an output with the option `path`, default `ports/tokens`. It writes `<name>.tokens.json`, the resolved tokens as DTCG 2025.10, and `<name>.resolver.json`, a resolver over it. The bytes match the 0.x dtcg output's for the same tokens.
 
+## Lint
+
+`breacan lint [<path>…]` flags a value hand-typed in source that the theme defines, one `path:line: rule: value` line per finding, and exits 1 when it finds any. With no path it reads the project root. It reads a file with one of the extensions `.css`, `.scss`, `.yaml`, `.yml`, `.py`, `.js`, `.mjs`, `.ts`, `.jinja`, `.html`, `.kt`, `.kts`, `.astro`, `.tsx`, `.jsx`, `.vue` and `.svelte`, and skips hidden folders, `node_modules` and generated files. The built-in rules are colour, motion, type size, radius, spacing and z-index. A line with `lint: own <why>` and a reason is a deliberate local value and passes.
+
+An addon adds rules with a `rules` list on any of its parts: `{ name, extensions?, check(line, file) }`. `check` returns each value to flag on the line. Without `extensions` a rule reads every linted file. The rules field is the smaller hook: a new part kind would touch kind validation, `parts()` and the help listing, and a rule needs no options of its own.
+
 ## Build and check
 
 `breacan build` compiles the theme over its base chain into a [DTCG 2025.10 resolver document](https://www.designtokens.org/tr/2025.10/resolver/). Each base is one set, root first, and the theme's palette and roles are the last set, named `theme`. The core resolves that document and runs every output part.
@@ -100,4 +106,7 @@ Before it writes anything, the build checks every output path. It fails, naming 
 - The neutral base holds five roles: `color.surface.default`, `color.text.default`, `color.accent.default`, `color.on-accent.default` and `corner.control`.
 - The `css` output writes every resolved token, the palette included.
 - An output's file content is text. Binary files arrive with the Material addon.
+- Lint reads a line at a time, so a value split across lines, or in a template literal built from parts, goes unflagged. It checks no theme values: it flags the shape of a hand-typed value, not whether the theme defines that exact value.
+- The rules file (`breacan.rules.json`) checks of 0.x lint, such as unknown kit variables and emoji icons, are not ported; the `agent-plugin` addon brings them as rules.
+- `breacan lint` runs from the project root, so a path is relative to the root, not the folder it was typed in.
 - The core ships its TypeScript source and runs on Bun only. Its sources use the `Bun` global, so a typecheck needs Bun's type definitions.

@@ -7,6 +7,7 @@
 import { defineAddon, defineBase, defineCommand, defineOutput } from "./addon.ts";
 import { srgb } from "./color.mjs";
 import { cssValue, cssVar } from "./css.ts";
+import { lint } from "./lint.ts";
 
 const colour = (hex: string) => ({ $value: srgb(hex) });
 
@@ -49,6 +50,18 @@ export const builtins = defineAddon({
       name: "check",
       summary: "Fail when an output or input differs from breacan.receipt.json.",
       run: ({ check }) => check(),
+    }),
+    defineCommand({
+      name: "lint",
+      summary: "Flag a hand-typed value the theme defines in the files or folders given (default: here).",
+      run: ({ args, parts }) => {
+        const rules = (["base", "output", "command"] as const).flatMap((kind) => parts(kind).flatMap((part) => part.rules ?? []));
+        const found = lint(args.length ? args : ["."], rules);
+        if (found.length) {
+          console.log(found.join("\n"));
+          throw new Error(`lint found ${found.length} hand-typed value${found.length === 1 ? "" : "s"}`);
+        }
+      },
     }),
   ],
 });
