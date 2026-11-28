@@ -1,6 +1,6 @@
 {
   "name": "breacan",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Build one look into each platform's native theme files from DTCG design tokens.",
   "type": "module",
   "license": "Apache-2.0",
