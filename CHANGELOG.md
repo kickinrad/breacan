@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.34.0](https://github.com/kickinrad/breacan/compare/v0.33.0...v0.34.0) (2026-11-28)
+
+
+### Features
+
+* ✨ add the bun workspace, many-package releases and npm publishing ([#157](https://github.com/kickinrad/breacan/issues/157)) ([a0bac0e](https://github.com/kickinrad/breacan/commit/a0bac0e431a1bc1cbe6270734efd59957badaf71))
+
+
+### Bug Fixes
+
+* 🐛 release only the old CLI and the core, at 0.x ([#174](https://github.com/kickinrad/breacan/issues/174)) ([9d3f19a](https://github.com/kickinrad/breacan/commit/9d3f19a78c7269e2517359a8d605bc9d09f196e6))
+* 🐛 release only the old CLI and the core, starting the core at 0.1.0 ([9d3f19a](https://github.com/kickinrad/breacan/commit/9d3f19a78c7269e2517359a8d605bc9d09f196e6))
+
 ## [0.33.0](https://github.com/kickinrad/breacan/compare/v0.32.1...v0.33.0) (2026-11-25)
 
 
