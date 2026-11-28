@@ -33,4 +33,5 @@ Each Tokyo kit holds its old inputs (`breacan.config.mjs`, `design/`) beside the
 - The new core's `css` golden is the five-role neutral stylesheet, so Tokyo Material's and Boombox's differ from the old ones until the Material addon ports them.
 - The new core builds `src/styles/tokens.css` for a kit whose config sets no css path, since `css` is a built-in. Tokyo Mono's is in `golden/new/css.json`, its only entry, because it has no old golden.
 - A test per kit and CLI fails when a build writes a path no addon owns, or an addon with no golden for the kit. Each addon's test compares the whole built map, not only the golden's paths.
+- The new core's `dtcg` output writes no mode file yet, so Tokyo Material's `golden/new/dtcg.json` lacks `tokyo-material.day.tokens.json`. Modes bring it back, and the new entry is then removed if the bytes match.
 - A fixture's new-shape files are a copy: the new core's studio and addons read them, but nothing checks they stay equal to the old inputs.
