@@ -66,7 +66,7 @@ test("a seed makes Material's tonal-spot roles, light or dark, and they read at 
     const dir = project(withScheme(`{ seed: "#3b5bdb", dark: ${dark} }`));
     expect(breacan(dir, "build").stderr).toBe("");
     const { color } = json(dir, "tokens-out/seed.tokens.json");
-    return Object.fromEntries(Object.entries<any>(color).filter(([key]) => key !== "$type").map(([key, role]) => [key, role.default.$value.hex]));
+    return Object.fromEntries(["surface", "text", "accent", "on-accent"].map((key) => [key, color[key].default.$value.hex]));
   };
   const [light, dark] = [roles(false), roles(true)];
   expect(light.surface).not.toBe(dark.surface);
@@ -234,9 +234,10 @@ test("the dtcg output writes the 0.x output's tokens and resolver files byte for
   const [{ tokens }] = apply(compile(theme, await loadBases(theme, bases, (base) => base.tokens({ options: base.name === "scheme" ? options : {}, mode: "default", read: async () => "", log() {}, warn() {} }))));
   const [write] = dtcg.parts as OutputPart[];
   const files = await write.write({ theme: { name: "seed" }, permutations: [{ input: {}, tokens }], options: { path: "tokens-out" }, read: async () => "", log() {}, warn() {}, output: async () => [] });
-  // The 0.x output reads tokens as { path, segments, type, raw }: a colour's raw is its hex.
+  // The 0.x output reads tokens as { path, segments, type, raw }: a colour's raw is its hex, with its alpha as #rrggbbaa.
+  const hex = ({ hex, alpha }: { hex?: string; alpha?: number }) => hex + (alpha === undefined ? "" : Math.round(alpha * 255).toString(16).padStart(2, "0"));
   const old = (oldDtcg as any).run({
-    tokens: tokens.map((token) => ({ ...token, raw: token.type === "color" ? token.value.hex : token.value })),
+    tokens: tokens.map((token) => ({ ...token, raw: token.type === "color" ? hex(token.value) : token.value })),
     media: {}, options: { path: "tokens-out" }, name: "seed", version: undefined,
   });
   expect(files).toEqual(await old);

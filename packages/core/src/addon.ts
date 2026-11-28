@@ -70,8 +70,21 @@ export interface OutputFile {
   content: string;
 }
 
-/** Where a base's value comes from: the platform's own, derived from others, or kept from the base below. */
-export type Mapping = Record<string, { source: "published" | "derived" | "kept"; from?: string }>;
+/**
+ * A base's mapping table: one row per core role, by role path, saying where the base's value comes from. In the
+ * fill order a role takes the platform's own value (`published`), else one computed from published values
+ * (`derived`), else it keeps the value of the base below (`kept`).
+ */
+export type Mapping = Record<string, MappingRow>;
+export interface MappingRow {
+  source: "published" | "derived" | "kept";
+  /** The citation: the token path or spec page the value comes from, the derivation, or why the base has none. */
+  from?: string;
+  /** The platform's own token for the role, such as `md.sys.color.surface`. */
+  token?: string;
+  /** The platform API's symbol for the role, by API, such as `{ swiftui: "Color(.systemBackground)" }`. */
+  symbols?: Record<string, string>;
+}
 
 /** What every part may do besides return its result: read a project file, and tell the person running the build. */
 export interface Talk {

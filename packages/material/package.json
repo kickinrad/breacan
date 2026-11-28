@@ -15,8 +15,19 @@
     "access": "public",
     "provenance": true
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "mapping.json",
+    "README.md"
+  ],
   "peerDependencies": {
     "breacan": "*"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@material/material-color-utilities": "latest"
+  }
 }
