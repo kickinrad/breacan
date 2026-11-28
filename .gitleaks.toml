@@ -4,4 +4,4 @@ useDefault = true
 
 [[allowlists]]
 description = "Golden output digests"
-paths = ['''^tests/kits/[^/]+\.golden\.json$''']
+paths = ['''^tests/kits/golden/(new/)?[^/]+\.json$''']

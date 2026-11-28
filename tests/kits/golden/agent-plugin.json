@@ -1,0 +1,10 @@
+{
+  "tokyo-material": {
+    "plugins/tokyo-material/.claude-plugin/plugin.json": "81b75bcd167f9b14bef8c1eefbf9cca8a4e7b732d8c76c93f6ad41382b6f8382",
+    "plugins/tokyo-material/skills/tokyo-material/references/breacan.rules.json": "27f20fb2840e32f4d707f60004bb6f3f18fdaf56c25d49c43e98961c3545a768",
+    "plugins/tokyo-material/skills/tokyo-material/references/components.md": "bb14b970eb85218f6f90b9be384781c2a622bc5b58acc800b5f3aec51c97115b",
+    "plugins/tokyo-material/skills/tokyo-material/references/index.md": "f1acdfa97f78e3b6e0adef8a9e9665f94ecf38151434504b46bcb277341675bc",
+    "plugins/tokyo-material/skills/tokyo-material/references/notes.md": "9ba63889e17fc3bc4f939443e5ce68708a72f1c33c0b9f1c7fe1e1990dd6b845",
+    "plugins/tokyo-material/skills/tokyo-material/references/theme.toml": "6436570d77be050cc2825c90c5a9cf6c70deb3c4404a803b5768e041d5ed9cb8"
+  }
+}

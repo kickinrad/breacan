@@ -1,0 +1,7 @@
+{
+  "tokyo-material": {
+    "ports/tokens/tokyo-material.day.tokens.json": "a83fb25cb327a4b27c2ac69d001b1b0eee297002c01929b985c4ae90246b180b",
+    "ports/tokens/tokyo-material.resolver.json": "c8b2f6df1eb4dbc31169ba309850e27801b564124a8dedf8b5a8dd736951de2c",
+    "ports/tokens/tokyo-material.tokens.json": "fc33763ce589150579d5d43282d34a21a047529533d7b1d3734121e3e226e403"
+  }
+}
