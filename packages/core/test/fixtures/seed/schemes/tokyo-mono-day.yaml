@@ -1,0 +1,32 @@
+system: "base24"
+name: "Tokyo Mono Day"
+author: "kickinrad (https://github.com/kickinrad/tokyo-mono)"
+variant: "light"
+
+# base00–base0F as in base16/tokyo-mono-day.yaml; base10–base17 add the deeper panels and the bright ANSI colours,
+# which Tokyo Mono keeps equal to the normal ones, as its Windows Terminal scheme does.
+palette:
+  base00: "#ffffff"  # Default Background
+  base01: "#fafafa"  # Lighter Background
+  base02: "#d1d1d1"  # Selection Background
+  base03: "#e0e0e0"  # Comments, Invisibles
+  base04: "#616161"  # Dark Foreground
+  base05: "#424242"  # Default Foreground
+  base06: "#242424"  # Light Foreground
+  base07: "#242424"  # Lightest Foreground
+  base08: "#f54729"  # Red
+  base09: "#cf7b20"  # Orange
+  base0A: "#8c6c3e"  # Yellow
+  base0B: "#587539"  # Green
+  base0C: "#007197"  # Cyan
+  base0D: "#2e7de9"  # Blue
+  base0E: "#9854f1"  # Purple
+  base0F: "#118c74"  # Teal
+  base10: "#f5f5f5"  # Darker Background
+  base11: "#ebebeb"  # Darkest Background
+  base12: "#f54729"  # Bright Red
+  base13: "#8c6c3e"  # Bright Yellow
+  base14: "#587539"  # Bright Green
+  base15: "#007197"  # Bright Cyan
+  base16: "#2e7de9"  # Bright Blue
+  base17: "#9854f1"  # Bright Magenta

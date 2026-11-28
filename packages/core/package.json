@@ -20,7 +20,13 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./css": "./src/css.ts"
+    "./color": "./src/color.mjs",
+    "./css": "./src/css.ts",
+    "./dtcg": "./src/dtcg.ts",
+    "./scheme": "./src/scheme.ts"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "latest"
   },
   "files": [
     "bin",

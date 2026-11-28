@@ -50,6 +50,9 @@
       "bin": {
         "breacan": "bin/breacan.mjs",
       },
+      "dependencies": {
+        "@material/material-color-utilities": "latest",
+      },
     },
     "packages/design-md": {
       "name": "@breacan/design-md",

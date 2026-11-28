@@ -25,7 +25,7 @@ SPDX-FileCopyrightText = ["2021 The Android Open Source Project", "2022 The Andr
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "tests/schemes/dracula.itermcolors"
+path = ["tests/schemes/dracula.itermcolors", "packages/core/test/fixtures/seed/schemes/dracula.itermcolors"]
 precedence = "override"
 SPDX-FileCopyrightText = ["2011 Mark Badolato", "Zeno Rocha"]
 SPDX-License-Identifier = "MIT"

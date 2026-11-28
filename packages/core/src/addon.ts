@@ -73,14 +73,22 @@ export interface OutputFile {
 /** Where a base's value comes from: the platform's own, derived from others, or kept from the base below. */
 export type Mapping = Record<string, { source: "published" | "derived" | "kept"; from?: string }>;
 
-export interface BaseContext<O> {
+/** What every part may do besides return its result: read a project file, and tell the person running the build. */
+export interface Talk {
+  /** Reads a file from the project root and records it as a build input, so `breacan check` holds it. */
+  read(path: string): Promise<string>;
+  /** Prints a line to stdout, prefixed with the part's name. */
+  log(message: string): void;
+  /** Prints a line to stderr, prefixed with `warning:` and the part's name. The build goes on. */
+  warn(message: string): void;
+}
+
+export interface BaseContext<O> extends Talk {
   options: O;
   /** The mode being built. */
   mode: string;
   /** The platform being built, when an output asks for one. */
   platform?: string;
-  /** Reads a file from the project root and records it as a build input, so `breacan check` holds it. */
-  read(path: string): Promise<string>;
 }
 export interface BaseResult {
   tokens: TokenTree;
@@ -90,11 +98,16 @@ export interface BaseResult {
   mapping?: Mapping;
 }
 
-export interface OutputContext<O> {
+export interface OutputContext<O> extends Talk {
   theme: { name: string };
   /** Every resolution of the theme; an output writes each one it supports. */
   permutations: Permutation[];
   options: O;
+  /**
+   * The files another output of the project writes, as it wrote them: before the generated header, and before the
+   * build checks their paths. It fails for an output the project lacks, and for two outputs that ask for each other.
+   */
+  output(name: string): Promise<OutputFile[]>;
 }
 
 export interface CommandContext<O> {

@@ -41,7 +41,7 @@ const withAddon = (parts: string) => `export default { addons: [{ name: "extra",
 const writes = (path: string) => `{ kind: "output", name: "out", write: () => [{ path: ${JSON.stringify(path)}, content: "x" }] }`;
 
 const bases = builtins.parts.filter((part): part is BasePart => part.kind === "base");
-const tokensOf = (base: BasePart) => base.tokens({ options: {}, mode: "default", read: async () => "" });
+const tokensOf = (base: BasePart) => base.tokens({ options: {}, mode: "default", read: async () => "", log() {}, warn() {} });
 const resolved = async (theme: Theme, extra: BasePart[] = []) => apply(compile(theme, await loadBases(theme, [...bases, ...extra], tokensOf)))[0].tokens;
 const value = (tokens: Awaited<ReturnType<typeof resolved>>, path: string) => {
   const token = tokens.find((each) => each.path === path);
