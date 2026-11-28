@@ -83,7 +83,7 @@ test("options are keyed by addon name, checked by type, and a part name belongs 
 test("an addon for another contract fails by name, and only the owning addon provides a core verb", async () => {
   await expect(loadProject(project('export default { addons: [{ name: "future", contract: 2, parts: [] }] };\n'))).rejects.toThrow("future is written for addon contract 2; this core reads contract 1");
   expect(defineAddon({ name: "x", parts: [] }).contract).toBe(1);
-  await expect(loadProject(project(withAddon('{ kind: "command", name: "lint", summary: "s", run() {} }')))).rejects.toThrow('extra: "lint" is a core verb, which only breacan provides');
+  await expect(loadProject(project(withAddon('{ kind: "command", name: "init", summary: "s", run() {} }')))).rejects.toThrow('extra: "init" is a core verb, which only breacan provides');
   await expect(loadProject(project(withAddon('{ kind: "command", name: "studio", summary: "s", run() {} }')))).rejects.toThrow("only @breacan/studio provides");
 });
 

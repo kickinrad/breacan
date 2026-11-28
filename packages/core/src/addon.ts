@@ -122,10 +122,22 @@ export interface CommandContext<O> {
   parts<K extends Part["kind"]>(kind: K): readonly Extract<Part, { kind: K }>[];
 }
 
+/** One `breacan lint` rule. It sees a line at a time and returns each hand-typed value it finds there. */
+export interface LintRule {
+  /** Names the rule in each finding: `path:line: <name>: <value>`. */
+  name: string;
+  /** File extensions it reads, with the dot. It reads every linted file when unset. */
+  extensions?: string[];
+  /** The values on `line` this rule flags; empty when the line is fine. */
+  check(line: string, file: string): string[];
+}
+
 interface PartShape<S extends OptionsSchema> {
   /** Unique across the project's addons. */
   name: string;
   options?: S;
+  /** Rules `breacan lint` adds to its own. Any kind of part may carry them. */
+  rules?: LintRule[];
 }
 /** Supplies role values a theme starts from. `base` names the base it starts from in turn. */
 export interface BasePart<S extends OptionsSchema = OptionsSchema> extends PartShape<S> {
