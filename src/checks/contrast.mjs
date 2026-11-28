@@ -6,7 +6,7 @@
 // them (each on-colour on its colour, the fixed roles, on-surface on the page, the card and the top surface,
 // outline on every surface), each derived mark group's pairs, and any pairs the kit lists; a named exception
 // lowers one pair's floor, with a reason. Every pair is resolved in every mode, and a pair under its floor fails.
-import { contrast } from "../color.mjs";
+import { contrast } from "../../packages/core/src/color.mjs";
 
 const sys = (role) => `md.sys.color.${role}`;
 const ACCENTS = ["primary", "secondary", "tertiary", "error"];

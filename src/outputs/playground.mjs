@@ -38,7 +38,7 @@ const beerCss = async () => {
 export const bundle = async (client, color, entry = "playground.js") => {
   const dir = mkdtempSync(join(tmpdir(), "breacan-playground-"));
   try {
-    for (const [file, text] of client) writeFileSync(join(dir, file), text.replaceAll('"../color.mjs"', '"./color.mjs"'));
+    for (const [file, text] of client) writeFileSync(join(dir, file), text.replaceAll('"../../packages/core/src/color.mjs"', '"./color.mjs"'));
     writeFileSync(join(dir, "color.mjs"), color);
     const result = await Bun.build({ entrypoints: [join(dir, entry)], target: "browser", format: "esm" });
     if (!result.success) throw new Error(`playground: the client did not bundle\n${result.logs.join("\n")}`);
@@ -48,7 +48,7 @@ export const bundle = async (client, color, entry = "playground.js") => {
     rmSync(dir, { recursive: true, force: true });
   }
 };
-// The client's modules; each imports the colour maths from "../color.mjs" in the source and "./color.mjs" beside the page.
+// The client's modules; each imports the colour maths from "../../packages/core/src/color.mjs" in the source and "./color.mjs" beside the page.
 const CLIENT = ["playground.js", "examples.js", "foundations.js", "components.js", "cards.js", "pages.js", "columns.js"];
 // A source file as text. The engine imports some of them as modules too (color.mjs, and the specimens the
 // claude-design output reads), and the bundler cannot embed a module as text beside importing it, so the binary
@@ -123,7 +123,7 @@ export default {
     const columnData = sets && { beer: mapping.split("\n").map((line) => line.trim()), base: shown.base, theme: shown.theme, fonts,
       platforms: Object.fromEntries(Object.entries(platforms ?? {}).map(([platform, each]) => [platform, { level: each.level, native: shown[`${platform}:native`], kit: shown[`${platform}:kit`] }])) };
 
-    const color = await source("../color.mjs");
+    const color = await source("../../packages/core/src/color.mjs");
     const client = await Promise.all(CLIENT.map(async (file) => [file, await source(`../web/${file}`)]));
     const fields = [
       `"name": ${JSON.stringify(name)}`,

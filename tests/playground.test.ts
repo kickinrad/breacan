@@ -6,8 +6,8 @@
 import { expect, test } from "bun:test";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { contrast } from "../src/color.mjs";
-import { HEADER_LINE } from "../src/header.mjs";
+import { contrast } from "../packages/core/src/color.mjs";
+import { HEADER_LINE } from "../packages/core/src/header.mjs";
 import { command, read, root, run, scratch } from "./helpers";
 
 

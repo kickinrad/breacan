@@ -15,7 +15,7 @@ run = "bun test"
 # playwright-core (the site source's browser driver) requires chromium-bidi, which only its BiDi channels reach.
 # The release asset holds the one binary, so `mise use github:kickinrad/breacan` puts `breacan` on the PATH.
 run = [
-  "bun build --compile --target=bun-linux-x64 --external \"chromium-bidi/*\" --asset src/color.mjs --asset src/web --asset node_modules/beercss/dist/cdn bin/breacan.mjs --outfile dist/breacan",
+  "bun build --compile --target=bun-linux-x64 --external \"chromium-bidi/*\" --asset packages/core/src/color.mjs --asset src/web --asset node_modules/beercss/dist/cdn bin/breacan.mjs --outfile dist/breacan",
   "tar -czf dist/breacan-linux-x64.tar.gz -C dist breacan",
 ]
 

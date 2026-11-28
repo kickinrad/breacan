@@ -11,7 +11,7 @@
 // holds each platform's base-mode tokens that differ from the base file (src/dial.mjs).
 // Options: path (a directory).
 import { join, resolve } from "node:path";
-import { text } from "../header.mjs";
+import { text } from "../../packages/core/src/header.mjs";
 import { EXTENSION } from "../resolver.mjs";
 
 const kept = (token) => !(token.builtin && token.path.startsWith("md.comp."));

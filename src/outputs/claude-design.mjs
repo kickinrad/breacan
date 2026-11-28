@@ -14,7 +14,7 @@ import beerCss from "beercss/dist/cdn/beer.min.css" with { type: "text" };
 import { version as beerVersion } from "beercss/package.json";
 import specimens from "../web/components.js";
 import { fontLinks } from "../web/foundations.js";
-import { text } from "../header.mjs";
+import { text } from "../../packages/core/src/header.mjs";
 
 const BEER_JS = `https://cdn.jsdelivr.net/npm/beercss@${beerVersion}/dist/cdn/beer.min.js`;
 // Beer's icon face, with the axes its fill and weight classes move.

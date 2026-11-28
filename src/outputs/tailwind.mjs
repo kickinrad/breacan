@@ -8,7 +8,7 @@
 // grows with the kit. Breakpoints and shadows stay Tailwind's: a breakpoint must be a literal width, and a
 // kit has no one variable per shadow.
 // Options: path (the file), css (the kit's runtime CSS file, named in the header).
-import { byPath } from '../color.mjs';
+import { byPath } from '../../packages/core/src/color.mjs';
 import { colorRoles, need } from '../system.mjs';
 
 const v = (path) => `var(--${path.replaceAll('.', '-')})`;

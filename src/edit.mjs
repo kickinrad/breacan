@@ -100,7 +100,7 @@ export const edit = async ({ config, port = 4400 }) => {
 
   // The panel's page: the kit's draft css (replaced live), the panel's stylesheet on the kit's variables, its client.
   const panel = async () => {
-    const color = await source("../color.mjs");
+    const color = await source("../../packages/core/src/color.mjs");
     const client = await Promise.all(["panel.js", "tune.js", "foundations.js"].map(async (file) => [file, await source(`../web/${file}`)]));
     return `<!doctype html>
 <html lang="en">

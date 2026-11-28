@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Foundations: the kit's values, read from the mode's tokens and drawn in the live theme's variables.
-// Each item is { id, name, body(data, tokens) → html }; the colour maths are the engine's, in "../color.mjs".
-import { bestOn, contrast } from "../color.mjs";
+// Each item is { id, name, body(data, tokens) → html }; the colour maths are the engine's, in "../../packages/core/src/color.mjs".
+import { bestOn, contrast } from "../../packages/core/src/color.mjs";
 
 // A token's CSS variable, as the kit's css output names it.
 const variable = (path) => `var(--${path.replaceAll(".", "-")})`;

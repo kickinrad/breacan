@@ -5,7 +5,7 @@
 // The Kit panel's control model: plain names first (the theme.toml path is the detail), DTCG's groups, each colour
 // with the pairs that hold it and whether they pass, and units on every length and time.
 import { expect, test } from "bun:test";
-import { contrast } from "../src/color.mjs";
+import { contrast } from "../packages/core/src/color.mjs";
 import { controls, status, tuneView, valueOf } from "../src/web/tune.js";
 
 const tokens = (palette: Record<string, string>, extra: { path: string; value: string; type: string }[] = []) => [

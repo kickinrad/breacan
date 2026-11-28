@@ -4,7 +4,7 @@
 
 // What the outputs read of a kit's tokens, by the kit's name (ctx.name): the colour roles, the corner scale,
 // a role's path. Pure functions over the resolved tokens.
-import { byPath } from './color.mjs';
+import { byPath } from '../packages/core/src/color.mjs';
 
 const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

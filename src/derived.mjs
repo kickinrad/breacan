@@ -10,7 +10,7 @@
 //   - a fixed role keeps one value in both modes: the other mode's container and the base mode's accent;
 //   - a mark is a group item's colour on the surface, and in the other mode tone 40 of its hue for the listed items.
 import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities';
-import { bestOn, byPath, contrast, stateLayer, textSafe } from './color.mjs';
+import { bestOn, byPath, contrast, stateLayer, textSafe } from '../packages/core/src/color.mjs';
 
 const colour = ($value, $description) => ({ $type: 'color', $value, $description, $extensions: { 'com.kickinrad.derived': true } });
 

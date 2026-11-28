@@ -4,7 +4,7 @@ Three verbs keep a kit and the apps on it honest. `breacan check` holds a kit's 
 
 ## The receipt
 
-Each `breacan build` writes `breacan.receipt.json`. It holds the sha256 of every input the build read and of every file it wrote. The code is `src/receipt.mjs`.
+Each `breacan build` writes `breacan.receipt.json`. It holds the sha256 of every input the build read and of every file it wrote. The code is `packages/core/src/receipt.mjs`.
 
 The inputs are:
 

@@ -18,8 +18,13 @@
   "bin": {
     "breacan": "bin/breacan.mjs"
   },
+  "exports": {
+    ".": "./src/index.ts",
+    "./css": "./src/css.ts"
+  },
   "files": [
     "bin",
+    "src",
     "README.md"
   ]
 }

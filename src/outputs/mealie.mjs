@@ -21,7 +21,7 @@
 // are the colours of Material's surface, surface-container-low, -container, -container-high and -container-highest,
 // the text on-surface's and the quieter text on-surface-variant's.
 import { basename } from 'node:path';
-import { contrast, linear } from '../color.mjs';
+import { contrast, linear } from '../../packages/core/src/color.mjs';
 import { twoModes } from '../system.mjs';
 
 const SLOT_KEYS = ['primary', 'accent', 'secondary', 'success', 'info', 'warning', 'error'];

@@ -7,6 +7,7 @@
 // trees in memory, one for the base mode and one per other mode; nothing is written beside it.
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { srgb } from "../packages/core/src/color.mjs";
 
 // Brand and plain fill Material's own typeface slots; mono and icon sit under the kit's name.
 const FACES = { brand: ["md", "ref", "typeface", "brand"], plain: ["md", "ref", "typeface", "plain"], mono: ["typeface", "mono"], icon: ["typeface", "icon"] };
@@ -33,8 +34,7 @@ const tokenPath = (value, where) => { text(value, where).split(".").forEach((par
 
 const colour = (hex, where) => {
   if (typeof hex !== "string" || !/^#[0-9a-fA-F]{6}$/.test(hex)) fail(`${where} must be a six-digit hex like #rrggbb, not ${JSON.stringify(hex)}`);
-  const components = [1, 3, 5].map((at) => Math.round(parseInt(hex.slice(at, at + 2), 16) / 255 * 1e4) / 1e4);
-  return { colorSpace: "srgb", components, hex: hex.toLowerCase() };
+  return srgb(hex);
 };
 
 const put = (tree, path, token) => {

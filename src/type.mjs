@@ -5,7 +5,7 @@
 // The fifteen Material type styles as targets emit them, read from the resolved tokens
 // (md.sys.typescale.*: the built-in Material layer with a kit's overrides over it). Emphasized styles
 // stay in the tokens; no target emits them yet.
-import { byPath } from './color.mjs';
+import { byPath } from '../packages/core/src/color.mjs';
 
 export const STYLES = ['display-large', 'display-medium', 'display-small', 'headline-large', 'headline-medium',
   'headline-small', 'title-large', 'title-medium', 'title-small', 'body-large', 'body-medium', 'body-small',

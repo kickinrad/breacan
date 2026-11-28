@@ -5,7 +5,7 @@
 // The resolver: layers merge lowest first, and a token's type comes from itself, its group, its alias, or the
 // token it replaced.
 import { expect, test } from "bun:test";
-import { resolve } from "../src/resolve.mjs";
+import { resolve } from "../packages/core/src/resolve.mjs";
 
 const typeOf = (layers: object[], path: string) => resolve(layers.map((tree) => ({ tree }))).find((token) => token.path === path)?.type;
 

@@ -8,7 +8,7 @@
 // A kit's theme, and later its platform's language, override any of it.
 import { blue, blueDark, gray, grayDark, red, redDark, slate, slateDark, violet, violetDark } from "@radix-ui/colors";
 import { SPACING, TYPE_ROLES } from "./contract.mjs";
-import { textSafe } from "./color.mjs";
+import { textSafe } from "../packages/core/src/color.mjs";
 
 const colour = (hex) => ({ $type: "color", $value: hex });
 const px = (value) => ({ $type: "dimension", $value: { value, unit: "px" } });

@@ -1,16 +1,29 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 // SPDX-FileCopyrightText: 2026 William Tierney
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// The core's command line. The tracer in the next task fills it; today it prints usage.
-const usage = "usage: breacan <command>\n\nThe new core is being built. Use the 0.33 release of the old binary until it ships.";
+// The core's command line. Each verb is a command part of the project's addons, the core's own build and check first.
+import { commandContext } from "../src/build.ts";
+import { builtins } from "../src/builtins.ts";
+import { loadProject, partsOf } from "../src/project.ts";
 
-const args = process.argv.slice(2);
-if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
-  console.log(usage);
+const usage = (commands) => `usage: breacan <command>\n\n${commands.map((each) => `  ${each.name.padEnd(8)}${each.summary}`).join("\n")}`;
+const fail = (message) => { console.error(`breacan: ${message}`); process.exit(1); };
+
+const [verb, ...args] = process.argv.slice(2);
+if (verb === undefined || verb === "--help" || verb === "-h") {
+  // Help needs no project: outside one it lists the core's commands.
+  let commands = partsOf({ addons: [builtins] }, "command");
+  try { commands = partsOf(await loadProject(process.cwd()), "command"); } catch {}
+  console.log(usage(commands));
 } else {
-  console.error(`breacan: unknown command "${args[0]}"\n${usage}`);
-  process.exitCode = 1;
+  try {
+    const project = await loadProject(process.cwd());
+    const command = partsOf(project, "command").find((each) => each.name === verb);
+    if (!command) fail(`unknown command "${verb}"\n${usage(partsOf(project, "command"))}`);
+    process.chdir(project.root);
+    await command.run(commandContext(project, command, args));
+  } catch (error) { fail(error.message); }
 }

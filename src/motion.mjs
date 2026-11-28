@@ -6,7 +6,7 @@
 // unit mass); CSS has no spring, so each becomes a linear() easing: the spring's position sampled from
 // rest to its settle time (within 0.1 % of the target), plus that settle time as the duration to pair
 // it with. Pure functions; the token names come from the built-in Material layer's md.sys.motion.
-import { byPath } from './color.mjs';
+import { byPath } from '../packages/core/src/color.mjs';
 
 // Position of a unit-mass spring released from 0 toward 1, at `t` seconds.
 export const position = (ratio, stiffness, t) => {

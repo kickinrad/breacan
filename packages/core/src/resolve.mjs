@@ -184,7 +184,7 @@ const shadow = (value) => (Array.isArray(value) ? value : [value]).map((item) =>
 }).join(", ");
 
 // One value as its CSS scalar, by type. A type with no CSS form leaves the value as it is, and the build refuses it.
-const scalar = (type, value) => {
+export const scalar = (type, value) => {
   switch (type) {
     case "color": return colour(value);
     case "dimension": case "duration": return unit(value);

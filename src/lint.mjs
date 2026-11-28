@@ -9,7 +9,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
 import beerCss from "beercss/dist/cdn/beer.min.css" with { type: "text" };
-import { hasHeader } from "./header.mjs";
+import { hasHeader } from "../packages/core/src/header.mjs";
 import layoutCss from "./web/layout.css" with { type: "text" };
 import materialCss from "./web/material.css" with { type: "text" };
 
