@@ -5,5 +5,5 @@
 import { defineConfig } from "breacan";
 
 export default defineConfig({
-  options: { css: { path: "styles/tokens.css" } },
+  options: { breacan: { path: "styles/tokens.css" } },
 });

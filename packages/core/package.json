@@ -19,7 +19,8 @@
     "breacan": "bin/breacan.mjs"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./css": "./src/css.ts"
   },
   "files": [
     "bin",

@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // The core's command line. Each verb is a command part of the project's addons, the core's own build and check first.
-import { partsOf } from "../src/addon.ts";
+import { commandContext } from "../src/build.ts";
 import { builtins } from "../src/builtins.ts";
-import { loadProject } from "../src/project.ts";
+import { loadProject, partsOf } from "../src/project.ts";
 
 const usage = (commands) => `usage: breacan <command>\n\n${commands.map((each) => `  ${each.name.padEnd(8)}${each.summary}`).join("\n")}`;
 const fail = (message) => { console.error(`breacan: ${message}`); process.exit(1); };
@@ -24,6 +24,6 @@ if (verb === undefined || verb === "--help" || verb === "-h") {
     const command = partsOf(project, "command").find((each) => each.name === verb);
     if (!command) fail(`unknown command "${verb}"\n${usage(partsOf(project, "command"))}`);
     process.chdir(project.root);
-    await command.run({ project, args });
+    await command.run(commandContext(project, command, args));
   } catch (error) { fail(error.message); }
 }

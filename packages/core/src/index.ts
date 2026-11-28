@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// The core's public API: the addon contract's types, and the two helpers that type a config and an addon.
-export { defineAddon, defineConfig } from "./addon.ts";
+// The core's public API: the addon contract's types, and the helpers that type a config, an addon and its parts.
+export { CONTRACT, defineAddon, defineBase, defineCommand, defineConfig, defineOutput } from "./addon.ts";
 export type {
-  Addon, BasePart, CommandContext, CommandPart, Config, InputPart, OptionSpec, Options, OptionsSchema, OutputContext,
-  OutputFile, OutputPart, Part, Project, Theme, Token, TokenTree,
+  Addon, BaseContext, BasePart, BaseResult, CommandContext, CommandPart, Config, Mapping, OptionSpec, OptionsOf,
+  OptionsSchema, OutputContext, OutputFile, OutputPart, Part, Permutation, Token, TokenTree, TokenValues,
 } from "./addon.ts";
