@@ -83,7 +83,10 @@ const optionsOf = (addon: Addon, given: Record<string, unknown> = {}) => {
       schema[key] = spec;
     }
   }
-  // shortcut: an option name no part declares passes through, until task 5c refuses it with the known list.
+  const known = Object.keys(schema);
+  for (const key of Object.keys(given)) {
+    if (!Object.hasOwn(schema, key)) throw new Error(`${addon.name}: unknown option "${key}"; ${known.length ? `the known options are ${known.join(", ")}` : "this addon takes no options"}`);
+  }
   const options: Record<string, unknown> = { ...given };
   for (const [key, spec] of Object.entries(schema)) {
     if (options[key] === undefined && spec.default !== undefined) options[key] = spec.default;

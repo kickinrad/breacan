@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2026 William Tierney
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name = "seed"
+base = "scheme"

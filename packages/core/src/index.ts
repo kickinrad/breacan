@@ -6,5 +6,5 @@
 export { CONTRACT, defineAddon, defineBase, defineCommand, defineConfig, defineOutput } from "./addon.ts";
 export type {
   Addon, BaseContext, BasePart, BaseResult, CommandContext, CommandPart, Config, Mapping, OptionSpec, OptionsOf,
-  OptionsSchema, OutputContext, OutputFile, OutputPart, Part, Permutation, Token, TokenTree, TokenValues,
+  OptionsSchema, OutputContext, OutputFile, OutputPart, Part, Permutation, Talk, Token, TokenTree, TokenValues,
 } from "./addon.ts";
