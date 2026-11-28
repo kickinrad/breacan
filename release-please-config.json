@@ -12,6 +12,18 @@
       "component": "core",
       "package-name": "breacan",
       "initial-version": "0.1.0"
+    },
+    "packages/image": {
+      "release-type": "node",
+      "component": "image",
+      "package-name": "@breacan/image",
+      "initial-version": "0.1.0"
+    },
+    "packages/website": {
+      "release-type": "node",
+      "component": "website",
+      "package-name": "@breacan/website",
+      "initial-version": "0.1.0"
     }
   }
 }

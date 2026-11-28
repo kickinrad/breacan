@@ -1,7 +1,7 @@
 {
   "name": "@breacan/image",
   "version": "0.0.0",
-  "description": "The Breac\u00e1n image addon.",
+  "description": "Breacán input: a starting palette from an image.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "William Tierney <wils@bestfootforward.business>",
@@ -18,5 +18,13 @@
   "peerDependencies": {
     "breacan": "*"
   },
-  "private": true
+  "exports": "./src/index.ts",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "dependencies": {
+    "@material/material-color-utilities": "latest",
+    "pngjs": "latest"
+  }
 }

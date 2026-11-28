@@ -8,7 +8,7 @@
 // chain root first, then the theme, so each layer overrides the one before it.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { BasePart, Permutation, Token, TokenTree } from "./addon.ts";
+import type { BasePart, InputPart, InputResult, Permutation, Token, TokenTree } from "./addon.ts";
 import { srgb } from "./color.mjs";
 import { resolve } from "./resolve.mjs";
 
@@ -117,6 +117,23 @@ export interface ResolverDocument {
   resolutionOrder: { $ref: string }[];
 }
 
+// Every input of the project, run before the bases, with what it returned. An input's name is its set's name, so it
+// cannot take the theme's or a base's.
+export const loadInputs = async (inputs: InputPart[], resultOf: (input: InputPart) => ReturnType<InputPart["load"]>) => {
+  const loaded: { name: string; result: InputResult }[] = [];
+  for (const input of inputs) {
+    if (input.name === "theme") fail('an input cannot be named "theme"; the theme\'s own set has that name');
+    const result = await resultOf(input);
+    if (!isTable(result)) throw new Error(`input ${input.name}: load() must return { palette?, tokens? }`);
+    for (const [key, hex] of Object.entries(result.palette ?? {})) {
+      if (!NAME.test(key) || typeof hex !== "string" || !HEX.test(hex)) throw new Error(`input ${input.name}: palette ${JSON.stringify(key)} must be a name and a hex like #rrggbb`);
+    }
+    if (result.tokens !== undefined && !isTable(result.tokens)) throw new Error(`input ${input.name}: tokens must be a token tree`);
+    loaded.push({ name: input.name, result });
+  }
+  return loaded;
+};
+
 // Each base in the theme's chain, root first, with the tree it returns.
 // shortcut: a base's other modes are refused, and its mapping table is not read; both arrive with task 5b.
 export const loadBases = async (theme: Theme, bases: BasePart[], tokensOf: (base: BasePart) => ReturnType<BasePart["tokens"]>) => {
@@ -133,17 +150,23 @@ export const loadBases = async (theme: Theme, bases: BasePart[], tokensOf: (base
 
 // The theme over its loaded base chain. A role must be one the chain defines, with the same type, so a misspelled
 // role or a colour given to a corner fails here.
-export const compile = (theme: Theme, bases: { name: string; tree: TokenTree }[]): ResolverDocument => {
+// Each input's tokens are a set after the bases, and its palette sits under the theme's own.
+export const compile = (theme: Theme, bases: { name: string; tree: TokenTree }[], inputs: { name: string; result: InputResult }[] = []): ResolverDocument => {
   const sets: ResolverDocument["sets"] = Object.fromEntries(bases.map(({ name, tree }) => [name, { sources: [tree] }]));
+  for (const { name, result } of inputs) {
+    if (sets[name]) fail(`input "${name}" has the name of a base; a part's name is unique`);
+    if (result.tokens) sets[name] = { sources: [result.tokens] };
+  }
+  const given = Object.assign({}, ...inputs.map(({ result }) => result.palette), theme.palette) as Record<string, string>;
   const roles: TokenTree = {};
   for (const [path, value] of Object.entries(theme.roles)) {
     const known = bases.map(({ tree }) => lookup(tree, path)).findLast(Boolean);
     if (!known) fail(`[roles] ${path} is not a role base "${theme.base}" has`);
-    const token = roleToken(path, value, theme.palette);
+    const token = roleToken(path, value, given);
     if (token.$type !== known!.type) fail(`[roles] ${path} is a ${known!.type}, not a ${token.$type}`);
     put(roles, path, token);
   }
-  const palette = Object.fromEntries(Object.entries(theme.palette).map(([key, hex]) => [key, { $value: srgb(hex) }]));
+  const palette = Object.fromEntries(Object.entries(given).map(([key, hex]) => [key, { $value: srgb(hex) }]));
   sets.theme = { sources: [{ ...(Object.keys(palette).length && { palette: { $type: "color", ...palette } }), ...roles }] };
   return { version: "2025.10", name: theme.name, sets, resolutionOrder: Object.keys(sets).map((name) => ({ $ref: `#/sets/${name}` })) };
 };

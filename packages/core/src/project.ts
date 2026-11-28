@@ -14,7 +14,7 @@ import { THEME } from "./theme.ts";
 export const CONFIG = "breacan.config.ts";
 const CONFIG_KEYS = ["addons", "paths", "options"];
 const PATH_KEYS = ["theme"];
-const KINDS = ["base", "output", "command"];
+const KINDS = ["input", "base", "output", "command"];
 // The core's verbs, and the one addon each may come from.
 const RESERVED: Record<string, string> = { init: builtins.name, add: builtins.name, build: builtins.name, check: builtins.name, lint: builtins.name, studio: "@breacan/studio" };
 

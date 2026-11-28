@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // The addon contract: one shape for every addon, the core's built-ins included. An addon is a name and a list of
-// parts, and each part is a base (role values a theme starts from), an output (files) or a command (a CLI verb).
+// parts, and each part is an input (a starting point read from outside), a base (role values a theme starts from), an output (files) or a command (a CLI verb).
 // An addon's parts share one options block, keyed by the addon's name in the config and checked against the
 // union of the parts' schemas. Write a part with defineBase, defineOutput or defineCommand to get its options typed.
 
@@ -83,6 +83,16 @@ export interface Talk {
   warn(message: string): void;
 }
 
+export interface InputContext<O> extends Talk {
+  options: O;
+}
+export interface InputResult {
+  /** Named raw colours, as #rrggbb. They join the theme's `[palette]` beneath its own, so a role can name them. */
+  palette?: Record<string, string>;
+  /** Primitives of the input's own, a token tree. They join the resolution as a set named after the part. */
+  tokens?: TokenTree;
+}
+
 export interface BaseContext<O> extends Talk {
   options: O;
   /** The mode being built. */
@@ -127,6 +137,11 @@ interface PartShape<S extends OptionsSchema> {
   name: string;
   options?: S;
 }
+/** Reads a starting point from outside the theme, such as an image. Every input runs before the bases. */
+export interface InputPart<S extends OptionsSchema = OptionsSchema> extends PartShape<S> {
+  kind: "input";
+  load(context: InputContext<OptionsOf<S>>): InputResult | Promise<InputResult>;
+}
 /** Supplies role values a theme starts from. `base` names the base it starts from in turn. */
 export interface BasePart<S extends OptionsSchema = OptionsSchema> extends PartShape<S> {
   kind: "base";
@@ -146,7 +161,7 @@ export interface CommandPart<S extends OptionsSchema = OptionsSchema> extends Pa
   run(context: CommandContext<OptionsOf<S>>): void | Promise<void>;
 }
 
-export type Part = BasePart<any> | OutputPart<any> | CommandPart<any>;
+export type Part = InputPart<any> | BasePart<any> | OutputPart<any> | CommandPart<any>;
 
 export interface Addon {
   /** The npm package name, such as `@breacan/tailwind`; the config keys the addon's options by it. */
@@ -168,6 +183,7 @@ export interface Config {
 
 /** Stamps the contract version on an addon. */
 export const defineAddon = (addon: Omit<Addon, "contract">): Addon => ({ ...addon, contract: CONTRACT });
+export const defineInput = <const S extends OptionsSchema = {}>(part: Omit<InputPart<S>, "kind">): InputPart<S> => ({ ...part, kind: "input" });
 export const defineBase = <const S extends OptionsSchema = {}>(part: Omit<BasePart<S>, "kind">): BasePart<S> => ({ ...part, kind: "base" });
 export const defineOutput = <const S extends OptionsSchema = {}>(part: Omit<OutputPart<S>, "kind">): OutputPart<S> => ({ ...part, kind: "output" });
 export const defineCommand = <const S extends OptionsSchema = {}>(part: Omit<CommandPart<S>, "kind">): CommandPart<S> => ({ ...part, kind: "command" });

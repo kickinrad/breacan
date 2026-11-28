@@ -12,7 +12,7 @@ import type { CommandContext, OutputFile, OutputPart, Part, Talk } from "./addon
 import { stamp, wantsHeader } from "./header.mjs";
 import { partsOf, type Project } from "./project.ts";
 import { checkReceipt, readReceipt, receipt, RECEIPT } from "./receipt.mjs";
-import { apply, compile, loadBases, readTheme, THEME } from "./theme.ts";
+import { apply, compile, loadBases, loadInputs, readTheme, THEME } from "./theme.ts";
 import pkg from "../package.json" with { type: "json" };
 
 // What a part gets besides its result: reading a project file, and telling the person running the build.
@@ -27,8 +27,9 @@ const resolveTheme = async (project: Project) => {
   const theme = await readTheme(project.root, project.config.paths?.theme ?? THEME);
   const inputs = [theme.file, project.configFile].filter((path): path is string => path !== undefined);
   const read = async (path: string) => { inputs.push(path); return readFile(resolve(project.root, path), "utf8"); };
+  const inputsLoaded = await loadInputs(partsOf(project, "input"), (input) => input.load({ options: project.optionsFor(input), ...talk(input, read) }));
   const bases = await loadBases(theme, partsOf(project, "base"), (base) => base.tokens({ options: project.optionsFor(base), mode: "default", ...talk(base, read) }));
-  return { theme, inputs, read, permutations: apply(compile(theme, bases)) };
+  return { theme, inputs, read, permutations: apply(compile(theme, bases, inputsLoaded)) };
 };
 
 const run = async (project: Project) => {
