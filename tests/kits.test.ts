@@ -16,6 +16,7 @@ for (const cli of clis()) {
     if (dir) prepare(cli, kit, dir);
     const has = dir && cli === "new" ? await outputNames(dir) : undefined;
     let built: Golden | undefined;
+    const once = () => (built ??= build(cli, kit, dir!));
     for (const addon of goldenAddons()) {
       const files = expected(cli, addon, kit.name);
       if (!files) continue;
@@ -23,9 +24,14 @@ for (const cli of clis()) {
       if (!dir) test.skip(`${name} (set BOOMBOX_DESIGN to run it)`, () => {});
       else if (has && !has.includes(addon)) test.skip(`${name} (the new core has no "${addon}" output yet)`, () => {});
       else test(name, () => {
-        built ??= build(cli, kit, dir);
-        expect(Object.fromEntries(Object.keys(files).map((path) => [path, built![addon]?.[path] ?? "missing"]))).toEqual(files);
+        expect(once()[addon] ?? {}).toEqual(files);
       }, 60_000);
     }
+    // Every output the build writes belongs to an addon with a golden for this kit, the new core's own css included.
+    if (dir) test(`${cli} CLI: ${kit.name} writes no output without a golden`, () => {
+      const ungolden = Object.keys(once()).filter((addon) => !expected(cli, addon, kit.name));
+      expect(ungolden).toEqual([]);
+    }, 60_000);
+    else test.skip(`${cli} CLI: ${kit.name} writes no output without a golden (set BOOMBOX_DESIGN to run it)`, () => {});
   }
 }

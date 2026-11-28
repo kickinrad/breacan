@@ -4,5 +4,8 @@
   },
   "tokyo-material": {
     "docs/playground/tokyo-material.css": "c1b2e4424f50aaa917a255672d2924f730c80496000675ad362640181f143b1c"
+  },
+  "tokyo-mono": {
+    "src/styles/tokens.css": "acbc93c9f822968e571510c86b60232a004885b541555a3ecbc566cda2d7fee3"
   }
 }

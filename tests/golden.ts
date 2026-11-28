@@ -52,7 +52,7 @@ export const owner = (kit: string, path: string): string | undefined => {
   if (path.startsWith("ports/mealie/")) return "mealie";
   if (/-beer\.css$/.test(path)) return "beer";
   if (path === "docs/playground/index.html") return "playground";
-  if (/^docs\/playground\/[^/]+\.css$/.test(path)) return "css";
+  if (/^docs\/playground\/[^/]+\.css$/.test(path) || path === "src/styles/tokens.css") return "css";
   if (path.startsWith("ports/tokens/")) return "dtcg";
   if (path.startsWith("ports/react-native/")) return "react-native";
   if (path.startsWith("ports/claude-design/")) return "claude-design";
@@ -97,9 +97,8 @@ export const outputNames = async (dir: string): Promise<string[]> => partsOf(awa
 
 const sha = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
 
-/** Run `breacan build` in the prepared `dir` and return each addon's files, path → sha256. Fails on a nonzero exit or
- * any stderr. A path no addon owns fails for the old CLI, so a new output cannot dodge the goldens; the new core's
- * extra files, such as the css default for a kit that has no css golden, are not compared. */
+/** Run `breacan build` in the prepared `dir` and return each addon's files, path → sha256. Fails on a nonzero exit,
+ * any stderr, or a written path no addon owns, so no output dodges the goldens. */
 export const build = (cli: Cli, kit: Kit, dir: string): Golden => {
   const result = Bun.spawnSync([...command(cli), "build"], { cwd: dir, stderr: "pipe" });
   const stderr = result.stderr.toString();
@@ -108,10 +107,7 @@ export const build = (cli: Cli, kit: Kit, dir: string): Golden => {
   const built: Golden = {};
   for (const { path } of outputs) {
     const addon = owner(kit.name, path);
-    if (addon === undefined) {
-      if (cli === "old") throw new Error(`no addon owns ${path} in ${kit.name}; add a rule to owner() in tests/golden.ts`);
-      continue;
-    }
+    if (addon === undefined) throw new Error(`no addon owns ${path} in ${kit.name}; add a rule to owner() in tests/golden.ts`);
     (built[addon] ??= {})[path] = sha(join(dir, path));
   }
   return built;
@@ -131,8 +127,9 @@ export const writeGolden = (cli: Cli, addon: string, kit: string, files: Record<
   writeFileSync(file, `${JSON.stringify(sort(Object.fromEntries(Object.entries(golden).map(([name, entries]) => [name, sort(entries)]))), null, 2)}\n`);
 };
 
-/** Every addon with a golden for the old CLI. */
-export const goldenAddons = (): string[] => (existsSync(join(root, "tests/kits/golden")) ? readdirSync(join(root, "tests/kits/golden")) : []).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -5)).sort();
+/** Every addon with a golden, old or new. */
+export const goldenAddons = (): string[] => [...new Set(["tests/kits/golden", "tests/kits/golden/new"].flatMap((dir) =>
+  existsSync(join(root, dir)) ? readdirSync(join(root, dir)).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -5)) : []))].sort();
 
 /** The files an addon's kit must build to under `cli`: the new core's own golden where it has one, else the old. */
 export const expected = (cli: Cli, addon: string, kit: string): Record<string, string> | undefined =>

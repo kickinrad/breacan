@@ -31,5 +31,6 @@ Each Tokyo kit holds its old inputs (`breacan.config.mjs`, `design/`) beside the
 
 - The new-shape `theme.toml` holds the night palette and three of the four neutral roles. The new core has no modes, faces, tokens, derived roles or contrast settings, and `color.on-accent.default` comes from a derived Material role. Each task that adds a section extends `tests/migrate-theme.ts` and the Tokyo fixtures.
 - The new core's `css` golden is the five-role neutral stylesheet, so Tokyo Material's and Boombox's differ from the old ones until the Material addon ports them.
-- The new core builds `src/styles/tokens.css` for every kit, since `css` is a built-in. Only the kit's golden paths are compared, so that file is not.
+- The new core builds `src/styles/tokens.css` for a kit whose config sets no css path, since `css` is a built-in. Tokyo Mono's is in `golden/new/css.json`, its only entry, because it has no old golden.
+- A test per kit and CLI fails when a build writes a path no addon owns, or an addon with no golden for the kit. Each addon's test compares the whole built map, not only the golden's paths.
 - A fixture's new-shape files are a copy: the new core's studio and addons read them, but nothing checks they stay equal to the old inputs.
