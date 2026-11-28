@@ -178,9 +178,34 @@ test("ctx.output fails for an output the project lacks, and for outputs that ask
   const cycle = project(extra(`
     { kind: "output", name: "a", write: async ({ output }) => output("b") },
     { kind: "output", name: "b", write: async ({ output }) => output("a") }`), plain);
-  expect(breacan(cycle, "build").stderr).toContain("outputs ask for each other: a → b → a");
+  expect(breacan(cycle, "build").stderr).toContain("outputs ask for each other: b → a → b");
   const self = project(extra(`{ kind: "output", name: "a", write: async ({ output }) => output("a") }`), plain);
   expect(breacan(self, "build").stderr).toContain("outputs ask for each other: a → a");
+});
+
+test("outputs that wait on each other at once fail naming the chain instead of hanging", () => {
+  const dir = project(extra(`
+    { kind: "output", name: "a", write: async ({ output }) => (await Promise.all([output("b"), output("c")])).flat() },
+    { kind: "output", name: "b", write: async ({ output }) => { await Bun.sleep(5); return output("c"); } },
+    { kind: "output", name: "c", write: async ({ output }) => { await Bun.sleep(5); return output("b"); } }`), plain);
+  const result = breacan(dir, "build");
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr).toMatch(/outputs ask for each other: (b → c → b|c → b → c)/);
+});
+
+test("an output may not write a file that this or another output read", () => {
+  const dir = project(extra(`
+    { kind: "output", name: "reader", write: async ({ read }) => { await read("data.txt"); return []; } },
+    { kind: "output", name: "writer", write: () => [{ path: "data.txt", content: "x" }] }`), plain);
+  writeFileSync(join(dir, "data.txt"), "input");
+  const result = breacan(dir, "build");
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr).toContain("output writer writes data.txt, which is an input of the build");
+  expect(read(dir, "data.txt")).toBe("input");
+  const self = project(extra(`{ kind: "output", name: "both", write: async ({ read }) => [{ path: "data.txt", content: await read("data.txt") }] }`), plain);
+  writeFileSync(join(self, "data.txt"), "input");
+  expect(breacan(self, "build").stderr).toContain("output both writes data.txt, which is an input of the build");
+  expect(read(self, "data.txt")).toBe("input");
 });
 
 test("an output reads a project file through ctx.read, and the receipt holds it", () => {

@@ -96,7 +96,7 @@ Before it writes anything, the build checks every output path. It fails, naming 
 - `scheme` makes one variant, since bases return no modes yet: a file gives its own, and a seed gives the one `dark` picks. The 0.x source took a light and a dark file together. It sets four roles and not Material's whole set, which the full role set brings.
 - `dtcg` writes the one permutation, so it has no mode or platform files yet. Those come with modes and the dial.
 - `ctx.log` and `ctx.warn` print straight to the console, so `breacan check` prints them too. An output that logs is noisy on every check.
-- `ctx.output` returns another output's files before their path check, so it can hand back a path the build then refuses for the other output.
+- `ctx.output` returns another output's files before their path check, so it can hand back a path the build then refuses for the other output. The path check runs after every output has run, so a file any output read is an input.
 - The neutral base holds five roles: `color.surface.default`, `color.text.default`, `color.accent.default`, `color.on-accent.default` and `corner.control`.
 - The `css` output writes every resolved token, the palette included.
 - An output's file content is text. Binary files arrive with the Material addon.
