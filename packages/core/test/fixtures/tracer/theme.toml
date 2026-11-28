@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 William Tierney
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name = "tracer"
+base = "neutral"
+
+[palette]
+paper = "#fbf7f0"
+ink = "#2b2118"
+rust = "#b4441c"
+
+[roles]
+color.surface.default = "paper"
+color.text.default = "ink"
+color.accent.default = "rust"
+corner.control = "4px"

@@ -47,4 +47,6 @@ export const hsl = (hex) => {
   const h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
   return [Math.round(h * 60), Math.round(s * 100), Math.round(l * 100)];
 };
+// A #rrggbb hex as a DTCG 2025.10 colour value: sRGB components to four places, the hex kept beside them.
+export const srgb = (hex) => ({ colorSpace: "srgb", components: [1, 3, 5].map((at) => Math.round(Number.parseInt(hex.slice(at, at + 2), 16) / 255 * 1e4) / 1e4), hex: hex.toLowerCase() });
 export const rgb = (hex) => hex.match(/[0-9a-f]{2}/gi).map((c) => Number.parseInt(c, 16));
