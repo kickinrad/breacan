@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 William Tierney
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name = "m3"
+base = "material"
+
+[palette]
+paper = "#fbf7f0"
+rust = "#b4441c"
+
+[roles]
+color.accent.default = "rust"
+
+[platform.material.roles]
+md.sys.color.surface-container-high = "paper"

@@ -5,30 +5,13 @@
 // The core's own addon, the same shape as any other: the neutral base, the css output, and the build and check
 // commands. Every project has it, first, and its options block in the config is `breacan`.
 import { defineAddon, defineBase, defineCommand, defineOutput } from "./addon.ts";
-import { srgb } from "./color.mjs";
 import { cssValue, cssVar } from "./css.ts";
-
-const colour = (hex: string) => ({ $value: srgb(hex) });
+import { neutral } from "./neutral.ts";
 
 export const builtins = defineAddon({
   name: "breacan",
   parts: [
-    defineBase({
-      name: "neutral",
-      // shortcut: five roles, enough for the tracer; task 5b adds the full role set and its mapping table.
-      tokens: () => ({
-        tokens: {
-          color: {
-            $type: "color",
-            surface: { default: colour("#ffffff") },
-            text: { default: colour("#1f2328") },
-            accent: { default: colour("#0969da") },
-            "on-accent": { default: colour("#ffffff") },
-          },
-          corner: { $type: "dimension", control: { $value: { value: 6, unit: "px" } } },
-        },
-      }),
-    }),
+    defineBase({ name: "neutral", tokens: () => ({ tokens: neutral }) }),
     defineOutput({
       name: "css",
       options: { path: { type: "string", description: "The css output's stylesheet, from the project root.", default: "src/styles/tokens.css" } },
