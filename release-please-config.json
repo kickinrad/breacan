@@ -10,72 +10,8 @@
     "packages/core": {
       "release-type": "node",
       "component": "core",
-      "package-name": "breacan"
-    },
-    "packages/studio": {
-      "release-type": "node",
-      "component": "studio",
-      "package-name": "@breacan/studio"
-    },
-    "packages/design-md": {
-      "release-type": "node",
-      "component": "design-md",
-      "package-name": "@breacan/design-md"
-    },
-    "packages/material": {
-      "release-type": "node",
-      "component": "material",
-      "package-name": "@breacan/material"
-    },
-    "packages/apple": {
-      "release-type": "node",
-      "component": "apple",
-      "package-name": "@breacan/apple"
-    },
-    "packages/tailwind": {
-      "release-type": "node",
-      "component": "tailwind",
-      "package-name": "@breacan/tailwind"
-    },
-    "packages/react-native": {
-      "release-type": "node",
-      "component": "react-native",
-      "package-name": "@breacan/react-native"
-    },
-    "packages/template": {
-      "release-type": "node",
-      "component": "template",
-      "package-name": "@breacan/template"
-    },
-    "packages/obsidian": {
-      "release-type": "node",
-      "component": "obsidian",
-      "package-name": "@breacan/obsidian"
-    },
-    "packages/mealie": {
-      "release-type": "node",
-      "component": "mealie",
-      "package-name": "@breacan/mealie"
-    },
-    "packages/claude-design": {
-      "release-type": "node",
-      "component": "claude-design",
-      "package-name": "@breacan/claude-design"
-    },
-    "packages/agent-plugin": {
-      "release-type": "node",
-      "component": "agent-plugin",
-      "package-name": "@breacan/agent-plugin"
-    },
-    "packages/image": {
-      "release-type": "node",
-      "component": "image",
-      "package-name": "@breacan/image"
-    },
-    "packages/website": {
-      "release-type": "node",
-      "component": "website",
-      "package-name": "@breacan/website"
+      "package-name": "breacan",
+      "initial-version": "0.1.0"
     }
   }
 }

@@ -1,17 +1,4 @@
 {
   ".": "0.33.0",
-  "packages/core": "0.0.0",
-  "packages/studio": "0.0.0",
-  "packages/design-md": "0.0.0",
-  "packages/material": "0.0.0",
-  "packages/apple": "0.0.0",
-  "packages/tailwind": "0.0.0",
-  "packages/react-native": "0.0.0",
-  "packages/template": "0.0.0",
-  "packages/obsidian": "0.0.0",
-  "packages/mealie": "0.0.0",
-  "packages/claude-design": "0.0.0",
-  "packages/agent-plugin": "0.0.0",
-  "packages/image": "0.0.0",
-  "packages/website": "0.0.0"
+  "packages/core": "0.0.0"
 }
